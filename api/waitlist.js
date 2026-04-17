@@ -55,55 +55,83 @@ export default async function handler(req, res) {
         to: email,
         subject: 'Welcome to the NightRecall Waitlist! 🌙',
         html: `
-          <!DOCTYPE html>
-          <html>
+          <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+          <html xmlns="http://www.w3.org/1999/xhtml">
           <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <title>Welcome to NightRecall</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <style>
-              body { margin: 0; padding: 0; background-color: #F0EFEC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-              .wrapper { width: 100%; table-layout: fixed; background-color: #F0EFEC; padding-bottom: 60px; }
-              .main { background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; color: #10332C; }
-              .header { padding: 40px 0 20px; text-align: center; background-color: #F0EFEC; }
-              .logo { width: 42px; height: 42px; }
-              .content { padding: 40px 50px; background-color: #ffffff; border-radius: 40px 40px 0 0; }
-              .title { font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 24px; color: #10332C; letter-spacing: -0.02em; }
-              .text { font-size: 16px; line-height: 1.7; margin-bottom: 30px; color: #4A5568; }
-              .footer { padding: 30px; text-align: center; font-size: 12px; color: #A0AEC0; background-color: #F0EFEC; }
-              .highlight { color: #10332C; font-weight: 700; }
-              .button { display: inline-block; padding: 16px 32px; background-color: #10332C; color: #F0EFEC !important; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 15px; }
+              a { color: #10332C; text-decoration: underline; }
+              .btn:hover { background-color: #1A4D43 !important; }
             </style>
           </head>
-          <body>
-            <center class="wrapper">
-              <table class="main" width="100%">
-                <tr>
-                  <td class="header">
-                    <img src="https://night-recall.vercel.app/assets/logo.png" alt="NightRecall" class="logo">
-                  </td>
-                </tr>
-                <tr>
-                  <td class="content">
-                    <h1 class="title">Locking in your<br>growth tonight.</h1>
-                    <p class="text">
-                      Hello, <br><br>
-                      Thanks for joining the <span class="highlight">NightRecall</span> waitlist. <br><br>
-                      We’re building a bridge between daily learning and lifelong memory. No more forgotten notes or wasted hours. Just one perfect question each night, right when your brain is ready to encode it forever.
-                    </p>
-                    <p class="text">
-                      We’ll notify you the moment early access is ready for your account.
-                    </p>
-                    <div style="text-align: center; margin-top: 40px;">
-                      <a href="https://night-recall.vercel.app" class="button">Visit Our Website</a>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="footer">
-                    <p>© 2026 NightRecall. The 1-minute nightly ritual.</p>
-                    <p>You received this because you joined the waitlist at night-recall.vercel.app</p>
-                  </td>
-                </tr>
-              </table>
-            </center>
+          <body style="margin: 0; padding: 0; background-color: #F0EFEC; -webkit-text-size-adjust: 100%;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F0EFEC;">
+              <tr>
+                <td align="center" style="padding: 40px 10px 40px 10px;">
+                  <!-- Main Card -->
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #ffffff; border-radius: 24px; border: 1px solid rgba(16, 51, 44, 0.08); box-shadow: 0 8px 30px rgba(16, 51, 44, 0.04);">
+                    <!-- Header with Logo -->
+                    <tr>
+                      <td align="center" style="padding: 40px 0 30px 0;">
+                        <img src="https://night-recall.vercel.app/assets/logo.png" alt="NightRecall" width="48" height="48" style="display: block; width: 48px; height: 48px; border: 0;" />
+                      </td>
+                    </tr>
+                    <!-- Body Content -->
+                    <tr>
+                      <td style="padding: 0 40px 40px 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                          <tr>
+                            <td align="center" style="color: #10332C; font-size: 28px; line-height: 1.25; font-weight: 800; letter-spacing: -0.03em;">
+                              Locking in your<br>growth tonight.
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 30px 0 0 0; color: #4A5568; font-size: 16px; line-height: 1.7; text-align: center;">
+                              Hello,<br><br>
+                              Thanks for joining the <strong>NightRecall</strong> waitlist. We’re building a bridge between daily learning and lifelong memory.
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 20px 0 0 0; color: #4A5568; font-size: 16px; line-height: 1.7; text-align: center;">
+                              No more forgotten notes. Just one perfect question each night, right when your brain is hardwired to encode it forever.
+                            </td>
+                          </tr>
+                          <!-- CTA Button -->
+                          <tr>
+                            <td align="center" style="padding: 40px 0 0 0;">
+                              <table border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                  <td align="center" bgcolor="#10332C" style="border-radius: 12px;">
+                                    <a href="https://night-recall.vercel.app" class="btn" style="display: inline-block; padding: 18px 36px; color: #F0EFEC !important; text-decoration: none; font-size: 15px; font-weight: 700;">Visit Our Website</a>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                      <td align="center" style="padding: 30px; background-color: #F8F7F4; border-radius: 0 0 24px 24px; border-top: 1px solid #EEEEEE; color: #A0AEC0; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.6;">
+                        <p style="margin: 0;">© 2026 NightRecall</p>
+                        <p style="margin: 4px 0 0 0;">The 1-minute nightly ritual to remember everything.</p>
+                      </td>
+                    </tr>
+                  </table>
+                  <!-- Unsubscribe area -->
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px;">
+                    <tr>
+                      <td align="center" style="padding: 20px; color: #A0AEC0; font-family: Arial, sans-serif; font-size: 11px;">
+                        You received this because you joined the waitlist at night-recall.vercel.app
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
           </body>
           </html>
         `
