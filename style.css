@@ -8,6 +8,7 @@
   --text-secondary: #64746F;
   --white: #ffffff;
   --border: rgba(16, 51, 44, 0.1);
+  --noise-opacity: 0.05;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,6 +21,18 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  letter-spacing: -0.015em;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+  z-index: 9999;
 }
 
 .container { max-width: 1160px; margin: 0 auto; padding: 0 5%; }
@@ -129,10 +142,10 @@ header {
 }
 
 h1 {
-  font-size: clamp(3rem, 5vw, 5rem);
+  font-size: clamp(3rem, 5vw, 5.2rem);
   font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -2px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
   margin-bottom: 24px;
   text-wrap: balance;
 }
@@ -289,14 +302,17 @@ h1 {
   width: 100%;
   max-width: 380px;
   border-radius: 48px;
-  padding: 56px 28px 48px; /* 위아래 패딩 증가 */
+  padding: 56px 28px 48px;
   color: var(--white);
   text-align: center;
-  box-shadow: 0 40px 80px rgba(13,36,32,0.35), inset 0 1px 1px rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 
+    0 40px 80px rgba(13,36,32,0.35), 
+    inset 0 1px 1px rgba(255,255,255,0.1),
+    inset 0 -1px 2px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.08);
   transform: rotate(-3deg) translateY(0);
-  transition: transform 0.1s linear; /* 3D JS를 부드럽게 하기 위해 짧게 설정 */
-  overflow: hidden; /* 배경 Blur가 넘치지 않게 */
+  transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
 }
 .app-card::before { /* 글래스모피즘 내부 반사광 추가 */
   content: '';
@@ -735,6 +751,101 @@ footer {
 }
 .footer-links a:hover { color: var(--text-primary); }
 
+/* ---- SCIENCE VISUAL RELAY ---- */
+.science-visual {
+  max-width: 800px;
+  margin: 60px auto 100px;
+  background: var(--white);
+  border-radius: 40px;
+  padding: 60px;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.brain-relay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  gap: 20px;
+}
+
+.relay-node {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+}
+
+.node-hippocampus {
+  background: var(--green-deep);
+  color: var(--white);
+  box-shadow: 0 20px 40px rgba(16,51,44,0.3);
+}
+
+.node-cortex {
+  background: var(--bg2);
+  color: var(--green-deep);
+  border: 2px dashed var(--green-light);
+}
+
+.relay-node span {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.node-label {
+  position: absolute;
+  bottom: -40px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  color: var(--green-deep);
+}
+
+/* 데이터 전송 스트림 (Waves) */
+.relay-stream {
+  flex: 1;
+  height: 60px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green-light), transparent);
+  animation: streamMove 2s infinite linear;
+  opacity: 0;
+}
+
+.wave:nth-child(2) { animation-delay: 0.6s; top: 40%; }
+.wave:nth-child(3) { animation-delay: 1.2s; bottom: 40%; }
+
+@keyframes streamMove {
+  0% { transform: translateX(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+.social-text { font-size: 0.9rem; color: var(--text-secondary); }
+.social-text strong { color: var(--green-deep); }
+
 /* ---- ANIMATIONS ---- */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -770,4 +881,7 @@ footer {
   .step-arrow { display: none; }
   .cta-box { padding: 48px 28px; border-radius: 32px; }
   .footer-inner { justify-content: center; text-align: center; }
+  .science-visual { padding: 40px 20px; }
+  .relay-node { width: 100px; height: 100px; padding: 10px; }
+  .relay-node span { font-size: 0.6rem; }
 }
