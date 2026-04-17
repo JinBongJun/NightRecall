@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend('re_HPoSpvfB_2VetyLDGvLv8o423K4nwePqf');
 
 export default async function handler(req, res) {
   // CORS handling
@@ -20,8 +20,8 @@ export default async function handler(req, res) {
 
   try {
     // 1. Attempt to add to Resend Audience if Audience ID is provided
-    // Found ID: 679125f9-7d42-419e-82ad-b51e542a3ae5 (General)
-    const audienceId = process.env.RESEND_AUDIENCE_ID || '679125f9-7d42-419e-82ad-b51e542a3ae5';
+    // Found ID: 43aa31c4-3ceb-481b-9ec5-c0363e981be5 (General - New Account)
+    const audienceId = process.env.RESEND_AUDIENCE_ID || '43aa31c4-3ceb-481b-9ec5-c0363e981be5';
     let contactCreated = false;
 
     if (audienceId) {
