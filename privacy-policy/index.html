@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/logo.png">
     <link rel="stylesheet" href="../style.css">
     <style>
         .legal-page { padding: 120px 0; max-width: 800px; margin: 0 auto; }
@@ -26,12 +27,7 @@
     <div class="cursor-glow" id="cursorGlow"></div>
     
     <div class="container legal-page">
-        <a href="../index.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; margin-bottom:24px; display:inline-block;">← Back to Home</a>
-        
-        <div class="lang-toggle">
-            <button class="lang-btn active" onclick="setLang('en')">English</button>
-            <button class="lang-btn" onclick="setLang('ko')">한국어</button>
-        </div>
+        <a href="../index.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; margin-bottom:32px; display:inline-block;">← Back to Home</a>
 
         <div class="legal-content">
             <!-- ENGLISH VERSION -->
@@ -69,57 +65,10 @@
                 <p>If you have any questions about this Privacy Policy, please contact us at:</p>
                 <p><strong>Email:</strong> bongjun0289@gmail.com</p>
             </div>
-
-            <!-- KOREAN VERSION -->
-            <div class="ko">
-                <h1>개인정보처리방침</h1>
-                <p>최종 수정일: 2026년 4월 17일</p>
-                <p>NightRecall("당사")은 귀하의 개인정보를 보호하기 위해 최선을 다하고 있습니다. 본 개인정보처리방침은 귀하가 당사의 모바일 애플리케이션 및 웹사이트를 이용할 때 당사가 귀하에 관한 정보를 수집, 사용 및 공유하는 방법에 대해 설명합니다.</p>
-
-                <h2>1. 수집하는 정보</h2>
-                <p>당사는 귀하가 당사에 직접 제공하는 정보를 수집합니다:</p>
-                <ul>
-                    <li><strong>계정 정보:</strong> 계정 생성 시 제공하는 이메일 주소 및 이름.</li>
-                    <li><strong>학습 콘텐츠:</strong> 귀하가 촬영한 노트 또는 교과서 사진, 그리고 해당 사진에서 추출된 텍스트.</li>
-                    <li><strong>이용 데이터:</strong> 학습 스트릭, 질문 답변 기록 및 앱 상호작용 정보.</li>
-                    <li><strong>기기 정보:</strong> 푸시 알림 및 보안을 위한 기기 ID 및 기본 OS 정보.</li>
-                </ul>
-
-                <h2>2. 정보의 이용 목적</h2>
-                <p>수집된 데이터는 다음의 목적으로 사용됩니다:</p>
-                <ul>
-                    <li>NightRecall 서비스 제공 및 유지 관리.</li>
-                    <li>학습 콘텐츠를 기반으로 한 개인화된 AI 질문 생성.</li>
-                    <li>기기간 학습 진도 동기화.</li>
-                    <li>학습 일정에 따른 알림 전송.</li>
-                    <li>앱 성능 개선 및 최적화.</li>
-                </ul>
-
-                <h2>3. AI를 통한 데이터 처리</h2>
-                <p>NightRecall은 학습 사진 분석을 위해 고급 AI 모델(예: Google Gemini)을 활용합니다. 귀하의 데이터는 학습 질문 생성을 위한 목적으로만 해당 프로세서에 보안상 안전하게 전송되며, 제3자에 의해 일반적인 AI 모델 학습용으로 사용되지 않습니다.</p>
-
-                <h2>4. 데이터 보관 및 삭제</h2>
-                <p>귀하의 데이터는 계정이 활성화되어 있는 동안 보관됩니다. 귀하는 언제든지 앱 설정 또는 당사의 <a href="../account-deletion/index.html">계정 삭제 요청 페이지</a>를 통해 계정 및 모든 관련 데이터의 삭제를 요청할 수 있습니다.</p>
-
-                <h2>5. 문의처</h2>
-                <p>본 방침에 대해 궁금한 점이 있으시면 다음으로 문의해 주시기 바랍니다:</p>
-                <p><strong>이메일:</strong> bongjun0289@gmail.com</p>
-            </div>
         </div>
     </div>
 
     <script>
-        function setLang(lang) {
-            document.querySelectorAll('.en, .ko').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.' + lang).forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.innerText.toLowerCase().includes(lang === 'en' ? 'english' : '한국어')) {
-                    btn.classList.add('active');
-                }
-            });
-        }
-
         // Custom cursor logic (reusing from index.html)
         const cursorGlow = document.getElementById('cursorGlow');
         let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;

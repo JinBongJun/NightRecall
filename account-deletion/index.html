@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../assets/logo.png">
     <link rel="stylesheet" href="../style.css">
     <style>
         .legal-page { padding: 120px 0; max-width: 800px; margin: 0 auto; }
@@ -28,12 +29,7 @@
     <div class="cursor-glow" id="cursorGlow"></div>
     
     <div class="container legal-page">
-        <a href="../index.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; margin-bottom:24px; display:inline-block;">← Back to Home</a>
-        
-        <div class="lang-toggle">
-            <button class="lang-btn active" onclick="setLang('en')">English</button>
-            <button class="lang-btn" onclick="setLang('ko')">한국어</button>
-        </div>
+        <a href="../index.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; margin-bottom:32px; display:inline-block;">← Back to Home</a>
 
         <div class="legal-content">
             <!-- ENGLISH VERSION -->
@@ -66,52 +62,10 @@
                     <li>Study progress and streaks.</li>
                 </ul>
             </div>
-
-            <!-- KOREAN VERSION -->
-            <div class="ko">
-                <h1>계정 삭제 요청</h1>
-                <p>계정 및 데이터 삭제에 대한 귀하의 선택을 존중합니다. 아래의 두 가지 방법 중 하나를 통해 삭제를 진행하실 수 있습니다.</p>
-
-                <h2>방법 1: 앱 내 삭제 (권장)</h2>
-                <p>가장 빠르게 삭제하는 방법은 앱 내 메뉴를 이용하는 것입니다:</p>
-                <ol>
-                    <li><strong>NightRecall</strong> 앱을 엽니다.</li>
-                    <li><strong>설정(Settings)</strong> 메뉴로 이동합니다.</li>
-                    <li><strong>계정 삭제(Delete Account)</strong>를 탭합니다.</li>
-                    <li>삭제를 승인합니다. 모든 데이터가 즉시 영구적으로 삭제됩니다.</li>
-                </ol>
-
-                <h2>방법 2: 이메일 요청</h2>
-                <p>앱을 이미 삭제했거나 접근할 수 없는 경우, 다음 지원팀 메일로 요청을 보내주시기 바랍니다:</p>
-                <p><strong>지원 이메일:</strong> <a href="mailto:bongjun0289@gmail.com">bongjun0289@gmail.com</a></p>
-                <p>메일 제목에 "계정 삭제 요청"을 기재하고, 삭제를 원하는 계정의 이메일 주소를 포함해 주세요. 요청 후 48시간 이내에 처리가 완료됩니다.</p>
-                <br>
-                <a href="mailto:bongjun0289@gmail.com?subject=계정%20삭제%20요청" class="btn-primary">이메일 삭제 요청하기</a>
-
-                <h2>어떤 정보가 삭제되나요?</h2>
-                <p>삭제 시 당사 서버에 저장된 귀하의 계정과 관련된 다음 데이터가 모두 영구적으로 제거됩니다:</p>
-                <ul>
-                    <li>계정 프로필 및 인증 데이터.</li>
-                    <li>학습 콘텐츠 (사진, 추출된 텍스트).</li>
-                    <li>생성된 AI 질문 및 답변 기록.</li>
-                    <li>학습 진도 및 스트릭 정보.</li>
-                </ul>
-            </div>
         </div>
     </div>
 
     <script>
-        function setLang(lang) {
-            document.querySelectorAll('.en, .ko').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.' + lang).forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.innerText.toLowerCase().includes(lang === 'en' ? 'english' : '한국어')) {
-                    btn.classList.add('active');
-                }
-            });
-        }
-
         const cursorGlow = document.getElementById('cursorGlow');
         let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
         document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
