@@ -955,24 +955,27 @@ footer {
   }
   
   .waitlist-form input {
+    display: block;
     width: 100%;
-    height: 58px; /* 고정 높이로 리듬 유지 */
-    padding: 0 24px;
+    padding: 16px 24px;
     border-radius: 16px;
     background: var(--white);
     color: var(--text-primary);
     border: 1px solid var(--border);
     box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     font-size: 1rem;
+    -webkit-appearance: none;
+    appearance: none;
   }
   
   .cta-btn {
     width: 100%;
-    height: 58px; /* 인풋과 높이 통일 */
+    padding: 16px;
     justify-content: center;
-    padding: 0;
     border-radius: 16px;
     font-size: 1.05rem;
+    display: flex;
+    align-items: center;
   }
   
   .success-message { 
