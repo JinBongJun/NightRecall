@@ -525,7 +525,7 @@ h1 {
   color: var(--text-secondary);
   font-size: 1.1rem;
   max-width: 560px;
-  margin: -30px auto 30px;
+  margin: -30px auto 20px;
   line-height: 1.8;
 }
 
@@ -591,8 +591,8 @@ h1 {
 .papers {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 28px;
-  margin-top: 40px;
+  gap: 20px;
+  margin-top: 20px;
 }
 
 .paper-card {
@@ -754,12 +754,12 @@ footer {
 /* ---- SCIENCE VISUAL RELAY ---- */
 .science-visual {
   max-width: 800px;
-  margin: 20px auto 40px;
+  margin: 10px auto 20px;
   background: var(--white);
-  border-radius: 40px;
-  padding: 60px;
+  border-radius: 30px;
+  padding: 30px 40px;
   border: 1px solid var(--border);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.04);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.03);
   position: relative;
   overflow: hidden;
 }
@@ -773,8 +773,8 @@ footer {
 }
 
 .relay-node {
-  width: 140px;
-  height: 140px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -783,7 +783,7 @@ footer {
   position: relative;
   z-index: 2;
   text-align: center;
-  padding: 20px;
+  padding: 15px;
 }
 
 .node-hippocampus {
