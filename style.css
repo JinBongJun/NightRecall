@@ -952,6 +952,7 @@ footer {
     gap: 12px;
     border: none;
     box-shadow: none;
+    align-items: stretch; /* 아이템들이 가득 차도록 보장 */
   }
   
   .waitlist-form input {
@@ -980,13 +981,15 @@ footer {
   
   .success-message { 
     margin-top: 20px; 
-    min-height: 24px; /* 높이 확보 */
+    min-height: 24px;
     position: static; 
     transform: none; 
     text-align: center; 
     width: 100%;
     font-size: 0.95rem;
     font-weight: 600;
+    color: inherit; /* 부모 배경색에 따라 자동 조절되도록 */
+    opacity: 0.9;
   }
   .app-card { width: 100%; }
 }
