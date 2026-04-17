@@ -967,13 +967,15 @@ footer {
     padding: 16px 20px !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
     border-radius: 16px !important;
+    border: 1px solid transparent !important; /* 물리적 크기 완벽 동기화 */
+    margin: 0 !important;
   }
 
   .waitlist-form input {
     display: block;
     background: var(--white);
     color: var(--text-primary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border) !important;
     font-size: 1rem !important;
     -webkit-appearance: none;
     appearance: none;
@@ -982,14 +984,15 @@ footer {
   .cta-btn {
     justify-content: center;
     font-size: 1.05rem;
-    display: flex;
+    display: flex !important;
     align-items: center;
-    border: none;
     transition: all 0.3s ease;
   }
 
-  /* 성공 상태 디자인 고도화 (레이아웃 틀어짐 전면 방지) */
-  .waitlist-form.is-success .cta-btn {
+  /* 성공 상태 디자인 고도화 (레이아웃 틀어짐 전면 봉쇄) */
+  .waitlist-form.is-success .cta-btn,
+  .waitlist-form.is-loading .cta-btn {
+    width: 100% !important; /* 우선순위 버그 완벽 해결 */
     background: #e7f3f0 !important;
     color: #10332c !important;
     border: 1px solid rgba(16,51,44,0.1) !important;
@@ -999,6 +1002,7 @@ footer {
 
   /* 다크 테마(CTA박스) 내부의 성공 버튼 처리 */
   .cta-box .waitlist-form.is-success .cta-btn {
+    width: 100% !important;
     background: rgba(255,255,255,0.15) !important;
     color: var(--white) !important;
     border: 1px solid rgba(255,255,255,0.2) !important;
