@@ -147,9 +147,18 @@ export default async function handler(req, res) {
       console.error('Welcome email failed:', e);
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ 
+      success: true, 
+      diagnostics: {
+        audienceIdUsed: audienceId,
+        contactCreated: contactCreated
+      }
+    });
   } catch (err) {
     console.error('Waitlist API Error:', err);
-    return res.status(500).json({ error: 'Failed to join waitlist. Please try again later.' });
+    return res.status(500).json({ 
+      error: 'Failed to join waitlist', 
+      debug: err.message 
+    });
   }
 }
