@@ -320,28 +320,32 @@
                 const input = allWaitlistInputs[index];
                 const msg = allWaitlistMsgs[index];
 
+                // Reset states
+                form.classList.remove('is-loading', 'is-success', 'is-error');
+
                 if (state === 'loading') {
+                    form.classList.add('is-loading');
                     btn.innerHTML = 'Saving...';
                     btn.disabled = true;
                     input.disabled = true;
                     if (msg) msg.style.display = 'none';
                 } else if (state === 'success') {
+                    form.classList.add('is-success');
                     btn.innerHTML = 'Saved ✓';
                     btn.disabled = true;
-                    btn.style.opacity = '0.8';
                     input.disabled = true;
                     if (msg) {
                         msg.innerHTML = content || '🎉 You\'re in! We\'ll notify you at launch.';
                         msg.style.display = 'block';
                     }
                 } else if (state === 'error') {
-                    btn.innerHTML = 'Reserve My Spot →'; // Reset to original
+                    form.classList.add('is-error');
+                    btn.innerHTML = 'Reserve My Spot →';
                     btn.disabled = false;
                     input.disabled = false;
                     if (msg) {
                         msg.innerHTML = content || '❌ Something went wrong. Try again.';
                         msg.style.display = 'block';
-                        msg.style.color = '#E25E5E';
                     }
                 }
             });

@@ -952,12 +952,17 @@ footer {
     gap: 12px;
     border: none;
     box-shadow: none;
-    align-items: stretch; /* 아이템들이 가득 차도록 보장 */
+    align-items: stretch !important; /* 모바일에서 무조건 가득 차도록 */
   }
   
+  .waitlist-form input,
+  .waitlist-form button {
+    width: 100% !important; /* 강제 너비 고정 */
+    box-sizing: border-box !important;
+  }
+
   .waitlist-form input {
     display: block;
-    width: 100%;
     padding: 16px 24px;
     border-radius: 16px;
     background: var(--white);
@@ -970,13 +975,28 @@ footer {
   }
   
   .cta-btn {
-    width: 100%;
     padding: 16px;
     justify-content: center;
     border-radius: 16px;
     font-size: 1.05rem;
     display: flex;
     align-items: center;
+    transition: all 0.3s ease;
+  }
+
+  /* 성공 상태 디자인 고도화 */
+  .waitlist-form.is-success .cta-btn {
+    background: #e7f3f0 !important;
+    color: #10332c !important;
+    border: 1px solid rgba(16,51,44,0.1);
+    opacity: 1 !important;
+  }
+
+  /* 다크 테마(CTA박스) 내부의 성공 버튼 처리 */
+  .cta-box .waitlist-form.is-success .cta-btn {
+    background: rgba(255,255,255,0.15) !important;
+    color: var(--white) !important;
+    border: 1px solid rgba(255,255,255,0.2);
   }
   
   .success-message { 
@@ -988,8 +1008,9 @@ footer {
     width: 100%;
     font-size: 0.95rem;
     font-weight: 600;
-    color: inherit; /* 부모 배경색에 따라 자동 조절되도록 */
+    color: inherit; 
     opacity: 0.9;
   }
+  .is-error .success-message { color: #E25E5E !important; }
   .app-card { width: 100%; }
 }
