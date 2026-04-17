@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NightRecall Account Deletion</title>
+    <style>
+      :root {
+        --bg: #f5f1e8;
+        --surface: #fffcf5;
+        --text: #1f2933;
+        --muted: #6b7280;
+        --primary: #224e5a;
+        --border: #e8ded0;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: radial-gradient(circle at top, #fff8ed 0%, var(--bg) 58%);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 48px 20px 72px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 18px 45px rgba(34, 78, 90, 0.08);
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 34px;
+        line-height: 1.1;
+      }
+      p, li {
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      ol {
+        padding-left: 20px;
+      }
+      .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #d7e7e9;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .cta {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 14px 18px;
+        background: var(--primary);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 16px;
+        font-weight: 700;
+      }
+      .section {
+        margin-top: 24px;
+      }
+      .placeholder {
+        font-weight: 700;
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div class="card">
+        <div class="badge">NightRecall Support</div>
+        <h1>Request account deletion</h1>
+        <p>
+          NightRecall lets users delete their account directly in the app from
+          <strong>Settings &gt; Delete Account</strong>. If you no longer have app access, use the support path below.
+        </p>
+
+        <section class="section">
+          <h2>How in-app deletion works</h2>
+          <ol>
+            <li>Open NightRecall.</li>
+            <li>Go to Settings.</li>
+            <li>Tap <strong>Delete Account</strong>.</li>
+            <li>Your account data, study inputs, questions, review history, and sessions are deleted.</li>
+          </ol>
+        </section>
+
+        <section class="section">
+          <h2>Support request path</h2>
+          <p>
+            Before launch, replace the placeholder below with a real support email address or a secure web form.
+          </p>
+          <p class="placeholder">TODO: support@nightrecall.example</p>
+          <a class="cta" href="mailto:support@nightrecall.example">Email deletion request</a>
+        </section>
+
+        <section class="section">
+          <h2>What gets deleted</h2>
+          <p>
+            Account profile data, linked login identities, active sessions, study inputs, generated questions, review events,
+            and scheduling metadata associated with the account.
+          </p>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

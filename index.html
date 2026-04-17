@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NightRecall — Snap. Sleep. Remember.</title>
+    <meta name="description" content="Snap a photo of what you learned. Let AI build one question before you sleep. Wake up remembering it — backed by sleep neuroscience.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="#main" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">Skip to main content</a>
+
+    <!-- ========= HEADER ========= -->
+    <header>
+        <div class="container header-inner">
+            <div class="logo">
+                <div class="logo-dot"></div>
+                NightRecall
+            </div>
+            <div class="header-right">
+                <a href="#waitlist" class="btn-header">Get Early Access →</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 커스텀 커서 글로우 -->
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- ========= HERO (ATTENTION) ========= -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-inner">
+                <div class="hero-text">
+                    <div class="badge">
+                        <span class="badge-dot"></span>
+                        SCIENCE-BACKED MEMORY HABIT
+                    </div>
+                    <h1>
+                        Snap a photo.<br>
+                        <span class="highlight">Remember forever.</span>
+                    </h1>
+                    <p class="hero-sub">
+                        No flashcards. No typing. Just snap a photo of what you learned today — our AI sends you one perfect question right before sleep, when your brain is primed to lock it in for life.
+                    </p>
+                    <div class="social-count">
+                        <div class="avatar-stack">
+                            <div class="avatar av1">J</div>
+                            <div class="avatar av2">S</div>
+                            <div class="avatar av3">M</div>
+                            <div class="avatar av4">K</div>
+                        </div>
+                        <span>Be the first to join the waitlist</span>
+                    </div>
+                    <form class="waitlist-form" id="waitlistForm">
+                        <label for="emailInput" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">Email address</label>
+                        <input type="email" id="emailInput" name="email" aria-label="Email address" placeholder="Enter your email address" autocomplete="email" spellcheck="false" required>
+                        <button type="submit" class="cta-btn">Reserve My Spot →</button>
+                    </form>
+                    <div class="success-message" id="successMessage">
+                        🎉 You're in! We'll notify you on launch day.
+                    </div>
+                    <p class="form-note">No spam. Unsubscribe anytime. Free during beta.</p>
+                </div>
+
+                <div class="hero-visual">
+                    <!-- 파티클 캔버스 -->
+                    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+                    <div class="visual-glow"></div>
+                    <div class="app-card" id="appCard">
+                        <!-- 안드로이드 UI 디테일 -->
+                        <div class="android-status-bar">
+                            <span class="time">9:41</span>
+                            <div class="status-icons">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+                            </div>
+                        </div>
+                        <div class="android-punch-hole"></div>
+
+                        <div class="card-topbar">
+                            <span class="card-badge-pill">TONIGHT · 1 QUESTION READY</span>
+                        </div>
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14l-4-4 1.41-1.41L11 13.17l6.59-6.58L19 8l-8 8z" fill="white"/></svg>
+                        </div>
+                        <h2 class="card-title">Tonight's question<br>is ready</h2>
+                        <p class="card-desc">Strengthen your memory with one quick question before sleep.</p>
+                        <p class="card-topic">TOPIC: STOICISM</p>
+                        <div class="card-btn-primary">Start tonight's question <span class="arrow">→</span></div>
+                        <div class="card-btn-secondary">Capture more from today</div>
+                        <p class="card-footer-text">SEE 2 MORE TONIGHT</p>
+                        
+                        <!-- 안드로이드 하단 제스처 바 -->
+                        <div class="android-nav-pill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main id="main">
+
+    <!-- ========= WAVE DIVIDER ========= -->
+    <div class="wave-divider">
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" fill="#10332C"></path>
+        </svg>
+    </div>
+
+    <!-- ========= PAIN (INTEREST) ========= -->
+    <section class="pain">
+        <div class="container">
+            <div class="pain-inner">
+                <div class="pain-label">THE PROBLEM</div>
+                <h2 class="pain-title">You study hard.<br>But you forget almost everything.</h2>
+                <div class="pain-stats">
+                    <div class="stat-card">
+                        <div class="stat-num" data-target="56" data-suffix="%">0%</div>
+                        <div class="stat-desc">of new information is forgotten within <strong>1 hour</strong> of learning it.</div>
+                        <div class="stat-src">Ebbinghaus, 1885 — Forgetting Curve</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" data-target="77" data-suffix="%">0%</div>
+                        <div class="stat-desc">is lost within <strong>6 days</strong> without any review or reinforcement.</div>
+                        <div class="stat-src">Ebbinghaus, 1885 — Forgetting Curve</div>
+                    </div>
+                    <div class="stat-card highlight-stat">
+                        <div class="stat-num">1 min</div>
+                        <div class="stat-desc">per night is all it takes to trigger sleep-based memory consolidation.</div>
+                        <div class="stat-src">NightRecall — your fix</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========= HOW IT WORKS ========= -->
+    <section class="how">
+        <div class="container">
+            <div class="section-label">HOW IT WORKS</div>
+            <h2 class="section-title">Three steps. Zero friction.</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">01</div>
+                    <div class="step-icon">📸</div>
+                    <h3>Snap your notes</h3>
+                    <p>Take a photo of your textbook, whiteboard, or handwritten notes. That's it — no typing, no tagging, no setup.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-num">02</div>
+                    <div class="step-icon">🧠</div>
+                    <h3>AI builds your question</h3>
+                    <p>Our AI reads your photo and extracts the single most important concept. It crafts one sharp question designed to trigger active recall.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-num">03</div>
+                    <div class="step-icon">🌙</div>
+                    <h3>Answer before sleep</h3>
+                    <p>A gentle notification arrives right before your bedtime. Answer the question in 60 seconds. Then sleep — and let your brain do the rest.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========= SCIENCE (DESIRE) ========= -->
+    <section class="science">
+        <div class="container">
+            <div class="section-label">BACKED BY SCIENCE</div>
+            <h2 class="section-title">Your brain is already built<br>for this. We just unlock it.</h2>
+            <p class="section-sub">Every feature of NightRecall is engineered around peer-reviewed neuroscience. Not a productivity fad.</p>
+
+            <div class="papers">
+                <div class="paper-card">
+                    <div class="paper-tag">LANDMARK STUDY</div>
+                    <h3 class="paper-title">“Sleep cuts forgetting in half — the original proof.”</h3>
+                    <p class="paper-body">Participants who slept immediately after learning nonsense syllables forgot significantly less than those who stayed awake. Sleep was shown to be a protective buffer against memory decay, not just passive rest.</p>
+                    <div class="paper-meta">
+                        <div class="paper-stat-row">
+                            <div class="paper-stat"><span>~50%</span> less forgetting after sleep</div>
+                            <div class="paper-stat"><span>1924</span> foundational research</div>
+                        </div>
+                        <div class="paper-citation">Jenkins & Dallenbach — "Obliviscence During Sleep and Waking." <em>The American Journal of Psychology</em>, 1924.</div>
+                    </div>
+                </div>
+
+                <div class="paper-card">
+                    <div class="paper-tag">DIRECT RELEVANCE</div>
+                    <h3 class="paper-title">“Sleeping right after learning beats sleeping later — significantly.”</h3>
+                    <p class="paper-body">When participants studied at 9 PM and slept shortly after, they retained declarative information significantly better than groups who studied at 9 AM. The <em>timing</em> of sleep relative to learning is critical for consolidation.</p>
+                    <div class="paper-meta">
+                        <div class="paper-stat-row">
+                            <div class="paper-stat"><span>24hr</span> retention comparison</div>
+                            <div class="paper-stat"><span>2012</span> PLOS ONE</div>
+                        </div>
+                        <div class="paper-citation">Payne, J.D., et al. — "Memory for Semantically Related and Unrelated Declarative Information: The Benefit of Sleep, the Cost of Wake." <em>PLOS ONE</em>, 2012.</div>
+                    </div>
+                </div>
+
+                <div class="paper-card">
+                    <div class="paper-tag">THE MECHANISM</div>
+                    <h3 class="paper-title">“During sleep, your hippocampus uploads memories to long-term cortex.”</h3>
+                    <p class="paper-body">During slow-wave sleep (deep sleep), the hippocampus replays neural patterns activated during learning — hundreds of times per night. This “active systems consolidation” transfers memories from fragile short-term storage to durable long-term cortex.</p>
+                    <div class="paper-meta">
+                        <div class="paper-stat-row">
+                            <div class="paper-stat"><span>SWS</span> slow-wave sleep reactivation</div>
+                            <div class="paper-stat"><span>2006</span> Nature Reviews</div>
+                        </div>
+                        <div class="paper-citation">Born, J. & Wilhelm, I. — "System consolidation of memory during sleep." <em>Psychological Research</em>, 2012. (Building on Born et al., 2006)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========= CTA (ACTION) ========= -->
+    <section class="cta-section" id="waitlist">
+        <div class="container">
+            <div class="cta-box">
+                <div class="cta-badge">LIMITED EARLY ACCESS</div>
+                <h2 class="cta-title">Stop forgetting what you<br>work so hard to learn.</h2>
+                <p class="cta-sub">Join the waitlist. Be first to access NightRecall when we launch. Free during the entire beta period.</p>
+                <form class="waitlist-form cta-form" id="waitlistForm2">
+                    <label for="emailInput2" class="sr-only" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">Email address</label>
+                    <input type="email" id="emailInput2" name="email" aria-label="Email address" placeholder="your@email.com" autocomplete="email" spellcheck="false" required>
+                    <button type="submit" class="cta-btn">Reserve My Spot <span class="arrow">→</span></button>
+                </form>
+                <div class="success-message" id="successMessage2">🎉 You're in! See you at launch.</div>
+                <p class="form-note" style="color: rgba(255,255,255,0.4)">No spam. Free during beta. Cancel anytime.</p>
+                <div class="social-count" style="justify-content:center; margin-top:24px;">
+                    <div class="avatar-stack">
+                        <div class="avatar av1">J</div>
+                        <div class="avatar av2">S</div>
+                        <div class="avatar av3">M</div>
+                        <div class="avatar av4">K</div>
+                    </div>
+                    <span style="color:rgba(255,255,255,0.6)">Be the first to join the waitlist</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </main>
+
+    <!-- ========= FOOTER ========= -->
+    <footer>
+        <div class="container footer-inner">
+            <div class="logo" style="font-size:1.1rem;">
+                <div class="logo-dot"></div>
+                NightRecall
+            </div>
+            <div class="footer-links">
+                <a href="account-deletion/index.html">Delete Account</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /* ================================
+           1. WAITLIST FORM HANDLER
+        ================================ */
+        function handleWaitlist(formId, inputId, msgId) {
+            document.getElementById(formId).addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById(inputId).value;
+                if (!email) return;
+                const btn = this.querySelector('button');
+                btn.innerHTML = 'Saved ✓';
+                btn.style.opacity = '0.8';
+                btn.disabled = true;
+                document.getElementById(inputId).disabled = true;
+                document.getElementById(msgId).style.display = 'block';
+            });
+        }
+        handleWaitlist('waitlistForm', 'emailInput', 'successMessage');
+        handleWaitlist('waitlistForm2', 'emailInput2', 'successMessage2');
+
+        /* ================================
+           2. CUSTOM CURSOR GLOW
+        ================================ */
+        const cursorGlow = document.getElementById('cursorGlow');
+        let mouseX = 0, mouseY = 0;
+        let glowX = 0, glowY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            glowX += (mouseX - glowX) * 0.08;
+            glowY += (mouseY - glowY) * 0.08;
+            cursorGlow.style.transform = `translate(${glowX - 200}px, ${glowY - 200}px)`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        /* ================================
+           3. SCROLL FADE-IN (with stagger)
+        ================================ */
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => entry.target.classList.add('visible'), delay);
+                    fadeObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.step').forEach((el, i) => {
+            el.classList.add('fade-in');
+            el.dataset.delay = i * 120;
+            fadeObserver.observe(el);
+        });
+        document.querySelectorAll('.paper-card').forEach((el, i) => {
+            el.classList.add('fade-in');
+            el.dataset.delay = i * 100;
+            fadeObserver.observe(el);
+        });
+        document.querySelectorAll('.stat-card').forEach((el, i) => {
+            el.classList.add('fade-in');
+            el.dataset.delay = i * 80;
+            fadeObserver.observe(el);
+        });
+
+        /* ================================
+           4. NUMBER COUNTER ANIMATION
+        ================================ */
+        function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+        function animateCounter(el) {
+            const target = parseInt(el.dataset.target);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1800;
+            const start = performance.now();
+
+            function step(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const value = Math.round(easeOut(progress) * target);
+                el.textContent = value + suffix;
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.dataset.target) {
+                    animateCounter(entry.target);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-num[data-target]').forEach(el => {
+            counterObserver.observe(el);
+        });
+
+        /* ================================
+           5. 3D TILT (Mouse Tracking)
+        ================================ */
+        const heroVisual = document.querySelector('.hero-visual');
+        const appCard = document.getElementById('appCard');
+
+        if (heroVisual && appCard) {
+            let currentRX = 0, currentRY = -3;
+            let targetRX = 0, targetRY = -3;
+            let tiltRAF;
+
+            heroVisual.addEventListener('mousemove', (e) => {
+                const rect = heroVisual.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                targetRX = ((y - rect.height / 2) / rect.height) * -20;
+                targetRY = ((x - rect.width / 2) / rect.width) * 20 - 3;
+            });
+
+            heroVisual.addEventListener('mouseenter', () => {
+                cancelAnimationFrame(tiltRAF);
+                function loop() {
+                    currentRX += (targetRX - currentRX) * 0.09;
+                    currentRY += (targetRY - currentRY) * 0.09;
+                    appCard.style.transform =
+                        `perspective(1000px) rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale(1.03)`;
+                    tiltRAF = requestAnimationFrame(loop);
+                }
+                loop();
+            });
+
+            heroVisual.addEventListener('mouseleave', () => {
+                cancelAnimationFrame(tiltRAF);
+                targetRX = 0; targetRY = -3;
+                function restore() {
+                    currentRX += (0 - currentRX) * 0.07;
+                    currentRY += (-3 - currentRY) * 0.07;
+                    appCard.style.transform =
+                        `perspective(1000px) rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale(1.0)`;
+                    if (Math.abs(currentRX) > 0.05 || Math.abs(currentRY + 3) > 0.05) {
+                        tiltRAF = requestAnimationFrame(restore);
+                    } else {
+                        appCard.style.transform = 'rotate(-3deg) translateY(0)';
+                    }
+                }
+                restore();
+            });
+        }
+
+        /* ================================
+           6. MAGNETIC BUTTON EFFECT
+        ================================ */
+        document.querySelectorAll('.cta-btn, .btn-header').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px) translateY(-1px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = '';
+                btn.style.transition = 'transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.3s ease, background 0.3s ease';
+                setTimeout(() => btn.style.transition = '', 500);
+            });
+        });
+
+        /* ================================
+           7. FLOATING PARTICLES CANVAS
+        ================================ */
+        const canvas = document.getElementById('particleCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            const heroSection = document.querySelector('.hero');
+
+            function resizeCanvas() {
+                canvas.width = heroSection.offsetWidth;
+                canvas.height = heroSection.offsetHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const PARTICLE_COUNT = 38;
+            const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 2.2 + 0.5,
+                speedX: (Math.random() - 0.5) * 0.35,
+                speedY: (Math.random() - 0.5) * 0.35,
+                opacity: Math.random() * 0.35 + 0.08,
+                opacityDir: Math.random() > 0.5 ? 1 : -1,
+            }));
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.opacity += p.opacityDir * 0.003;
+                    if (p.opacity > 0.45 || p.opacity < 0.05) p.opacityDir *= -1;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(46, 125, 106, ${p.opacity})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(drawParticles);
+            }
+            drawParticles();
+        }
+    </script>
+</body>
+</html>
