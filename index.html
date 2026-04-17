@@ -306,26 +306,57 @@
         /* ================================
            1. WAITLIST FORM HANDLER
         ================================ */
-        function handleWaitlist(formId, inputId, msgId) {
-            const form = document.getElementById(formId);
-            if (!form) return;
+        /* ================================
+           1. GLOBAL WAITLIST SYNC HANDLER
+        ================================ */
+        const allWaitlistForms = document.querySelectorAll('.waitlist-form');
+        const allWaitlistInputs = document.querySelectorAll('.waitlist-form input');
+        const allWaitlistBtns = document.querySelectorAll('.waitlist-form button');
+        const allWaitlistMsgs = document.querySelectorAll('.success-message');
 
+        function updateAllForms(state, content = '') {
+            allWaitlistForms.forEach((form, index) => {
+                const btn = allWaitlistBtns[index];
+                const input = allWaitlistInputs[index];
+                const msg = allWaitlistMsgs[index];
+
+                if (state === 'loading') {
+                    btn.innerHTML = 'Saving...';
+                    btn.disabled = true;
+                    input.disabled = true;
+                    if (msg) msg.style.display = 'none';
+                } else if (state === 'success') {
+                    btn.innerHTML = 'Saved ✓';
+                    btn.disabled = true;
+                    btn.style.opacity = '0.8';
+                    input.disabled = true;
+                    if (msg) {
+                        msg.innerHTML = content || '🎉 You\'re in! We\'ll notify you at launch.';
+                        msg.style.display = 'block';
+                        msg.style.color = '#10332C';
+                    }
+                } else if (state === 'error') {
+                    btn.innerHTML = 'Reserve My Spot →'; // Reset to original
+                    btn.disabled = false;
+                    input.disabled = false;
+                    if (msg) {
+                        msg.innerHTML = content || '❌ Something went wrong. Try again.';
+                        msg.style.display = 'block';
+                        msg.style.color = '#E25E5E';
+                    }
+                }
+            });
+        }
+
+        allWaitlistForms.forEach(form => {
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const emailInput = document.getElementById(inputId);
+                const emailInput = this.querySelector('input');
                 const email = emailInput.value;
                 if (!email) return;
 
-                const btn = this.querySelector('button');
-                const msg = document.getElementById(msgId);
-                const originalBtnText = btn.innerHTML;
-
-                // Loading State
-                btn.innerHTML = '<span class="loading-dots">Saving...</span>';
-                btn.disabled = true;
-                emailInput.disabled = true;
-                msg.style.display = 'none';
-                msg.style.color = 'var(--green-deep)';
+                // Set all forms to loading
+                updateAllForms('loading');
 
                 try {
                     const response = await fetch('/api/waitlist', {
@@ -335,30 +366,17 @@
                     });
 
                     if (response.ok) {
-                        btn.innerHTML = 'Saved ✓';
-                        btn.style.opacity = '0.8';
-                        msg.innerHTML = '🎉 You\'re in! We\'ll notify you at launch.';
-                        msg.style.display = 'block';
-                        msg.style.color = '#10332C';
+                        updateAllForms('success');
                     } else {
                         const data = await response.json();
                         throw new Error(data.error || 'Failed to save');
                     }
                 } catch (err) {
                     console.error('Waitlist error:', err);
-                    btn.innerHTML = originalBtnText;
-                    btn.disabled = false;
-                    emailInput.disabled = false;
-                    
-                    // Show friendly error
-                    msg.innerHTML = '❌ Something went wrong. Please try again.';
-                    msg.style.color = '#E25E5E';
-                    msg.style.display = 'block';
+                    updateAllForms('error', '❌ Something went wrong. Please try again.');
                 }
             });
-        }
-        handleWaitlist('waitlistForm', 'emailInput', 'successMessage');
-        handleWaitlist('waitlistForm2', 'emailInput2', 'successMessage2');
+        });
 
         /* ================================
            2. CUSTOM CURSOR GLOW
