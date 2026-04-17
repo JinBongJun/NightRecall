@@ -20,16 +20,21 @@ export default async function handler(req, res) {
 
   try {
     // 1. Attempt to add to Resend Audience if Audience ID is provided
-    const audienceId = process.env.RESEND_AUDIENCE_ID;
+    // Found ID: 679125f9-7d42-419e-82ad-b51e542a3ae5 (General)
+    const audienceId = process.env.RESEND_AUDIENCE_ID || '679125f9-7d42-419e-82ad-b51e542a3ae5';
     let contactCreated = false;
 
     if (audienceId) {
-      const { error: contactError } = await resend.contacts.create({
-        email: email,
-        unsubscribed: false,
-        audienceId: audienceId,
-      });
-      if (!contactError) contactCreated = true;
+      try {
+        const { error: contactError } = await resend.contacts.create({
+          email: email,
+          unsubscribed: false,
+          audienceId: audienceId,
+        });
+        if (!contactError) contactCreated = true;
+      } catch (contactErr) {
+        console.error('Failed to add contact to audience:', contactErr);
+      }
     }
 
     // 2. Notify the developer (Always do this for now so they see signups immediately)
