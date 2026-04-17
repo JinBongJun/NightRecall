@@ -75,15 +75,15 @@ header {
   color: var(--green-deep);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   letter-spacing: -0.5px;
 }
 
 .logo-img {
-  width: 32px;
-  height: 32px;
+  width: 42px;
+  height: 42px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .btn-header {
