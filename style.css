@@ -919,31 +919,33 @@ footer {
 /* ---- RESPONSIVE ---- */
 @media (max-width: 900px) {
   .hero { padding: 60px 0 60px; }
-  .hero-inner { flex-direction: column; text-align: center; gap: 60px; }
-  .hero-text { min-width: 100%; order: 1; }
-  .hero-visual { min-width: 100%; order: 2; margin-top: 20px; }
-  .hero-sub { margin: 0 auto 36px; font-size: 1.15rem; }
+  .hero-inner { flex-direction: column; text-align: center; gap: 60px; width: 100%; }
+  .hero-text { width: 100% !important; min-width: 0 !important; order: 1; }
+  .hero-visual { width: 100% !important; min-width: 0 !important; order: 2; margin-top: 20px; }
+  .hero-sub { margin: 0 auto 36px; font-size: 1.15rem; width: 100%; }
   .social-count { justify-content: center; }
-  .waitlist-form { margin: 0 auto; }
-  .app-card { transform: rotate(0); width: 85%; }
+  .waitlist-form { margin: 0 auto; width: 100% !important; max-width: 500px; }
+  .app-card { transform: rotate(0); width: 85%; max-width: 320px; margin: 0 auto; }
   
   .step-arrow { display: none; }
-  .cta-box { padding: 48px 28px; border-radius: 32px; }
+  .cta-box { padding: 48px 24px; border-radius: 32px; width: 100%; }
   .footer-inner { justify-content: center; text-align: center; gap: 40px; }
   
-  .science-visual { padding: 40px 10px; }
+  .science-visual { padding: 40px 10px; width: 100%; }
   .relay-node { width: 80px; height: 80px; padding: 8px; }
   .relay-node span { font-size: 0.55rem; }
 }
 
 @media (max-width: 600px) {
   header { padding: 16px 0; }
-  .logo { font-size: 1.1rem; }
-  .btn-header { padding: 10px 18px; font-size: 0.85rem; }
+  .header-inner { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 16px !important; }
+  .logo { font-size: 1rem; gap: 8px; }
+  .logo-img { width: 32px; height: 32px; }
+  .btn-header { padding: 8px 14px; font-size: 0.75rem; }
   
-  .hero { padding: 40px 0 50px; }
-  h1 { font-size: clamp(2.2rem, 10vw, 3rem); margin-bottom: 24px; }
-  .hero-sub { font-size: 1.1rem; line-height: 1.6; }
+  .hero { padding: 30px 0 40px; }
+  h1 { font-size: clamp(2rem, 9vw, 2.8rem); margin-bottom: 20px; }
+  .hero-sub { font-size: 1rem; line-height: 1.6; padding: 0 10px; }
   
   .waitlist-form {
     flex-direction: column;
@@ -952,18 +954,20 @@ footer {
     gap: 12px;
     border: none;
     box-shadow: none;
-    align-items: stretch !important; /* 모바일에서 무조건 가득 차도록 */
+    align-items: stretch !important;
+    width: 100% !important;
   }
   
   .waitlist-form input,
   .waitlist-form button {
-    width: 100% !important; /* 강제 너비 고정 */
+    width: 100% !important;
     box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
 
   .waitlist-form input {
     display: block;
-    padding: 16px 24px;
+    padding: 16px 20px;
     border-radius: 16px;
     background: var(--white);
     color: var(--text-primary);
@@ -1006,11 +1010,12 @@ footer {
     transform: none; 
     text-align: center; 
     width: 100%;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: inherit; 
     opacity: 0.9;
+    line-height: 1.4;
   }
   .is-error .success-message { color: #E25E5E !important; }
-  .app-card { width: 100%; }
+  .app-card { width: 90%; margin: 0 auto; }
 }
