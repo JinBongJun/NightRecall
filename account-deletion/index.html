@@ -1,115 +1,127 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>NightRecall Account Deletion</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Deletion Request — NightRecall</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
     <style>
-      :root {
-        --bg: #f5f1e8;
-        --surface: #fffcf5;
-        --text: #1f2933;
-        --muted: #6b7280;
-        --primary: #224e5a;
-        --border: #e8ded0;
-      }
-      body {
-        margin: 0;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: radial-gradient(circle at top, #fff8ed 0%, var(--bg) 58%);
-        color: var(--text);
-      }
-      .wrap {
-        max-width: 760px;
-        margin: 0 auto;
-        padding: 48px 20px 72px;
-      }
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 28px;
-        box-shadow: 0 18px 45px rgba(34, 78, 90, 0.08);
-      }
-      h1 {
-        margin: 0 0 12px;
-        font-size: 34px;
-        line-height: 1.1;
-      }
-      p, li {
-        color: var(--muted);
-        line-height: 1.7;
-      }
-      ol {
-        padding-left: 20px;
-      }
-      .badge {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: #d7e7e9;
-        color: var(--primary);
-        font-weight: 700;
-        font-size: 12px;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-      .cta {
-        display: inline-block;
-        margin-top: 12px;
-        padding: 14px 18px;
-        background: var(--primary);
-        color: #fff;
-        text-decoration: none;
-        border-radius: 16px;
-        font-weight: 700;
-      }
-      .section {
-        margin-top: 24px;
-      }
-      .placeholder {
-        font-weight: 700;
-        color: var(--text);
-      }
+        .legal-page { padding: 120px 0; max-width: 800px; margin: 0 auto; }
+        .legal-content { background: white; padding: 60px; border-radius: 40px; border: 1px solid var(--border); box-shadow: 0 40px 80px rgba(0,0,0,0.03); }
+        .legal-content h1 { font-size: 2.5rem; margin-bottom: 24px; color: var(--green-deep); }
+        .legal-content h2 { font-size: 1.5rem; margin-top: 40px; margin-bottom: 16px; color: var(--green-deep); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .legal-content p { margin-bottom: 16px; color: var(--text-secondary); line-height: 1.8; }
+        .legal-content ol { margin-bottom: 24px; padding-left: 20px; color: var(--text-secondary); }
+        .legal-content li { margin-bottom: 8px; }
+        .lang-toggle { background: var(--bg2); padding: 4px; border-radius: 12px; display: inline-flex; gap: 8px; margin-bottom: 32px; }
+        .lang-btn { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; border: none; }
+        .lang-btn.active { background: white; color: var(--green-deep); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-primary { display: inline-block; background: var(--green-deep); color: white; padding: 16px 32px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s; }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .ko { display: none; }
     </style>
-  </head>
-  <body>
-    <main class="wrap">
-      <div class="card">
-        <div class="badge">NightRecall Support</div>
-        <h1>Request account deletion</h1>
-        <p>
-          NightRecall lets users delete their account directly in the app from
-          <strong>Settings &gt; Delete Account</strong>. If you no longer have app access, use the support path below.
-        </p>
+</head>
+<body>
+    <div class="cursor-glow" id="cursorGlow"></div>
+    
+    <div class="container legal-page">
+        <a href="../index.html" style="text-decoration:none; color:var(--text-secondary); font-weight:600; margin-bottom:24px; display:inline-block;">← Back to Home</a>
+        
+        <div class="lang-toggle">
+            <button class="lang-btn active" onclick="setLang('en')">English</button>
+            <button class="lang-btn" onclick="setLang('ko')">한국어</button>
+        </div>
 
-        <section class="section">
-          <h2>How in-app deletion works</h2>
-          <ol>
-            <li>Open NightRecall.</li>
-            <li>Go to Settings.</li>
-            <li>Tap <strong>Delete Account</strong>.</li>
-            <li>Your account data, study inputs, questions, review history, and sessions are deleted.</li>
-          </ol>
-        </section>
+        <div class="legal-content">
+            <!-- ENGLISH VERSION -->
+            <div class="en">
+                <h1>Account Deletion Request</h1>
+                <p>We respect your choice to delete your account and data. You can initiate deletion using either of the methods below.</p>
 
-        <section class="section">
-          <h2>Support request path</h2>
-          <p>
-            Before launch, replace the placeholder below with a real support email address or a secure web form.
-          </p>
-          <p class="placeholder">TODO: support@nightrecall.example</p>
-          <a class="cta" href="mailto:support@nightrecall.example">Email deletion request</a>
-        </section>
+                <h2>Method 1: In-App Deletion (Recommended)</h2>
+                <p>The fastest way to delete your account is through the app:</p>
+                <ol>
+                    <li>Open <strong>NightRecall</strong>.</li>
+                    <li>Navigate to <strong>Settings</strong>.</li>
+                    <li>Tap <strong>Delete Account</strong>.</li>
+                    <li>Confirm the deletion. All data will be permanently removed instantly.</li>
+                </ol>
 
-        <section class="section">
-          <h2>What gets deleted</h2>
-          <p>
-            Account profile data, linked login identities, active sessions, study inputs, generated questions, review events,
-            and scheduling metadata associated with the account.
-          </p>
-        </section>
-      </div>
-    </main>
-  </body>
+                <h2>Method 2: Email Request</h2>
+                <p>If you have uninstalled the app or cannot access it, please send an email to our support team:</p>
+                <p><strong>Support Email:</strong> <a href="mailto:bongjun0289@gmail.com">bongjun0289@gmail.com</a></p>
+                <p>Please include "Account Deletion Request" in the subject line and specify your account email address. We will process your request within 48 hours.</p>
+                <br>
+                <a href="mailto:bongjun0289@gmail.com?subject=Account%20Deletion%20Request" class="btn-primary">Email Deletion Request</a>
+
+                <h2>What information will be deleted?</h2>
+                <p>Upon deletion, all the following data associated with your account will be permanently removed from our servers:</p>
+                <ul>
+                    <li>Account profile and authentication data.</li>
+                    <li>Study content (photos, extracted text).</li>
+                    <li>Generated AI questions and history.</li>
+                    <li>Study progress and streaks.</li>
+                </ul>
+            </div>
+
+            <!-- KOREAN VERSION -->
+            <div class="ko">
+                <h1>계정 삭제 요청</h1>
+                <p>계정 및 데이터 삭제에 대한 귀하의 선택을 존중합니다. 아래의 두 가지 방법 중 하나를 통해 삭제를 진행하실 수 있습니다.</p>
+
+                <h2>방법 1: 앱 내 삭제 (권장)</h2>
+                <p>가장 빠르게 삭제하는 방법은 앱 내 메뉴를 이용하는 것입니다:</p>
+                <ol>
+                    <li><strong>NightRecall</strong> 앱을 엽니다.</li>
+                    <li><strong>설정(Settings)</strong> 메뉴로 이동합니다.</li>
+                    <li><strong>계정 삭제(Delete Account)</strong>를 탭합니다.</li>
+                    <li>삭제를 승인합니다. 모든 데이터가 즉시 영구적으로 삭제됩니다.</li>
+                </ol>
+
+                <h2>방법 2: 이메일 요청</h2>
+                <p>앱을 이미 삭제했거나 접근할 수 없는 경우, 다음 지원팀 메일로 요청을 보내주시기 바랍니다:</p>
+                <p><strong>지원 이메일:</strong> <a href="mailto:bongjun0289@gmail.com">bongjun0289@gmail.com</a></p>
+                <p>메일 제목에 "계정 삭제 요청"을 기재하고, 삭제를 원하는 계정의 이메일 주소를 포함해 주세요. 요청 후 48시간 이내에 처리가 완료됩니다.</p>
+                <br>
+                <a href="mailto:bongjun0289@gmail.com?subject=계정%20삭제%20요청" class="btn-primary">이메일 삭제 요청하기</a>
+
+                <h2>어떤 정보가 삭제되나요?</h2>
+                <p>삭제 시 당사 서버에 저장된 귀하의 계정과 관련된 다음 데이터가 모두 영구적으로 제거됩니다:</p>
+                <ul>
+                    <li>계정 프로필 및 인증 데이터.</li>
+                    <li>학습 콘텐츠 (사진, 추출된 텍스트).</li>
+                    <li>생성된 AI 질문 및 답변 기록.</li>
+                    <li>학습 진도 및 스트릭 정보.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            document.querySelectorAll('.en, .ko').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.' + lang).forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText.toLowerCase().includes(lang === 'en' ? 'english' : '한국어')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        const cursorGlow = document.getElementById('cursorGlow');
+        let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        function animateCursor() {
+            glowX += (mouseX - glowX) * 0.08;
+            glowY += (mouseY - glowY) * 0.08;
+            if(cursorGlow) cursorGlow.style.transform = `translate(${glowX - 200}px, ${glowY - 200}px)`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+    </script>
+</body>
 </html>
