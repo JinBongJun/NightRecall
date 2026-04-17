@@ -317,12 +317,15 @@
                 if (!email) return;
 
                 const btn = this.querySelector('button');
+                const msg = document.getElementById(msgId);
                 const originalBtnText = btn.innerHTML;
 
                 // Loading State
-                btn.innerHTML = 'Saving...';
+                btn.innerHTML = '<span class="loading-dots">Saving...</span>';
                 btn.disabled = true;
                 emailInput.disabled = true;
+                msg.style.display = 'none';
+                msg.style.color = 'var(--green-deep)';
 
                 try {
                     const response = await fetch('/api/waitlist', {
@@ -334,16 +337,23 @@
                     if (response.ok) {
                         btn.innerHTML = 'Saved ✓';
                         btn.style.opacity = '0.8';
-                        document.getElementById(msgId).style.display = 'block';
+                        msg.innerHTML = '🎉 You\'re in! We\'ll notify you at launch.';
+                        msg.style.display = 'block';
+                        msg.style.color = '#10332C';
                     } else {
-                        throw new Error('Failed to save');
+                        const data = await response.json();
+                        throw new Error(data.error || 'Failed to save');
                     }
                 } catch (err) {
                     console.error('Waitlist error:', err);
-                    btn.innerHTML = 'Retry?';
+                    btn.innerHTML = originalBtnText;
                     btn.disabled = false;
                     emailInput.disabled = false;
-                    setTimeout(() => { if(!btn.disabled) btn.innerHTML = originalBtnText; }, 3000);
+                    
+                    // Show friendly error
+                    msg.innerHTML = '❌ Something went wrong. Please try again.';
+                    msg.style.color = '#E25E5E';
+                    msg.style.display = 'block';
                 }
             });
         }

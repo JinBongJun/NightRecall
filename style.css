@@ -971,6 +971,14 @@ footer {
     border-radius: 16px;
   }
   
-  .success-message { margin-top: 16px; position: static; transform: none; text-align: center; }
+  .success-message { 
+    margin-top: 20px; 
+    position: static; 
+    transform: none; 
+    text-align: center; 
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
   .app-card { width: 100%; }
 }

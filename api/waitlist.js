@@ -138,7 +138,7 @@ export default async function handler(req, res) {
           </html>
         `
       });
-    } catch (e) {tch (e) {
+    } catch (e) {
       console.error('Welcome email failed:', e);
     }
 
