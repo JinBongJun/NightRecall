@@ -46,9 +46,7 @@ export default async function handler(req, res) {
           <p style="font-size: 12px; color: #888;">NightRecall Auto-Notification</p>
         </div>
       `
-    });
-
-    // 3. Send welcome email to user
+    })    // 3. Send welcome email to user
     try {
       await resend.emails.send({
         from: 'NightRecall <onboarding@resend.dev>',
@@ -71,7 +69,11 @@ export default async function handler(req, res) {
               <tr>
                 <td align="center" style="padding: 40px 10px 40px 10px;">
                   <!-- Main Card -->
-                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #ffffff; border-radius: 24px; border: 1px solid rgba(16, 51, 44, 0.08); box-shadow: 0 8px 30px rgba(16, 51, 44, 0.04);">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 24px; border: 1px solid rgba(16, 51, 44, 0.08); box-shadow: 0 8px 30px rgba(16, 51, 44, 0.04); overflow: hidden;">
+                    <!-- Brand Top Bar -->
+                    <tr>
+                      <td height="6" style="background-color: #10332C; font-size: 0; line-height: 0;">&nbsp;</td>
+                    </tr>
                     <!-- Header with Logo -->
                     <tr>
                       <td align="center" style="padding: 40px 0 30px 0;">
@@ -80,31 +82,31 @@ export default async function handler(req, res) {
                     </tr>
                     <!-- Body Content -->
                     <tr>
-                      <td style="padding: 0 40px 40px 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                      <td style="padding: 0 50px 50px 50px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
                           <tr>
-                            <td align="center" style="color: #10332C; font-size: 28px; line-height: 1.25; font-weight: 800; letter-spacing: -0.03em;">
-                              Locking in your<br>growth tonight.
+                            <td align="center" style="color: #10332C; font-size: 32px; line-height: 1.25; font-weight: 800; letter-spacing: -0.04em;">
+                              Locking in your<br>growth tonight. 🌙
                             </td>
                           </tr>
                           <tr>
-                            <td style="padding: 30px 0 0 0; color: #4A5568; font-size: 16px; line-height: 1.7; text-align: center;">
-                              Hello,<br><br>
-                              Thanks for joining the <strong>NightRecall</strong> waitlist. We’re building a bridge between daily learning and lifelong memory.
+                            <td style="padding: 36px 0 0 0; color: #4A5568; font-size: 17px; line-height: 1.8; text-align: center;">
+                              Hello there,<br><br>
+                              We’re building <strong>NightRecall</strong> to be the bridge between daily learning and lifelong memory. 
                             </td>
                           </tr>
                           <tr>
-                            <td style="padding: 20px 0 0 0; color: #4A5568; font-size: 16px; line-height: 1.7; text-align: center;">
-                              No more forgotten notes. Just one perfect question each night, right when your brain is hardwired to encode it forever.
+                            <td style="padding: 24px 0 0 0; color: #4A5568; font-size: 17px; line-height: 1.8; text-align: center;">
+                              The 1-minute nightly ritual is almost ready for you. No more forgotten notes. Just one perfect question each night, right when your brain is hardwired to encode it forever.
                             </td>
                           </tr>
                           <!-- CTA Button -->
                           <tr>
-                            <td align="center" style="padding: 40px 0 0 0;">
+                            <td align="center" style="padding: 48px 0 10px 0;">
                               <table border="0" cellpadding="0" cellspacing="0">
                                 <tr>
-                                  <td align="center" bgcolor="#10332C" style="border-radius: 12px;">
-                                    <a href="https://night-recall.vercel.app" class="btn" style="display: inline-block; padding: 18px 36px; color: #F0EFEC !important; text-decoration: none; font-size: 15px; font-weight: 700;">Visit Our Website</a>
+                                  <td align="center" bgcolor="#10332C" style="border-radius: 14px;">
+                                    <a href="https://night-recall.vercel.app" class="btn" style="display: inline-block; padding: 20px 40px; color: #F0EFEC !important; text-decoration: none; font-size: 16px; font-weight: 700;">Visit Our Website</a>
                                   </td>
                                 </tr>
                               </table>
@@ -115,17 +117,17 @@ export default async function handler(req, res) {
                     </tr>
                     <!-- Footer -->
                     <tr>
-                      <td align="center" style="padding: 30px; background-color: #F8F7F4; border-radius: 0 0 24px 24px; border-top: 1px solid #EEEEEE; color: #A0AEC0; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.6;">
-                        <p style="margin: 0;">© 2026 NightRecall</p>
+                      <td align="center" style="padding: 30px; background-color: #F8F7F4; border-top: 1px solid #EEEEEE; color: #A0AEC0; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.6;">
+                        <p style="margin: 0; font-weight: 700; color: #10332C; opacity: 0.5;">NightRecall</p>
                         <p style="margin: 4px 0 0 0;">The 1-minute nightly ritual to remember everything.</p>
                       </td>
                     </tr>
                   </table>
                   <!-- Unsubscribe area -->
-                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px;">
+                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                     <tr>
-                      <td align="center" style="padding: 20px; color: #A0AEC0; font-family: Arial, sans-serif; font-size: 11px;">
-                        You received this because you joined the waitlist at night-recall.vercel.app
+                      <td align="center" style="padding: 24px; color: #A0AEC0; font-family: Arial, sans-serif; font-size: 11px;">
+                        You received this because you joined the waitlist at <a href="https://night-recall.vercel.app" style="color: #A0AEC0;">night-recall.vercel.app</a>
                       </td>
                     </tr>
                   </table>
@@ -136,7 +138,7 @@ export default async function handler(req, res) {
           </html>
         `
       });
-    } catch (e) {
+    } catch (e) {tch (e) {
       console.error('Welcome email failed:', e);
     }
 
