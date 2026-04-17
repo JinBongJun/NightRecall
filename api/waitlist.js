@@ -48,20 +48,64 @@ export default async function handler(req, res) {
       `
     });
 
-    // 3. Send welcome email to user (Optional - using Resend's default verified domain for now)
+    // 3. Send welcome email to user
     try {
       await resend.emails.send({
         from: 'NightRecall <onboarding@resend.dev>',
         to: email,
         subject: 'Welcome to the NightRecall Waitlist! 🌙',
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; color: #10332C; background: #F0EFEC; border-radius: 24px;">
-            <h1 style="font-size: 24px;">Thanks for joining the waitlist!</h1>
-            <p style="font-size: 16px; line-height: 1.6;">We're working hard on NightRecall, the 1-minute nightly ritual to help you remember everything you learn.</p>
-            <p style="font-size: 16px; line-height: 1.6;">We'll notify you as soon as we're ready for early access.</p>
-            <br>
-            <p style="font-weight: bold;">— The NightRecall Team</p>
-          </div>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { margin: 0; padding: 0; background-color: #F0EFEC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+              .wrapper { width: 100%; table-layout: fixed; background-color: #F0EFEC; padding-bottom: 60px; }
+              .main { background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; color: #10332C; }
+              .header { padding: 40px 0 20px; text-align: center; background-color: #F0EFEC; }
+              .logo { width: 42px; height: 42px; }
+              .content { padding: 40px 50px; background-color: #ffffff; border-radius: 40px 40px 0 0; }
+              .title { font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 24px; color: #10332C; letter-spacing: -0.02em; }
+              .text { font-size: 16px; line-height: 1.7; margin-bottom: 30px; color: #4A5568; }
+              .footer { padding: 30px; text-align: center; font-size: 12px; color: #A0AEC0; background-color: #F0EFEC; }
+              .highlight { color: #10332C; font-weight: 700; }
+              .button { display: inline-block; padding: 16px 32px; background-color: #10332C; color: #F0EFEC !important; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 15px; }
+            </style>
+          </head>
+          <body>
+            <center class="wrapper">
+              <table class="main" width="100%">
+                <tr>
+                  <td class="header">
+                    <img src="https://night-recall.vercel.app/assets/logo.png" alt="NightRecall" class="logo">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="content">
+                    <h1 class="title">Locking in your<br>growth tonight.</h1>
+                    <p class="text">
+                      Hello, <br><br>
+                      Thanks for joining the <span class="highlight">NightRecall</span> waitlist. <br><br>
+                      We’re building a bridge between daily learning and lifelong memory. No more forgotten notes or wasted hours. Just one perfect question each night, right when your brain is ready to encode it forever.
+                    </p>
+                    <p class="text">
+                      We’ll notify you the moment early access is ready for your account.
+                    </p>
+                    <div style="text-align: center; margin-top: 40px;">
+                      <a href="https://night-recall.vercel.app" class="button">Visit Our Website</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="footer">
+                    <p>© 2026 NightRecall. The 1-minute nightly ritual.</p>
+                    <p>You received this because you joined the waitlist at night-recall.vercel.app</p>
+                  </td>
+                </tr>
+              </table>
+            </center>
+          </body>
+          </html>
         `
       });
     } catch (e) {
