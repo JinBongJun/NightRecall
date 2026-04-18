@@ -1,7 +1,20 @@
 import nodemailer from 'nodemailer';
+import pg from 'pg';
 import { Resend } from 'resend';
 
+const { Pool } = pg;
 const resend = new Resend(process.env.RESEND_API_KEY);
+const databaseUrl = process.env.DATABASE_URL || process.env.RAILWAY_DATABASE_URL;
+
+const pool =
+  databaseUrl
+    ? new Pool({
+        connectionString: databaseUrl,
+        ssl: databaseUrl.includes("localhost") || databaseUrl.includes("127.0.0.1")
+          ? false
+          : { rejectUnauthorized: false },
+      })
+    : null;
 
 function createMailTransporter() {
   const user = process.env.GMAIL_USER;
@@ -98,6 +111,39 @@ function getWelcomeHtml() {
   `;
 }
 
+async function saveToDatabase(email) {
+  if (!pool) {
+    console.warn("DATABASE_URL is not configured. Skipping Railway waitlist sync.");
+    return;
+  }
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS waitlist_signups (
+      id BIGSERIAL PRIMARY KEY,
+      email TEXT NOT NULL UNIQUE,
+      source TEXT,
+      signup_count INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_signup_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(
+    `
+      INSERT INTO waitlist_signups (email, source)
+      VALUES ($1, $2)
+      ON CONFLICT (email)
+      DO UPDATE SET
+        signup_count = waitlist_signups.signup_count + 1,
+        source = EXCLUDED.source,
+        updated_at = NOW(),
+        last_signup_at = NOW()
+    `,
+    [email.toLowerCase().trim(), "landing-page"],
+  );
+}
+
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -132,6 +178,12 @@ export default async function handler(req, res) {
       } catch (contactErr) {
         console.error('Failed to add contact to audience:', contactErr);
       }
+    }
+
+    try {
+      await saveToDatabase(email);
+    } catch (backendErr) {
+      console.error("Database waitlist sync failed:", backendErr);
     }
 
     if (transporter && gmailUser) {
