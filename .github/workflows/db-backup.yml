@@ -1,0 +1,74 @@
+name: DB Backup
+
+on:
+  # Daily backups (best-effort scheduling by GitHub).
+  schedule:
+    # 18:10 UTC = 03:10 KST (next day)
+    - cron: "10 18 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install pg_dump
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Create dumps
+        env:
+          WAITLIST_DATABASE_URL: ${{ secrets.WAITLIST_DATABASE_URL }}
+          APP_DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+
+          TS="$(date -u +%Y%m%dT%H%M%SZ)"
+          OUT="db-backup-${TS}"
+          mkdir -p "${OUT}"
+
+          if [ -n "${WAITLIST_DATABASE_URL:-}" ]; then
+            echo "Dumping waitlist DB..."
+            pg_dump "${WAITLIST_DATABASE_URL}" \
+              --format=custom \
+              --no-owner \
+              --no-acl \
+              --file "${OUT}/waitlist.dump"
+          else
+            echo "WAITLIST_DATABASE_URL is missing; skipping waitlist dump." >&2
+          fi
+
+          if [ -n "${APP_DATABASE_URL:-}" ]; then
+            echo "Dumping app DB..."
+            pg_dump "${APP_DATABASE_URL}" \
+              --format=custom \
+              --no-owner \
+              --no-acl \
+              --file "${OUT}/app.dump"
+          else
+            echo "APP_DATABASE_URL is missing; skipping app dump." >&2
+          fi
+
+          # If neither secret exists, fail loudly so we don't silently think we're backed up.
+          if [ ! -f "${OUT}/waitlist.dump" ] && [ ! -f "${OUT}/app.dump" ]; then
+            echo "No dumps were created. Check GitHub Secrets." >&2
+            exit 1
+          fi
+
+          sha256sum "${OUT}"/* > "${OUT}/SHA256SUMS.txt"
+          tar -czf "${OUT}.tar.gz" "${OUT}"
+          ls -lah "${OUT}.tar.gz"
+
+      - name: Upload backup artifact (14 days)
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup
+          path: db-backup-*.tar.gz
+          retention-days: 14
+
