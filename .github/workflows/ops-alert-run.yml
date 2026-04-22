@@ -1,0 +1,37 @@
+name: Ops Alert Runner
+
+on:
+  schedule:
+    # GitHub scheduled workflows are best-effort; expect occasional delays.
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ops-alert-runner
+  cancel-in-progress: false
+
+jobs:
+  alert-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Call /v1/ops/alert-run
+        env:
+          OPS_ALERT_RUN_URL: ${{ vars.OPS_ALERT_RUN_URL }}
+          OPS_CRON_TOKEN: ${{ secrets.OPS_CRON_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${OPS_ALERT_RUN_URL:-}" ]; then
+            echo "Missing OPS_ALERT_RUN_URL (Actions variable)." >&2
+            exit 1
+          fi
+          if [ -z "${OPS_CRON_TOKEN:-}" ]; then
+            echo "Missing OPS_CRON_TOKEN (Actions secret)." >&2
+            exit 1
+          fi
+
+          curl --silent --show-error --fail \
+            -X POST "${OPS_ALERT_RUN_URL}" \
+            -H "X-Ops-Token: ${OPS_CRON_TOKEN}"
+
