@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "NightRecall",
+    "slug": "nightrecall",
+    "scheme": "nightrecall",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/logo.png",
+    "splash": {
+      "backgroundColor": "#F5F1E8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.nightrecall.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#F5F1E8"
+      }
+    },
+    "plugins": [
+      "expo-notifications",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "NightRecall accesses your photos so you can extract study material from screenshots or notes.",
+          "cameraPermission": "NightRecall accesses your camera so you can capture study material for tonight's question."
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      "@sentry/react-native"
+    ],
+    "extra": {
+      "apiBaseUrl": "https://nightrecall-production.up.railway.app/v1",
+      "googleWebClientId": "792853648615-h3lk0e00n1ck0rlfmtc0n7l53j3drj7u.apps.googleusercontent.com",
+      "googleAndroidClientId": "792853648615-126rd1iebot70v9vt98pgsubp7dt35d8.apps.googleusercontent.com",
+      "eas": {
+        "projectId": "3c8303ee-c6bf-4ab3-858f-5b16a96675a5"
+      }
+    }
+  }
+}

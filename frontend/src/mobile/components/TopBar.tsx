@@ -1,0 +1,183 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors } from "../theme/colors";
+
+import { BrandWordmark } from "./BrandWordmark";
+import { useAuthStore } from "../store/authStore";
+
+type Props = {
+  title?: string;
+  subtitle?: string;
+  leftIcon?: keyof typeof MaterialIcons.glyphMap | null;
+  rightIcon?: keyof typeof MaterialIcons.glyphMap | null;
+  onLeftPress?: () => void;
+  onRightPress?: () => void;
+};
+
+export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRightPress }: Props) {
+  const showTitle = Boolean(title);
+  const showProfileAction = rightIcon === "account-circle";
+  const plan = useAuthStore((state) => state.plan);
+  const planLabel = plan === "plus" ? "PLUS" : "FREE";
+
+  return (
+    <View style={styles.root}>
+      <View style={styles.shell}>
+        {leftIcon ? (
+          <Pressable onPress={onLeftPress} style={styles.iconButton} hitSlop={8}>
+            <MaterialIcons name={leftIcon} size={22} color={colors.primary} />
+          </Pressable>
+        ) : (
+          <View style={styles.iconSpacer} />
+        )}
+
+        <View style={[styles.centerSection, showTitle ? styles.centerSectionTitled : styles.centerSectionBrand]}>
+          {showTitle ? (
+            <View style={styles.titleWrap}>
+              <View style={styles.metaRow}>
+                {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+                <View style={styles.planBadge}>
+                  <Text style={styles.planBadgeText}>{planLabel}</Text>
+                </View>
+              </View>
+              <Text style={styles.title}>{title}</Text>
+            </View>
+          ) : (
+            <BrandWordmark size="small" showBetaBadge badgeLabel={planLabel} />
+          )}
+        </View>
+
+        {rightIcon ? (
+          showProfileAction ? (
+            <Pressable onPress={onRightPress} style={styles.profileButton} hitSlop={8}>
+              <View style={styles.profileGlyphWrap}>
+                <MaterialIcons name="person" size={19} color={colors.primary} />
+              </View>
+              <View style={styles.profileDot} />
+            </Pressable>
+          ) : (
+            <Pressable onPress={onRightPress} style={styles.iconButton} hitSlop={8}>
+              <MaterialIcons name={rightIcon} size={22} color={colors.primary} />
+            </Pressable>
+          )
+        ) : (
+          <View style={styles.iconSpacer} />
+        )}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: {
+    minHeight: 66,
+  },
+  shell: {
+    minHeight: 66,
+    borderRadius: 26,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    shadowColor: colors.shadow,
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  iconButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surfaceLow,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  iconSpacer: {
+    width: 42,
+    height: 42,
+  },
+  centerSection: {
+    flex: 1,
+    minHeight: 46,
+    justifyContent: "center",
+    paddingHorizontal: 2,
+  },
+  centerSectionTitled: {
+    alignItems: "center",
+  },
+  centerSectionBrand: {
+    alignItems: "center",
+  },
+  titleWrap: {
+    alignItems: "center",
+    gap: 2,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    justifyContent: "center",
+  },
+  subtitle: {
+    color: colors.mutedSoft,
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 0.9,
+    textTransform: "uppercase",
+  },
+  title: {
+    color: colors.primary,
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+  },
+  planBadge: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(18,67,67,0.10)",
+    borderWidth: 1,
+    borderColor: "rgba(18,67,67,0.18)",
+  },
+  planBadgeText: {
+    color: colors.primary,
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.0,
+  },
+  profileButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surfaceLow,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  profileGlyphWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.surface,
+  },
+  profileDot: {
+    position: "absolute",
+    right: 7,
+    top: 7,
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: colors.primary,
+    borderWidth: 2,
+    borderColor: colors.surface,
+  },
+});

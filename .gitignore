@@ -1,1 +1,31 @@
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+
+# Node / Expo
 node_modules/
+dist/
+.expo/
+frontend/.expo/
+frontend/.npm-cache/
+
+# Env / secrets / local DBs
+.env
+backend/.env
+*.log
+*.db
+nightrecall.db
+backend/nightrecall.db
+
+# Tool caches
+.tmp/
+backend/pytest-cache-files-*/
+pytest-cache-files-*/
