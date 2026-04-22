@@ -16,11 +16,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Install pg_dump
+      - name: Install pg_dump (Postgres 18)
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          sudo apt-get install -y ca-certificates curl gnupg
+
+          # Install a pg_dump version that can talk to Railway's Postgres 18.x.
+          # Ubuntu's default postgresql-client can be older (e.g. 16.x), which fails against a newer server.
+          sudo install -d /usr/share/postgresql-common/pgdg
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] http://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo $VERSION_CODENAME)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-18
+          pg_dump --version
 
       - name: Create dumps
         env:
@@ -71,4 +81,3 @@ jobs:
           name: db-backup
           path: db-backup-*.tar.gz
           retention-days: 14
-
