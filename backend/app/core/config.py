@@ -25,7 +25,13 @@ class Settings(BaseSettings):
     jwt_refresh_token_ttl_days: int = 30
     job_inline_processing: bool | None = None
     job_worker_poll_interval_seconds: float = 2.0
+    source_image_storage_provider: str = "local"
     source_image_storage_root: str = "./storage/source-images"
+    source_image_storage_endpoint_url: str | None = None
+    source_image_storage_bucket: str | None = None
+    source_image_storage_region: str | None = None
+    source_image_storage_access_key_id: str | None = None
+    source_image_storage_secret_access_key: str | None = None
     google_web_client_id: str | None = None
     google_android_client_id: str | None = None
     google_ios_client_id: str | None = None

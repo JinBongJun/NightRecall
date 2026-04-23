@@ -1,12 +1,12 @@
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, get_db
 from app.api.v1.rate_limit import rate_limit_user
+from app.db.models.study import StudyInput
 from app.db.models.user import User
 from app.db.schemas.study_inputs import (
     StudyInputExtractJobResponse,
@@ -19,12 +19,10 @@ from app.db.schemas.study_inputs import (
 )
 from app.services.study_extract_job_service import StudyInputExtractJobService
 from app.services.study_extract_service import StudyExtractService
-from app.services.study_input_service import StudyInputService
 from app.services.analytics_service import AnalyticsService
 from app.services.source_image_storage_service import SourceImageStorageService
+from app.services.study_input_service import StudyInputService
 from app.services.usage_limit_service import UsageLimitService
-from app.db.models.user import User
-from app.db.models.study import StudyInput
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -52,10 +50,9 @@ def get_source_image(
     source_image_ref: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> FileResponse:
+) -> Response:
     storage = SourceImageStorageService()
-    path = storage.resolve_path(source_image_ref)
-    if not path.exists():
+    if not storage.exists(source_image_ref):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="source image not found")
 
     owned_image = db.scalar(
@@ -66,7 +63,8 @@ def get_source_image(
     )
     if not owned_image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="source image not found")
-    return FileResponse(path)
+    blob = storage.download(source_image_ref)
+    return Response(content=blob.content, media_type=blob.mime_type)
 
 
 @router.post("/extract", response_model=StudyInputExtractResponse)
