@@ -8,7 +8,6 @@ export type SavedTopicSource = {
   topic_id: string;
   study_input_id: string;
   input_type: "keywords" | "notes";
-  raw_content: string;
   source_kind?: "photo" | "manual" | null;
   source_preview_text?: string | null;
   source_image_ref?: string | null;
@@ -38,7 +37,6 @@ export type SavedStudyInputsResponse = {
 export type SavedStudyInputDetail = {
   study_input_id: string;
   input_type: "keywords" | "notes";
-  raw_content: string;
   source_kind?: "photo" | "manual" | null;
   source_preview_text?: string | null;
   source_image_ref?: string | null;

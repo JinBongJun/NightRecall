@@ -222,7 +222,6 @@ class ReviewService:
             topic_id=topic.id,
             study_input_id=study_input.id,
             input_type=study_input.input_type,
-            raw_content=study_input.raw_content,
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
             source_image_ref=study_input.source_image_ref,
@@ -238,7 +237,6 @@ class ReviewService:
         return SavedStudyInputDetailResponse(
             study_input_id=study_input.id,
             input_type=study_input.input_type,
-            raw_content=study_input.raw_content,
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
             source_image_ref=study_input.source_image_ref,

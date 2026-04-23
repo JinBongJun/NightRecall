@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -25,35 +25,12 @@ import { toStudyInputPayload } from "../utils/reviewDraft";
 
 type Props = NativeStackScreenProps<RootStackParamList, "EditPoints">;
 
-const parseRawContent = (inputType: "keywords" | "notes", rawContent: string): string => {
-  if (inputType !== "keywords") {
-    return rawContent;
-  }
-
-  try {
-    const parsed = JSON.parse(rawContent);
-    if (Array.isArray(parsed)) {
-      return parsed.filter((item): item is string => typeof item === "string" && item.trim().length > 0).join("\n");
-    }
-  } catch {
-    return rawContent;
-  }
-
-  return rawContent;
-};
-
-const topicFallbacksFromSource = (sourceText: string): string[] =>
-  sourceText
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-
 const resolveTopicText = (topic: Topic, index: number, sourceText: string): string => {
   if (typeof topic.text === "string" && topic.text.trim()) {
     return topic.text.trim();
   }
 
-  return topicFallbacksFromSource(sourceText)[index] ?? "Saved point";
+  return sourceText.trim() || `Saved point ${index + 1}`;
 };
 
 const toInitialPoints = (texts: string[]): ReviewDraftPoint[] =>
@@ -94,7 +71,6 @@ export function EditPointsScreen({ route, navigation }: Props) {
       : toInitialPoints([]),
   );
   const [savedInputType, setSavedInputType] = useState<"keywords" | "notes">("notes");
-  const [savedRawContent, setSavedRawContent] = useState("");
   const [savedSourcePreview, setSavedSourcePreview] = useState("");
   const [savedSourceImageRef, setSavedSourceImageRef] = useState<string | null>(null);
   const [savedTopics, setSavedTopics] = useState<Topic[]>([]);
@@ -122,7 +98,6 @@ export function EditPointsScreen({ route, navigation }: Props) {
 
         const visibleTopics = source.topics.filter((topic) => topic.is_starred);
         setSavedInputType(source.input_type);
-        setSavedRawContent(source.raw_content);
         setSavedSourcePreview(source.source_preview_text ?? "");
         setSavedSourceImageRef(source.source_image_ref ?? null);
         setSavedTopics(visibleTopics);
@@ -155,7 +130,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
     route.params.variant === "new"
       ? sourceDraft.trim() || newPoints.find((point) => point.text.trim())?.text.trim() || route.params.sourceText.trim() || undefined
       : savedSourcePreview || undefined;
-  const normalizedSavedSourceText = useMemo(() => parseRawContent(savedInputType, savedRawContent), [savedInputType, savedRawContent]);
+  const normalizedSavedSourceText = savedSourcePreview || "No saved source text.";
 
   const updatePoint = (id: string, updates: Partial<ReviewDraftPoint>) => {
     setNewPoints((current) => current.map((point) => (point.id === id ? { ...point, ...updates } : point)));
@@ -336,7 +311,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
             ) : (
               <View style={styles.savedSourceCopy}>
                 {savedSourcePreview ? <Text style={styles.savedSourcePreview}>{savedSourcePreview}</Text> : null}
-                <Text style={styles.savedSourceText}>{normalizedSavedSourceText || "No saved source text."}</Text>
+                <Text style={styles.savedSourceText}>{normalizedSavedSourceText}</Text>
               </View>
             )}
           </View>

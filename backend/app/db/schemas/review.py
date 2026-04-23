@@ -22,7 +22,6 @@ class SavedTopicSourceResponse(APIModel):
     topic_id: str
     study_input_id: str
     input_type: str
-    raw_content: str
     source_kind: str | None = None
     source_preview_text: str | None = None
     source_image_ref: str | None = None
@@ -52,7 +51,6 @@ class SavedStudyInputsResponse(APIModel):
 class SavedStudyInputDetailResponse(APIModel):
     study_input_id: str
     input_type: str
-    raw_content: str
     source_kind: str | None = None
     source_preview_text: str | None = None
     source_image_ref: str | None = None

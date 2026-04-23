@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -22,23 +22,6 @@ import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SavedCardDetail">;
 
-const parseRawContent = (inputType: "keywords" | "notes", rawContent: string): string => {
-  if (inputType !== "keywords") {
-    return rawContent;
-  }
-
-  try {
-    const parsed = JSON.parse(rawContent);
-    if (Array.isArray(parsed)) {
-      return parsed.filter((item): item is string => typeof item === "string" && item.trim().length > 0).join("\n");
-    }
-  } catch {
-    return rawContent;
-  }
-
-  return rawContent;
-};
-
 const topicFallbacksFromSource = (sourceText: string): string[] =>
   sourceText
     .split("\n")
@@ -59,7 +42,6 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
 
   const [loading, setLoading] = useState(true);
   const [inputType, setInputType] = useState<"keywords" | "notes">("notes");
-  const [rawContent, setRawContent] = useState("");
   const [sourcePreviewText, setSourcePreviewText] = useState("");
   const [sourceImageRef, setSourceImageRef] = useState<string | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -76,7 +58,6 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
               return;
             }
             setInputType(source.input_type);
-            setRawContent(source.raw_content);
             setSourcePreviewText(source.source_preview_text ?? "");
             setSourceImageRef(source.source_image_ref ?? null);
             const visibleTopics = source.topics.filter((topic) => topic.is_starred);
@@ -98,7 +79,6 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
           return;
         }
         setInputType(source.input_type);
-        setRawContent(source.raw_content);
         setSourcePreviewText(source.source_preview_text ?? "");
         setSourceImageRef(source.source_image_ref ?? null);
         const visibleTopics = source.topics.filter((topic) => topic.is_starred);
@@ -124,8 +104,8 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
   }, [navigation, studyInputId, topicId]);
 
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
-  const normalizedSourceText = useMemo(() => parseRawContent(inputType, rawContent), [inputType, rawContent]);
   const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
+  const normalizedSourceText = sourcePreviewText || "No saved source text.";
 
   return (
     <ScreenContainer>
@@ -178,7 +158,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
             <Text style={styles.sourceLabel}>{sourceImageRef ? "Saved photo" : inputType === "keywords" ? "Saved keywords" : "Saved note"}</Text>
             {sourceImageRef ? <Image source={{ uri: getSourceImageUrl(sourceImageRef) }} style={styles.sourceImage} /> : null}
             {sourcePreviewText ? <Text style={styles.sourcePreview}>{sourcePreviewText}</Text> : null}
-            <Text style={styles.sourceText}>{normalizedSourceText || "No saved source text."}</Text>
+            <Text style={styles.sourceText}>{normalizedSourceText}</Text>
           </View>
 
           <View style={styles.section}>
