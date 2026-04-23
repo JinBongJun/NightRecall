@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     ops_alert_threshold_429: int = 30
     ops_alert_threshold_slow: int = 20
     ops_alert_threshold_exception: int = 1
+    ops_alert_threshold_job_failed: int = 1
+    ops_alert_threshold_job_slow: int = 10
 
     def validate_security(self) -> None:
         """

@@ -22,5 +22,7 @@ class OpsAlert(Base):
     http_429: Mapped[int] = mapped_column(Integer, default=0)
     slow: Mapped[int] = mapped_column(Integer, default=0)
     exception: Mapped[int] = mapped_column(Integer, default=0)
+    job_failed: Mapped[int] = mapped_column(Integer, default=0)
+    job_slow: Mapped[int] = mapped_column(Integer, default=0)
 
     sent_ok: Mapped[int] = mapped_column(Integer, default=0)

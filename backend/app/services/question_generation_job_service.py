@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.db.models.ops_event import OpsEvent
 from app.db.models.question_job import QuestionGenerationJob
 from app.db.models.user import User
 from app.db.schemas.questions import (
@@ -71,14 +72,19 @@ class QuestionGenerationJobService:
             job.started_at = datetime.now(UTC)
             db.commit()
 
+            run_started_at = datetime.now(UTC)
             payload = QuestionGenerateRequest.model_validate_json(job.request_json)
             response = QuestionService(db).generate_questions(job.user_id, payload)
+            duration_ms = int((datetime.now(UTC) - run_started_at).total_seconds() * 1000)
 
             job.status = "succeeded"
             job.result_json = response.model_dump_json()
             job.error_message = None
             job.completed_at = datetime.now(UTC)
             db.commit()
+            self._record_job_event(db, kind="job", detail=None, duration_ms=duration_ms, user_id=job.user_id)
+            if duration_ms >= 20_000:
+                self._record_job_event(db, kind="job", detail="slow", duration_ms=duration_ms, user_id=job.user_id)
             logger.info("question_generation.job succeeded job_id=%s user_id=%s count=%s", job.id, job.user_id, len(response.questions))
         except Exception as exc:
             logger.exception("question_generation.job failed job_id=%s", job_id)
@@ -89,6 +95,7 @@ class QuestionGenerationJobService:
                 job.error_message = str(exc)
                 job.completed_at = datetime.now(UTC)
                 db.commit()
+                self._record_job_event(db, kind="job", detail="failed", duration_ms=None, user_id=job.user_id)
         finally:
             db.close()
 
@@ -117,3 +124,24 @@ class QuestionGenerationJobService:
             created_at=job.created_at,
             updated_at=job.updated_at,
         )
+
+    def _record_job_event(self, db: Session, *, kind: str, detail: str | None, duration_ms: int | None, user_id: str) -> None:
+        try:
+            db.add(
+                OpsEvent(
+                    id=make_id("ops"),
+                    created_at=datetime.now(UTC),
+                    request_id=None,
+                    route="/jobs/question-generation",
+                    method="JOB",
+                    status_code=None,
+                    duration_ms=duration_ms,
+                    user_id_nullable=user_id,
+                    ip_hash_nullable=None,
+                    kind=kind,
+                    detail=detail,
+                )
+            )
+            db.commit()
+        except Exception:
+            db.rollback()

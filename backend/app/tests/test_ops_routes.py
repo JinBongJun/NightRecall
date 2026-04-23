@@ -33,6 +33,20 @@ def test_ops_digest_works_with_token(client, monkeypatch) -> None:
             detail=None,
         )
     )
+    db.add(
+        OpsEvent(
+            id="ops_job_fail_seed",
+            request_id=None,
+            route="/jobs/question-generation",
+            method="JOB",
+            status_code=None,
+            duration_ms=25000,
+            user_id_nullable="usr_test",
+            ip_hash_nullable=None,
+            kind="job",
+            detail="failed",
+        )
+    )
     db.commit()
 
     import app.core.config as config_mod
@@ -44,6 +58,7 @@ def test_ops_digest_works_with_token(client, monkeypatch) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["http_5xx"] >= 1
+    assert payload["job_failed"] >= 1
 
 
 def test_ops_alert_run_sends_slack_once_and_is_idempotent(client, monkeypatch) -> None:
@@ -93,6 +108,48 @@ def test_ops_alert_run_sends_slack_once_and_is_idempotent(client, monkeypatch) -
     assert r2.json()["sent"] is False
     assert r2.json()["reason"] in ("already_sent", "below_threshold")
     assert len(calls) == 1
+
+
+def test_ops_alert_run_triggers_on_job_failure(client, monkeypatch) -> None:
+    test_client, db = client
+
+    db.add(
+        OpsEvent(
+            id="ops_job_failed",
+            request_id=None,
+            route="/jobs/study-input-extract",
+            method="JOB",
+            status_code=None,
+            duration_ms=25000,
+            user_id_nullable="usr_test",
+            ip_hash_nullable=None,
+            kind="job",
+            detail="failed",
+        )
+    )
+    db.commit()
+
+    import app.core.config as config_mod
+    import app.services.ops_alert_service as ops_mod
+
+    settings = config_mod.get_settings()
+    monkeypatch.setattr(settings, "ops_cron_token", "tok_test", raising=False)
+    monkeypatch.setattr(settings, "ops_slack_webhook_url", "https://example.com/webhook", raising=False)
+
+    calls: list[dict] = []
+
+    def fake_post(url, json, timeout):  # type: ignore[no-untyped-def]
+        calls.append({"url": url, "json": json, "timeout": timeout})
+        return SimpleNamespace(status_code=200)
+
+    monkeypatch.setattr(ops_mod.requests, "post", fake_post, raising=True)
+
+    response = test_client.post("/v1/ops/alert-run", headers={"X-Ops-Token": "tok_test"})
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["sent"] is True
+    assert payload["digest"]["job_failed"] >= 1
+    assert "job failed" in calls[0]["json"]["text"]
 
 
 def test_ops_alert_run_retries_if_slack_failed_before(client, monkeypatch) -> None:

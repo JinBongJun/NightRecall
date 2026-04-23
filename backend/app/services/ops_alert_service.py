@@ -23,6 +23,8 @@ class OpsDigest:
     http_429: int
     slow: int
     exception: int
+    job_failed: int
+    job_slow: int
 
 
 class OpsAlertService:
@@ -79,6 +81,28 @@ class OpsAlertService:
             )
             or 0
         )
+        job_failed = int(
+            self.db.scalar(
+                select(func.count(OpsEvent.id)).where(
+                    OpsEvent.created_at >= window_start,
+                    OpsEvent.created_at < window_end,
+                    OpsEvent.kind == "job",
+                    OpsEvent.detail == "failed",
+                )
+            )
+            or 0
+        )
+        job_slow = int(
+            self.db.scalar(
+                select(func.count(OpsEvent.id)).where(
+                    OpsEvent.created_at >= window_start,
+                    OpsEvent.created_at < window_end,
+                    OpsEvent.kind == "job",
+                    OpsEvent.detail == "slow",
+                )
+            )
+            or 0
+        )
 
         return OpsDigest(
             window_start=window_start,
@@ -88,6 +112,8 @@ class OpsAlertService:
             http_429=http_429,
             slow=slow,
             exception=exception,
+            job_failed=job_failed,
+            job_slow=job_slow,
         )
 
     def should_alert(self, digest: OpsDigest) -> bool:
@@ -97,6 +123,8 @@ class OpsAlertService:
                 digest.http_429 >= int(self.settings.ops_alert_threshold_429),
                 digest.slow >= int(self.settings.ops_alert_threshold_slow),
                 digest.exception >= int(self.settings.ops_alert_threshold_exception),
+                digest.job_failed >= int(self.settings.ops_alert_threshold_job_failed),
+                digest.job_slow >= int(self.settings.ops_alert_threshold_job_slow),
             ]
         )
 
@@ -145,6 +173,8 @@ class OpsAlertService:
             alert.http_429 = digest.http_429
             alert.slow = digest.slow
             alert.exception = digest.exception
+            alert.job_failed = digest.job_failed
+            alert.job_slow = digest.job_slow
             self.db.commit()
 
         text = (
@@ -153,6 +183,8 @@ class OpsAlertService:
             f"- 429: {digest.http_429}\n"
             f"- slow(>=2s): {digest.slow}\n"
             f"- exceptions: {digest.exception}\n"
+            f"- job failed: {digest.job_failed}\n"
+            f"- job slow(>=20s): {digest.job_slow}\n"
             f"- window: {digest.window_start.isoformat()} -> {digest.window_end.isoformat()}"
         )
 
