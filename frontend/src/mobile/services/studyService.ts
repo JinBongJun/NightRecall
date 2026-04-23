@@ -1,5 +1,11 @@
 import { apiClient } from "./api";
-import { QuestionGenerationJobResponse, StudyInputExtractResponse, StudyInputExtractJobResponse, Topic } from "../types/api";
+import {
+  QuestionGenerationJobResponse,
+  StudyInputExtractResponse,
+  StudyInputExtractJobResponse,
+  StudyInputSourceImageUploadResponse,
+  Topic,
+} from "../types/api";
 
 const QUESTION_GENERATION_POLL_INTERVAL_MS = 1500;
 const QUESTION_GENERATION_JOB_TIMEOUT_MS = 180000;
@@ -12,6 +18,7 @@ export async function createStudyInput(payload: {
   starred_indices: number[];
   source_kind?: "photo" | "manual";
   source_preview_text?: string;
+  source_image_ref?: string;
 }) {
   const response = await apiClient.post("/study-inputs", payload);
   return response.data as {
@@ -19,8 +26,13 @@ export async function createStudyInput(payload: {
     topics: Topic[];
     source_kind?: "photo" | "manual" | null;
     source_preview_text?: string | null;
-    source_image_data?: string | null;
+    source_image_ref?: string | null;
   };
+}
+
+export async function uploadSourceImage(payload: { image_base64: string; image_mime_type?: string }) {
+  const response = await apiClient.post("/study-inputs/source-images", payload);
+  return response.data as StudyInputSourceImageUploadResponse;
 }
 
 export async function redactStudyInputSource(studyInputId: string) {

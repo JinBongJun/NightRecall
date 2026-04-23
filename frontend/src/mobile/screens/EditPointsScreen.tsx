@@ -12,7 +12,8 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import { fetchSavedInputDetail, fetchSavedTopicSource } from "../services/reviewService";
-import { createStudyInput } from "../services/studyService";
+import { createStudyInput, uploadSourceImage } from "../services/studyService";
+import { getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
@@ -95,7 +96,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
   const [savedInputType, setSavedInputType] = useState<"keywords" | "notes">("notes");
   const [savedRawContent, setSavedRawContent] = useState("");
   const [savedSourcePreview, setSavedSourcePreview] = useState("");
-  const [savedSourceImageData, setSavedSourceImageData] = useState<string | null>(null);
+  const [savedSourceImageRef, setSavedSourceImageRef] = useState<string | null>(null);
   const [savedTopics, setSavedTopics] = useState<Topic[]>([]);
   const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>(
     route.params.variant === "saved" ? route.params.selectedTopicIds ?? [] : [],
@@ -123,7 +124,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         setSavedInputType(source.input_type);
         setSavedRawContent(source.raw_content);
         setSavedSourcePreview(source.source_preview_text ?? "");
-        setSavedSourceImageData(source.source_image_data ?? null);
+        setSavedSourceImageRef(source.source_image_ref ?? null);
         setSavedTopics(visibleTopics);
         setSelectedTopicIds((current) => (current.length ? current : visibleTopics.map((topic) => topic.id)));
       } catch (error) {
@@ -188,11 +189,23 @@ export function EditPointsScreen({ route, navigation }: Props) {
         return;
       }
 
+      const sourceImageRef =
+        route.params.mode === "photo" && route.params.imageBase64
+          ? (await uploadSourceImage({
+              image_base64: route.params.imageBase64,
+              image_mime_type:
+                route.params.imageMimeType && route.params.imageMimeType.startsWith("image/")
+                  ? route.params.imageMimeType
+                  : "image/jpeg",
+            })).source_image_ref
+          : undefined;
+
       const studyInput = await createStudyInput({
         ...payload,
         starred_indices: starredIndices,
         source_kind: route.params.mode === "photo" ? "photo" : "manual",
         source_preview_text: normalizedSourcePreview,
+        source_image_ref: sourceImageRef,
       });
       setTopics(studyInput.topics);
       upsertSavedInput({
@@ -200,6 +213,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         input_type: payload.input_type,
         source_kind: studyInput.source_kind ?? (route.params.mode === "photo" ? "photo" : "manual"),
         source_preview_text: studyInput.source_preview_text ?? normalizedSourcePreview ?? null,
+        source_image_ref: studyInput.source_image_ref ?? sourceImageRef ?? null,
         title: studyInput.source_preview_text ?? normalizedSourcePreview ?? usablePoints[0].text.trim(),
         preview:
           usablePoints.find((point) => point.text.trim() !== (studyInput.source_preview_text ?? normalizedSourcePreview ?? "").trim())?.text.trim() ?? "",
@@ -307,8 +321,8 @@ export function EditPointsScreen({ route, navigation }: Props) {
             {route.params.variant === "new" && route.params.imageUri ? (
               <Image source={{ uri: route.params.imageUri }} style={styles.sourceImage} />
             ) : null}
-            {route.params.variant === "saved" && savedSourceImageData ? (
-              <Image source={{ uri: savedSourceImageData }} style={styles.sourceImage} />
+            {route.params.variant === "saved" && savedSourceImageRef ? (
+              <Image source={{ uri: getSourceImageUrl(savedSourceImageRef) }} style={styles.sourceImage} />
             ) : null}
             {route.params.variant === "new" ? (
               <TextInput

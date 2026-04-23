@@ -15,7 +15,7 @@ class StudyInput(Base):
     raw_content: Mapped[str] = mapped_column(Text)
     source_kind: Mapped[str | None] = mapped_column(String(24), nullable=True)
     source_preview_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    source_image_data: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_image_ref: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, index=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
 

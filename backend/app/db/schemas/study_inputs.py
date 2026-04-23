@@ -20,7 +20,7 @@ class StudyInputCreateRequest(APIModel):
     starred_indices: list[int] = Field(default_factory=list)
     source_kind: Literal["photo", "manual"] | None = None
     source_preview_text: str | None = None
-    source_image_data: str | None = None
+    source_image_ref: str | None = None
 
     @field_validator("content")
     @classmethod
@@ -43,10 +43,6 @@ class StudyInputCreateRequest(APIModel):
             raise ValueError("keywords input requires array content")
         if self.input_type == "notes" and not isinstance(self.content, str):
             raise ValueError("notes input requires string content")
-        if self.source_image_data and not self.source_image_data.startswith("data:image/"):
-            raise ValueError("source_image_data must be an image data URI")
-        if self.source_image_data and len(self.source_image_data) > MAX_SOURCE_IMAGE_DATA_LENGTH:
-            raise ValueError("source_image_data is too large")
         if self.source_preview_text is not None and not self.source_preview_text.strip():
             self.source_preview_text = None
         return self
@@ -57,7 +53,16 @@ class StudyInputCreateResponse(APIModel):
     topics: list[TopicResponse]
     source_kind: str | None = None
     source_preview_text: str | None = None
-    source_image_data: str | None = None
+    source_image_ref: str | None = None
+
+
+class StudyInputSourceImageUploadRequest(APIModel):
+    image_base64: str
+    image_mime_type: str = "image/jpeg"
+
+
+class StudyInputSourceImageUploadResponse(APIModel):
+    source_image_ref: str
 
 
 class StudyInputExtractRequest(APIModel):

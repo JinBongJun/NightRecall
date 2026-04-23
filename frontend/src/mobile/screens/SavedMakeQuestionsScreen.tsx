@@ -14,6 +14,7 @@ import {
   fetchSavedInputDetail,
   fetchSavedTopicSource,
 } from "../services/reviewService";
+import { getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
 import { Topic } from "../types/api";
@@ -60,7 +61,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
   const [inputType, setInputType] = useState<"keywords" | "notes">("notes");
   const [rawContent, setRawContent] = useState("");
   const [sourcePreviewText, setSourcePreviewText] = useState("");
-  const [sourceImageData, setSourceImageData] = useState<string | null>(null);
+  const [sourceImageRef, setSourceImageRef] = useState<string | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
 
   useEffect(() => {
@@ -77,10 +78,10 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
             setInputType(source.input_type);
             setRawContent(source.raw_content);
             setSourcePreviewText(source.source_preview_text ?? "");
-        setSourceImageData(source.source_image_data ?? null);
-        const visibleTopics = source.topics.filter((topic) => topic.is_starred);
-        setTopics(visibleTopics);
-        return;
+            setSourceImageRef(source.source_image_ref ?? null);
+            const visibleTopics = source.topics.filter((topic) => topic.is_starred);
+            setTopics(visibleTopics);
+            return;
           } catch (error) {
             if (!topicId) {
               throw error;
@@ -99,7 +100,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
         setInputType(source.input_type);
         setRawContent(source.raw_content);
         setSourcePreviewText(source.source_preview_text ?? "");
-        setSourceImageData(source.source_image_data ?? null);
+        setSourceImageRef(source.source_image_ref ?? null);
         const visibleTopics = source.topics.filter((topic) => topic.is_starred);
         setTopics(visibleTopics);
       } catch (error) {
@@ -174,8 +175,8 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
           </HeroCard>
 
           <View style={styles.sourceCard}>
-            <Text style={styles.sourceLabel}>{sourceImageData ? "Saved photo" : inputType === "keywords" ? "Saved keywords" : "Saved note"}</Text>
-            {sourceImageData ? <Image source={{ uri: sourceImageData }} style={styles.sourceImage} /> : null}
+            <Text style={styles.sourceLabel}>{sourceImageRef ? "Saved photo" : inputType === "keywords" ? "Saved keywords" : "Saved note"}</Text>
+            {sourceImageRef ? <Image source={{ uri: getSourceImageUrl(sourceImageRef) }} style={styles.sourceImage} /> : null}
             {sourcePreviewText ? <Text style={styles.sourcePreview}>{sourcePreviewText}</Text> : null}
             <Text style={styles.sourceText}>{normalizedSourceText || "No saved source text."}</Text>
           </View>

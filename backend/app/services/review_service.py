@@ -27,6 +27,7 @@ from app.db.schemas.review import (
 )
 from app.db.schemas.study_inputs import TopicResponse
 from app.services.question_service import QuestionService
+from app.services.source_image_storage_service import SourceImageStorageService
 from app.services.streak_service import StreakService
 from app.utils.ids import make_id
 from app.utils.time import local_date
@@ -179,7 +180,7 @@ class ReviewService:
                     input_type=study_input.input_type,
                     source_kind=study_input.source_kind,
                     source_preview_text=study_input.source_preview_text,
-                    source_image_data=None,
+                    source_image_ref=study_input.source_image_ref,
                     title=title,
                     preview=preview,
                     bookmarked_count=len(starred_topics),
@@ -206,7 +207,7 @@ class ReviewService:
             raw_content=study_input.raw_content,
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
-            source_image_data=None,
+            source_image_ref=study_input.source_image_ref,
             topics=[TopicResponse.model_validate(item) for item in topics],
         )
 
@@ -222,7 +223,7 @@ class ReviewService:
             raw_content=study_input.raw_content,
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
-            source_image_data=None,
+            source_image_ref=study_input.source_image_ref,
             topics=[TopicResponse.model_validate(item) for item in topics],
         )
 
@@ -264,6 +265,7 @@ class ReviewService:
 
         if topic_ids:
             self.db.execute(delete(StudyTopic).where(StudyTopic.id.in_(topic_ids)))
+        SourceImageStorageService().delete(study_input.source_image_ref)
         self.db.execute(delete(StudyInput).where(StudyInput.id == study_input_id))
         self.db.commit()
 
@@ -283,10 +285,12 @@ class ReviewService:
             self.db.execute(delete(Question).where(Question.id.in_(question_ids)))
 
         study_input_id = topic.study_input_id
+        source_image_ref = topic.study_input.source_image_ref if topic.study_input else None
         self.db.execute(delete(StudyTopic).where(StudyTopic.id == topic_id))
 
         remaining_topic = self.db.scalar(select(StudyTopic.id).where(StudyTopic.study_input_id == study_input_id).limit(1))
         if not remaining_topic:
+            SourceImageStorageService().delete(source_image_ref)
             self.db.execute(delete(StudyInput).where(StudyInput.id == study_input_id))
 
         self.db.commit()

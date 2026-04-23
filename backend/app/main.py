@@ -44,8 +44,8 @@ def ensure_sqlite_schema() -> None:
         statements.append("ALTER TABLE study_inputs ADD COLUMN source_kind VARCHAR(24)")
     if "source_preview_text" not in columns:
         statements.append("ALTER TABLE study_inputs ADD COLUMN source_preview_text TEXT")
-    if "source_image_data" not in columns:
-        statements.append("ALTER TABLE study_inputs ADD COLUMN source_image_data TEXT")
+    if "source_image_ref" not in columns:
+        statements.append("ALTER TABLE study_inputs ADD COLUMN source_image_ref VARCHAR(128)")
 
     if not statements:
         return

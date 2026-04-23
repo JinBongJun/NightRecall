@@ -11,6 +11,10 @@ export function getApiBaseUrl() {
   return apiClient.defaults.baseURL ?? defaultBaseURL;
 }
 
+export function getSourceImageUrl(sourceImageRef: string) {
+  return `${getApiBaseUrl().replace(/\/$/, "")}/study-inputs/source-images/${sourceImageRef}`;
+}
+
 export const apiClient = axios.create({
   baseURL: defaultBaseURL,
   timeout: 10000,

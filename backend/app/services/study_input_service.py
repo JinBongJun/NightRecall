@@ -6,6 +6,7 @@ from app.db.models.study import StudyInput, StudyTopic
 from app.db.repositories.study_repository import StudyRepository
 from app.db.schemas.study_inputs import StudyInputCreateRequest, StudyInputCreateResponse, TopicResponse
 from app.services.topic_service import TopicService
+from app.services.source_image_storage_service import SourceImageStorageService
 from app.utils.ids import make_id
 
 
@@ -15,6 +16,12 @@ class StudyInputService:
         self.repository = StudyRepository(db)
 
     def create_study_input(self, user_id: str, payload: StudyInputCreateRequest) -> StudyInputCreateResponse:
+        source_image_ref = payload.source_image_ref
+        if source_image_ref:
+            source_image_path = SourceImageStorageService().resolve_path(source_image_ref)
+            if not source_image_path.exists():
+                raise ValueError("source image not found")
+
         study_input = StudyInput(
             id=make_id("si"),
             user_id=user_id,
@@ -22,7 +29,7 @@ class StudyInputService:
             raw_content=json.dumps(payload.content, ensure_ascii=False) if isinstance(payload.content, list) else payload.content,
             source_kind=payload.source_kind,
             source_preview_text=payload.source_preview_text,
-            source_image_data=None,
+            source_image_ref=source_image_ref,
         )
         self.repository.create_input(study_input)
 
@@ -44,7 +51,7 @@ class StudyInputService:
             topics=[TopicResponse.model_validate(topic) for topic in topics],
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
-            source_image_data=None,
+            source_image_ref=study_input.source_image_ref,
         )
 
     def redact_study_input_source(self, user_id: str, study_input_id: str) -> None:
@@ -55,7 +62,8 @@ class StudyInputService:
         study_input.raw_content = "[source removed after question generation]"
         study_input.source_kind = None
         study_input.source_preview_text = None
-        study_input.source_image_data = None
+        SourceImageStorageService().delete(study_input.source_image_ref)
+        study_input.source_image_ref = None
 
         topics = self.repository.get_topics_for_input(study_input_id)
         for index, topic in enumerate(topics, start=1):

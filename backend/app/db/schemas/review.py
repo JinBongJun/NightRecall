@@ -25,7 +25,7 @@ class SavedTopicSourceResponse(APIModel):
     raw_content: str
     source_kind: str | None = None
     source_preview_text: str | None = None
-    source_image_data: str | None = None
+    source_image_ref: str | None = None
     topics: list[TopicResponse]
 
 
@@ -34,7 +34,7 @@ class SavedStudyInputSummaryResponse(APIModel):
     input_type: str
     source_kind: str | None = None
     source_preview_text: str | None = None
-    source_image_data: str | None = None
+    source_image_ref: str | None = None
     title: str
     preview: str
     bookmarked_count: int
@@ -51,7 +51,7 @@ class SavedStudyInputDetailResponse(APIModel):
     raw_content: str
     source_kind: str | None = None
     source_preview_text: str | None = None
-    source_image_data: str | None = None
+    source_image_ref: str | None = None
     topics: list[TopicResponse]
 
 

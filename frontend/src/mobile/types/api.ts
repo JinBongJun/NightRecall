@@ -11,7 +11,7 @@ export type SavedTopicSource = {
   raw_content: string;
   source_kind?: "photo" | "manual" | null;
   source_preview_text?: string | null;
-  source_image_data?: string | null;
+  source_image_ref?: string | null;
   topics: Topic[];
 };
 
@@ -20,7 +20,7 @@ export type SavedStudyInputSummary = {
   input_type: "keywords" | "notes";
   source_kind?: "photo" | "manual" | null;
   source_preview_text?: string | null;
-  source_image_data?: string | null;
+  source_image_ref?: string | null;
   title: string;
   preview: string;
   bookmarked_count: number;
@@ -37,7 +37,7 @@ export type SavedStudyInputDetail = {
   raw_content: string;
   source_kind?: "photo" | "manual" | null;
   source_preview_text?: string | null;
-  source_image_data?: string | null;
+  source_image_ref?: string | null;
   topics: Topic[];
 };
 
@@ -109,6 +109,10 @@ export type StatsResponse = {
 export type StudyInputExtractResponse = {
   source_preview: string;
   points: ExtractedPoint[];
+};
+
+export type StudyInputSourceImageUploadResponse = {
+  source_image_ref: string;
 };
 
 export type UsageLimitInfo = {
