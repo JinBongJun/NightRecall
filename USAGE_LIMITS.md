@@ -10,6 +10,8 @@ This document defines the product-facing quota rules for the free plan.
 - Extracting and saving study material without generating questions does not consume question quota.
 - Generating questions from saved learning consumes question quota at the time of generation.
 - Reviewing already generated questions does not consume extraction or question quota.
+- Library storage is not separately quota-limited. Saved learning cards can remain in the library until the user deletes them.
+- A new library card can only be created when the user spends one photo read and bookmarks at least one point from that extraction.
 
 ## User-Facing Terminology
 
@@ -17,6 +19,7 @@ This document defines the product-facing quota rules for the free plan.
 - `Questions left tonight`: remaining new questions the user can generate for the current local day.
 - `Ready now`: questions already generated and available to review right away.
 - `Day streak`: consecutive local days with at least one completed review.
+- `Saved learning`: extracted cards kept in the library for later review.
 
 ## Enforcement Notes
 

@@ -7,7 +7,6 @@ import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
-import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 
@@ -15,9 +14,6 @@ type Props = NativeStackScreenProps<RootStackParamList, "Create">;
 
 export function CreateScreen({ navigation }: Props) {
   const usageLimits = useUsageLimits();
-  const currentQuestion = useReviewStore((state) => state.currentQuestion);
-  const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
-  const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
   const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
 
@@ -32,14 +28,8 @@ export function CreateScreen({ navigation }: Props) {
 
       <CenteredHeroCard
         badgeLabel="Tonight"
-        title={`${remainingQuestionsTonight} of 3 questions left`}
-        body={
-          remainingQuestionsTonight === 0
-            ? "You already made 3 questions tonight."
-            : activeQuestionCount > 0
-            ? `${activeQuestionCount} question${activeQuestionCount > 1 ? "s are" : " is"} already ready.`
-            : `${remainingPhotoReadsTonight} of 3 photo reads are still available.`
-        }
+        title="Tonight overview"
+        body={`${remainingQuestionsTonight} questions left, ${remainingPhotoReadsTonight} photo reads left tonight.`}
         tone="neutral"
         iconName="schedule"
       />

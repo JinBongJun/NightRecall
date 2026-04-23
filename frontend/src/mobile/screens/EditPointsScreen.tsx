@@ -146,7 +146,6 @@ export function EditPointsScreen({ route, navigation }: Props) {
     };
   }, [navigation, route.params]);
 
-  const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
   const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
   const tonightIsFull = remainingQuestionsTonight <= 0;
@@ -397,13 +396,8 @@ export function EditPointsScreen({ route, navigation }: Props) {
           <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Question count</Text>
             <Text style={styles.summaryBody}>Start with 1 question. You can make up to 3 if you want.</Text>
-            <Text style={styles.summaryCapacity}>{`${remainingQuestionsTonight} of 3 questions left tonight.`}</Text>
-            <Text style={styles.summaryHelper}>{`${remainingPhotoReadsTonight} of 3 photo reads left tonight.`}</Text>
-            {activeQuestionCount > 0 ? (
-              <Text style={styles.summaryHelper}>
-                {activeQuestionCount} question{activeQuestionCount > 1 ? "s are" : " is"} already ready.
-              </Text>
-            ) : null}
+            <Text style={styles.summaryCapacity}>{`${remainingQuestionsTonight} questions left tonight.`}</Text>
+            <Text style={styles.summaryHelper}>{`${remainingPhotoReadsTonight} photo reads left tonight.`}</Text>
             <QuantitySelector
               values={[1, 2, 3]}
               selectedValue={selectedQuestionCount}

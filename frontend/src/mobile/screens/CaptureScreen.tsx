@@ -29,6 +29,7 @@ export function CaptureScreen({ navigation }: Props) {
   } | null>(null);
   const canContinue = Boolean(selectedImage?.base64);
 
+  const questionGenerationsRemaining = usageLimits?.question_generation_daily.remaining ?? 3;
   const photoReadsRemaining = usageLimits?.photo_extract_daily.remaining ?? null;
   const photoReadsLocked = photoReadsRemaining === 0;
 
@@ -121,6 +122,18 @@ export function CaptureScreen({ navigation }: Props) {
         title="Capture today's learning"
         subtitle="Import notes, slides, photos, or quick ideas to prepare tonight's question."
       />
+
+      <View style={styles.limitStrip}>
+        <View style={styles.limitStat}>
+          <Text style={styles.limitValue}>{questionGenerationsRemaining}</Text>
+          <Text style={styles.limitLabel}>Questions left</Text>
+        </View>
+        <View style={styles.limitDivider} />
+        <View style={styles.limitStat}>
+          <Text style={styles.limitValue}>{photoReadsRemaining ?? 3}</Text>
+          <Text style={styles.limitLabel}>Photo reads left</Text>
+        </View>
+      </View>
 
       <SectionRow title="Quick capture" />
       {photoLimitCopy ? <Text style={[styles.limitNote, photoReadsLocked && styles.limitNoteLocked]}>{photoLimitCopy}</Text> : null}
@@ -225,6 +238,36 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     gap: 12,
+  },
+  limitStrip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.surfaceLow,
+    borderRadius: 22,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "rgba(192,200,199,0.18)",
+  },
+  limitStat: {
+    flex: 1,
+    alignItems: "center",
+    gap: 4,
+  },
+  limitValue: {
+    color: colors.primary,
+    fontSize: 22,
+    fontWeight: "800",
+  },
+  limitLabel: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  limitDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: colors.line,
   },
   limitNote: {
     marginTop: 10,

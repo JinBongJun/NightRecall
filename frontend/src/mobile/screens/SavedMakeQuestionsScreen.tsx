@@ -154,7 +154,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
             iconName="auto-stories"
             titleMaxWidth={220}
             meta={
-              `${remainingQuestionsTonight} questions left, ${remainingPhotoReadsTonight} photo reads left tonight.`
+              `${remainingQuestionsTonight} questions left tonight, ${remainingPhotoReadsTonight} photo reads left tonight.`
             }
           >
             <View style={styles.summaryRow}>
