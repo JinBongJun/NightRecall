@@ -45,6 +45,18 @@ export type ExtractedPoint = {
   text: string;
 };
 
+export type StudyInputExtractJobStatus = "queued" | "running" | "succeeded" | "failed";
+
+export type StudyInputExtractJobResponse = {
+  job_id: string;
+  status: StudyInputExtractJobStatus;
+  source_preview?: string | null;
+  points?: ExtractedPoint[] | null;
+  error_message?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Question = {
   id: string;
   question_type: "mcq" | "true_false" | "fill_blank";
@@ -63,6 +75,17 @@ export type TonightQuestionResponse = {
 
 export type GeneratedQuestionsResponse = {
   questions: Question[];
+};
+
+export type QuestionGenerationJobStatus = "queued" | "running" | "succeeded" | "failed";
+
+export type QuestionGenerationJobResponse = {
+  job_id: string;
+  status: QuestionGenerationJobStatus;
+  questions?: Question[];
+  error_message?: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type AnswerResponse = {

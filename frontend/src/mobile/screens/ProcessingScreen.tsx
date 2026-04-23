@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 
 import { ScreenContainer } from "../components/ScreenContainer";
-import { extractStudyInput } from "../services/studyService";
+import { startStudyInputExtractJob, waitForStudyInputExtractJob } from "../services/studyService";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 import { asUsageLimitReason } from "../utils/usageLimits";
@@ -130,18 +130,24 @@ export function ProcessingScreen({ route, navigation }: Props) {
           return;
         }
 
-        const extracted = await extractStudyInput({
+        const job = await startStudyInputExtractJob({
           source_type: "image",
           image_base64: imageBase64,
           image_mime_type: imageMimeType,
         });
+        const completed = await waitForStudyInputExtractJob(job.job_id, {
+          isCancelled: () => cancelled,
+        });
 
         if (!cancelled) {
+          if (!completed.points?.length) {
+            throw new Error("study_input_extract_job_returned_no_points");
+          }
           navigation.replace("EditPoints", {
             variant: "new",
             mode: "photo",
-            sourceText: extracted.source_preview || sourceText,
-            extractedPoints: extracted.points.map((point) => point.text),
+            sourceText: completed.source_preview || sourceText,
+            extractedPoints: completed.points.map((point) => point.text),
             imageUri,
             imageBase64,
             imageMimeType,
@@ -151,7 +157,9 @@ export function ProcessingScreen({ route, navigation }: Props) {
         const apiDetail =
           axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
             ? error.response.data.detail
-            : null;
+            : error instanceof Error
+              ? error.message
+              : null;
         const usageLimitReason = asUsageLimitReason(apiDetail);
         if (!cancelled && usageLimitReason === "photo_extract") {
           navigation.replace("UsageLimit", {

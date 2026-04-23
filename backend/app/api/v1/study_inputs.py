@@ -1,17 +1,19 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, get_db
 from app.api.v1.rate_limit import rate_limit_user
 from app.db.models.user import User
 from app.db.schemas.study_inputs import (
+    StudyInputExtractJobResponse,
     StudyInputCreateRequest,
     StudyInputCreateResponse,
     StudyInputExtractRequest,
     StudyInputExtractResponse,
 )
+from app.services.study_extract_job_service import StudyInputExtractJobService
 from app.services.study_extract_service import StudyExtractService
 from app.services.study_input_service import StudyInputService
 from app.services.analytics_service import AnalyticsService
@@ -75,6 +77,56 @@ def extract_study_input(
         },
     )
     return response
+
+
+@router.post("/extract/jobs", response_model=StudyInputExtractJobResponse, status_code=status.HTTP_202_ACCEPTED)
+def create_extract_job(
+    payload: StudyInputExtractRequest,
+    background_tasks: BackgroundTasks,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    _: None = Depends(rate_limit_user(endpoint="study_inputs.extract_jobs", limit=15, window_seconds=60)),
+) -> StudyInputExtractJobResponse:
+    logger.info(
+        "study_inputs.extract.jobs route source_type=%s has_text=%s has_image=%s image_mime_type=%s",
+        payload.source_type,
+        bool(payload.source_text),
+        bool(payload.image_base64),
+        payload.image_mime_type,
+    )
+    service = StudyInputExtractJobService(db)
+    try:
+        response = service.create_job(current_user.id, payload, background_tasks)
+    except ValueError as exc:
+        AnalyticsService(db).record(
+            name="study_inputs.extract.job.failed",
+            user_id=current_user.id,
+            request_id=getattr(request.state, "request_id", None),
+            props={"source_type": payload.source_type},
+        )
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
+    AnalyticsService(db).record(
+        name="study_inputs.extract.job.created",
+        user_id=current_user.id,
+        request_id=getattr(request.state, "request_id", None),
+        props={"source_type": payload.source_type},
+    )
+    return response
+
+
+@router.get("/extract/jobs/{job_id}", response_model=StudyInputExtractJobResponse)
+def get_extract_job(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> StudyInputExtractJobResponse:
+    service = StudyInputExtractJobService(db)
+    try:
+        return service.get_job(current_user.id, job_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
 
 @router.post("", response_model=StudyInputCreateResponse, status_code=status.HTTP_201_CREATED)

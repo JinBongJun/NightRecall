@@ -7,7 +7,19 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import get_settings
 from app.db.base import Base
-from app.db.models import Question, QuestionSchedule, ReviewEvent, StudyInput, StudyTopic, UsageEvent, User, UserIdentity, UserSession
+from app.db.models import (
+    Question,
+    QuestionGenerationJob,
+    QuestionSchedule,
+    ReviewEvent,
+    StudyInput,
+    StudyTopic,
+    StudyInputExtractJob,
+    UsageEvent,
+    User,
+    UserIdentity,
+    UserSession,
+)
 
 config = context.config
 settings = get_settings()

@@ -1,18 +1,20 @@
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import axios from "axios";
 
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SectionHeader } from "../components/SectionHeader";
 import { TopicChip } from "../components/TopicChip";
 import { useUsageLimits } from "../hooks/useUsageLimits";
-import { createStudyInput, generateQuestions } from "../services/studyService";
+import { createStudyInput, startQuestionGenerationJob, waitForQuestionGenerationJob } from "../services/studyService";
 import { useAuthStore } from "../store/authStore";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
+import { asUsageLimitReason } from "../utils/usageLimits";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Capture">;
 
@@ -50,29 +52,35 @@ export function AddLearningScreen({ navigation }: Props) {
           : { input_type: "notes" as const, content: note, starred_indices: [] };
       const studyInput = await createStudyInput(payload);
       setTopics(studyInput.topics);
-      const generated = await generateQuestions({
+      const job = await startQuestionGenerationJob({
         study_input_id: studyInput.study_input_id,
         count: Math.min(count, remainingQuestionsTonight),
-      }) as {
-        questions?: Array<{
-          id: string;
-          question_type: "mcq" | "true_false" | "fill_blank";
-          question_text: string;
-          choices: string[] | null;
-          answer_index: number | null;
-          answer_text: string | null;
-          explanation: string;
-        }>;
-      };
-      if (generated.questions?.length) {
-        if (count > 1) {
-          setSessionQuestions(generated.questions);
-        } else {
-          setTonightQuestion(generated.questions[0]);
-        }
+      });
+      const completed = await waitForQuestionGenerationJob(job.job_id);
+      if (!completed.questions?.length) {
+        throw new Error("question_generation_job_returned_no_questions");
+      }
+      if (count > 1) {
+        setSessionQuestions(completed.questions);
+      } else {
+        setTonightQuestion(completed.questions[0]);
       }
       navigation.navigate("Review", { mode: "auto" });
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === "question_generation_cancelled") {
+        return;
+      }
+      const detail =
+        axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
+          ? error.response.data.detail
+          : error instanceof Error
+            ? error.message
+            : "Could not save learning";
+      const usageLimitReason = asUsageLimitReason(detail);
+      if (usageLimitReason === "question_generation_daily" || usageLimitReason === "question_generation_monthly") {
+        navigation.navigate("UsageLimit", { reason: usageLimitReason });
+        return;
+      }
       Alert.alert("Could not save learning", "Check the input shape, then try again.");
     }
   };

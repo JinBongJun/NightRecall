@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
@@ -89,3 +90,23 @@ class ExtractedPointResponse(APIModel):
 class StudyInputExtractResponse(APIModel):
     source_preview: str
     points: list[ExtractedPointResponse]
+
+
+StudyInputExtractJobStatus = Literal["queued", "running", "succeeded", "failed"]
+
+
+class StudyInputExtractJobRequest(APIModel):
+    source_type: Literal["text", "image"]
+    source_text: str | None = None
+    image_base64: str | None = None
+    image_mime_type: str | None = None
+
+
+class StudyInputExtractJobResponse(APIModel):
+    job_id: str
+    status: StudyInputExtractJobStatus
+    source_preview: str | None = None
+    points: list[ExtractedPointResponse] | None = None
+    error_message: str | None = None
+    created_at: datetime
+    updated_at: datetime

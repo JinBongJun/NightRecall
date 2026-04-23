@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
@@ -6,6 +7,7 @@ from app.db.schemas.common import APIModel
 
 
 QuestionType = Literal["mcq", "true_false", "fill_blank"]
+QuestionGenerationJobStatus = Literal["queued", "running", "succeeded", "failed"]
 
 
 class QuestionGenerateRequest(APIModel):
@@ -48,3 +50,12 @@ class QuestionOutput(APIModel):
 
 class QuestionGenerateResponse(APIModel):
     questions: list[QuestionOutput]
+
+
+class QuestionGenerationJobResponse(APIModel):
+    job_id: str
+    status: QuestionGenerationJobStatus
+    questions: list[QuestionOutput] | None = None
+    error_message: str | None = None
+    created_at: datetime
+    updated_at: datetime

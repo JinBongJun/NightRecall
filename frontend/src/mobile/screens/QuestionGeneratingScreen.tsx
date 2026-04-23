@@ -5,7 +5,12 @@ import axios from "axios";
 
 import { ScreenContainer } from "../components/ScreenContainer";
 import { deleteSavedInput, generateQuestionsFromSavedInput, generateQuestionsFromSavedTopic } from "../services/reviewService";
-import { createStudyInput, generateQuestions, redactStudyInputSource } from "../services/studyService";
+import {
+  createStudyInput,
+  redactStudyInputSource,
+  startQuestionGenerationJob,
+  waitForQuestionGenerationJob,
+} from "../services/studyService";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
@@ -14,6 +19,13 @@ import { asUsageLimitReason } from "../utils/usageLimits";
 import { toStudyInputPayload } from "../utils/reviewDraft";
 
 type Props = NativeStackScreenProps<RootStackParamList, "QuestionGenerating">;
+
+const getErrorMessage = (error: unknown): string | null => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return null;
+};
 
 export function QuestionGeneratingScreen({ route, navigation }: Props) {
   const pulse = useRef(new Animated.Value(0)).current;
@@ -200,45 +212,49 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             };
           }
 
-          const generated = await generateQuestions({
+          const job = await startQuestionGenerationJob({
             study_input_id: studyInput.study_input_id,
             count: route.params.selectedQuestionCount,
           });
-          const questions = generated && typeof generated === "object" && "questions" in generated ? (generated as { questions?: unknown }).questions : undefined;
-          if (Array.isArray(questions)) {
-            setTopics(studyInput.topics);
-            if (pendingSavedInput) {
-              upsertSavedInput({
-                study_input_id: pendingSavedInput.study_input_id,
-                input_type: pendingSavedInput.input_type,
-                source_kind: pendingSavedInput.source_kind,
-                source_preview_text: pendingSavedInput.source_preview_text,
-                source_image_data: pendingSavedInput.source_image_data,
-                title: pendingSavedInput.title,
-                preview: pendingSavedInput.preview,
-                bookmarked_count: pendingSavedInput.bookmarked_count,
-                topic_id: pendingSavedInput.topic_id,
-              });
-            }
-            if (shouldRedactSource && transientStudyInputId) {
-              try {
-                await redactStudyInputSource(transientStudyInputId);
-              } catch {
-                // Keep the nightly flow moving even if cleanup fails.
-              }
-            }
-            finishWithQuestions(
-              questions as Array<{
-                id: string;
-                question_type: "mcq" | "true_false" | "fill_blank";
-                question_text: string;
-                choices: string[] | null;
-                answer_index: number | null;
-                answer_text: string | null;
-                explanation: string;
-              }>,
-            );
+          const completedJob = await waitForQuestionGenerationJob(job.job_id, {
+            isCancelled: () => cancelled,
+          });
+          const questions = completedJob.questions;
+          if (!Array.isArray(questions) || !questions.length) {
+            throw new Error("question_generation_job_returned_no_questions");
           }
+          setTopics(studyInput.topics);
+          if (pendingSavedInput) {
+            upsertSavedInput({
+              study_input_id: pendingSavedInput.study_input_id,
+              input_type: pendingSavedInput.input_type,
+              source_kind: pendingSavedInput.source_kind,
+              source_preview_text: pendingSavedInput.source_preview_text,
+              source_image_data: pendingSavedInput.source_image_data,
+              title: pendingSavedInput.title,
+              preview: pendingSavedInput.preview,
+              bookmarked_count: pendingSavedInput.bookmarked_count,
+              topic_id: pendingSavedInput.topic_id,
+            });
+          }
+          if (shouldRedactSource && transientStudyInputId) {
+            try {
+              await redactStudyInputSource(transientStudyInputId);
+            } catch {
+              // Keep the nightly flow moving even if cleanup fails.
+            }
+          }
+          finishWithQuestions(
+            questions as Array<{
+              id: string;
+              question_type: "mcq" | "true_false" | "fill_blank";
+              question_text: string;
+              choices: string[] | null;
+              answer_index: number | null;
+              answer_text: string | null;
+              explanation: string;
+            }>,
+          );
           return;
         }
 
@@ -280,6 +296,9 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             // Do not hide the original generation failure behind cleanup errors.
           }
         }
+        if (cancelled) {
+          return;
+        }
         if (axios.isAxiosError(error) && error.code === "ECONNABORTED") {
           Alert.alert(
             "Question generation is taking longer than expected",
@@ -288,10 +307,13 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
           );
           return;
         }
+        const message = getErrorMessage(error);
         const detail =
           axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
             ? error.response.data.detail
-            : "NightRecall could not finish making questions right now.";
+            : message && message !== "question_generation_cancelled"
+              ? message
+              : "NightRecall could not finish making questions right now.";
         const usageLimitReason = asUsageLimitReason(typeof detail === "string" ? detail : null);
         if (usageLimitReason === "question_generation_daily" || usageLimitReason === "question_generation_monthly") {
           navigation.replace("UsageLimit", { reason: usageLimitReason });

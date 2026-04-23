@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "change-me"
     jwt_access_token_ttl_minutes: int = 30
     jwt_refresh_token_ttl_days: int = 30
+    job_inline_processing: bool | None = None
+    job_worker_poll_interval_seconds: float = 2.0
     google_web_client_id: str | None = None
     google_android_client_id: str | None = None
     google_ios_client_id: str | None = None
@@ -88,6 +90,12 @@ class Settings(BaseSettings):
     def cors_allow_credentials(self) -> bool:
         origins = self.effective_cors_origins
         return bool(origins) and "*" not in origins
+
+    @property
+    def inline_job_processing_enabled(self) -> bool:
+        if self.job_inline_processing is not None:
+            return self.job_inline_processing
+        return self.is_development
 
 
 @lru_cache

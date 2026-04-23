@@ -8,7 +8,18 @@ from sqlalchemy.pool import StaticPool
 
 from app.api.v1.dependencies import get_current_user, get_db
 from app.db.base import Base
-from app.db.models import Question, QuestionSchedule, ReviewEvent, StudyInput, StudyTopic, UsageEvent, User, UserIdentity, UserSession
+from app.db.models import (
+    Question,
+    QuestionGenerationJob,
+    QuestionSchedule,
+    ReviewEvent,
+    StudyInput,
+    StudyTopic,
+    UsageEvent,
+    User,
+    UserIdentity,
+    UserSession,
+)
 from app.main import create_app
 
 

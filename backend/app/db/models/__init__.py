@@ -1,7 +1,9 @@
 from app.db.models.auth import UserIdentity, UserSession
 from app.db.models.question import Question, QuestionSchedule
+from app.db.models.question_job import QuestionGenerationJob
 from app.db.models.review import ReviewEvent
 from app.db.models.study import StudyInput, StudyTopic
+from app.db.models.study_extract_job import StudyInputExtractJob
 from app.db.models.rate_limit import RateLimitBucket
 from app.db.models.ops_event import OpsEvent
 from app.db.models.analytics_event import AnalyticsEvent
@@ -16,8 +18,10 @@ __all__ = [
     "UserSession",
     "StudyInput",
     "StudyTopic",
+    "StudyInputExtractJob",
     "Question",
     "QuestionSchedule",
+    "QuestionGenerationJob",
     "ReviewEvent",
     "UsageEvent",
     "WaitlistSignup",
