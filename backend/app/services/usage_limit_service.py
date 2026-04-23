@@ -18,7 +18,10 @@ QUESTION_GENERATION_DAILY_LIMIT = 3
 QUESTION_GENERATION_MONTHLY_LIMIT = 30
 
 PHOTO_EXTRACT_EVENT = "photo_extract"
-QUESTION_GENERATION_SESSION_EVENT = "question_generation_session"
+# Free-plan policy:
+# - photo_extract_daily counts photo extraction attempts.
+# - question_generation_* counts actual questions generated, not request sessions.
+QUESTION_GENERATION_EVENT = "question_generation"
 
 
 class UsageLimitService:
@@ -33,17 +36,18 @@ class UsageLimitService:
         if daily_count >= PHOTO_EXTRACTION_DAILY_LIMIT:
             raise ValueError(PHOTO_EXTRACTION_LIMIT_REACHED)
 
-    def assert_can_generate_questions(self, user: User, now: datetime | None = None) -> None:
+    def assert_can_generate_questions(self, user: User, requested_count: int = 1, now: datetime | None = None) -> None:
         reference_now = now or utc_now()
         day_start_utc = self._local_day_start_utc(user.timezone, reference_now)
         month_start_utc = self._local_month_start_utc(user.timezone, reference_now)
+        requested = max(1, requested_count)
 
-        daily_count = self.repository.count_events_for_user_since(user.id, QUESTION_GENERATION_SESSION_EVENT, day_start_utc)
-        if daily_count >= QUESTION_GENERATION_DAILY_LIMIT:
+        daily_count = self.repository.count_events_for_user_since(user.id, QUESTION_GENERATION_EVENT, day_start_utc)
+        if daily_count + requested > QUESTION_GENERATION_DAILY_LIMIT:
             raise ValueError(QUESTION_GENERATION_DAILY_LIMIT_REACHED)
 
-        monthly_count = self.repository.count_events_for_user_since(user.id, QUESTION_GENERATION_SESSION_EVENT, month_start_utc)
-        if monthly_count >= QUESTION_GENERATION_MONTHLY_LIMIT:
+        monthly_count = self.repository.count_events_for_user_since(user.id, QUESTION_GENERATION_EVENT, month_start_utc)
+        if monthly_count + requested > QUESTION_GENERATION_MONTHLY_LIMIT:
             raise ValueError(QUESTION_GENERATION_MONTHLY_LIMIT_REACHED)
 
     def record_photo_extract(self, user_id: str) -> None:
@@ -55,14 +59,15 @@ class UsageLimitService:
             )
         )
 
-    def record_question_generation_session(self, user_id: str) -> None:
-        self.repository.add_event(
-            UsageEvent(
-                id=make_id("ue"),
-                user_id=user_id,
-                event_type=QUESTION_GENERATION_SESSION_EVENT,
+    def record_question_generation(self, user_id: str, count: int) -> None:
+        for _ in range(max(0, count)):
+            self.repository.add_event(
+                UsageEvent(
+                    id=make_id("ue"),
+                    user_id=user_id,
+                    event_type=QUESTION_GENERATION_EVENT,
+                )
             )
-        )
 
     def get_limits(self, user: User, now: datetime | None = None) -> UsageLimitsResponse:
         reference_now = now or utc_now()
@@ -71,10 +76,10 @@ class UsageLimitService:
 
         photo_used = self.repository.count_events_for_user_since(user.id, PHOTO_EXTRACT_EVENT, day_start_utc)
         question_daily_used = self.repository.count_events_for_user_since(
-            user.id, QUESTION_GENERATION_SESSION_EVENT, day_start_utc
+            user.id, QUESTION_GENERATION_EVENT, day_start_utc
         )
         question_monthly_used = self.repository.count_events_for_user_since(
-            user.id, QUESTION_GENERATION_SESSION_EVENT, month_start_utc
+            user.id, QUESTION_GENERATION_EVENT, month_start_utc
         )
 
         return UsageLimitsResponse(

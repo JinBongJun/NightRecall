@@ -6,6 +6,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SectionHeader } from "../components/SectionHeader";
 import { TopicChip } from "../components/TopicChip";
+import { useUsageLimits } from "../hooks/useUsageLimits";
 import { createStudyInput, generateQuestions } from "../services/studyService";
 import { useAuthStore } from "../store/authStore";
 import { useReviewStore } from "../store/reviewStore";
@@ -19,16 +20,18 @@ type Tab = "keywords" | "notes";
 
 export function AddLearningScreen({ navigation }: Props) {
   const userId = useAuthStore((state) => state.userId);
+  const usageLimits = useUsageLimits();
   const setTopics = useTopicsStore((state) => state.setTopics);
   const setTonightQuestion = useReviewStore((state) => state.setTonightQuestion);
   const setSessionQuestions = useReviewStore((state) => state.setSessionQuestions);
-  const recordNightlyGenerationSession = useReviewStore((state) => state.recordNightlyGenerationSession);
   const [tab, setTab] = useState<Tab>("keywords");
   const [keywords, setKeywords] = useState("photosynthesis, chlorophyll, ATP");
   const [note, setNote] = useState("");
   const [starred, setStarred] = useState<number[]>([0]);
 
   const keywordItems = keywords.split(",").map((item) => item.trim()).filter(Boolean);
+  const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
+  const generationLocked = remainingQuestionsTonight <= 0;
 
   const toggleStar = (index: number) => {
     setStarred((current) => (current.includes(index) ? current.filter((item) => item !== index) : [...current, index]));
@@ -36,6 +39,10 @@ export function AddLearningScreen({ navigation }: Props) {
 
   const submit = async (count: number) => {
     if (!userId) return;
+    if (generationLocked) {
+      Alert.alert("Tonight is full", "You already made 3 questions tonight. Review what's ready or come back tomorrow.");
+      return;
+    }
     try {
       const payload =
         tab === "keywords"
@@ -43,7 +50,10 @@ export function AddLearningScreen({ navigation }: Props) {
           : { input_type: "notes" as const, content: note, starred_indices: [] };
       const studyInput = await createStudyInput(payload);
       setTopics(studyInput.topics);
-      const generated = await generateQuestions({ study_input_id: studyInput.study_input_id, count }) as {
+      const generated = await generateQuestions({
+        study_input_id: studyInput.study_input_id,
+        count: Math.min(count, remainingQuestionsTonight),
+      }) as {
         questions?: Array<{
           id: string;
           question_type: "mcq" | "true_false" | "fill_blank";
@@ -55,7 +65,6 @@ export function AddLearningScreen({ navigation }: Props) {
         }>;
       };
       if (generated.questions?.length) {
-        recordNightlyGenerationSession();
         if (count > 1) {
           setSessionQuestions(generated.questions);
         } else {
@@ -64,7 +73,7 @@ export function AddLearningScreen({ navigation }: Props) {
       }
       navigation.navigate("Review", { mode: "auto" });
     } catch {
-      Alert.alert("Could not save learning", "Check the input shape and try again.");
+      Alert.alert("Could not save learning", "Check the input shape, then try again.");
     }
   };
 
@@ -109,8 +118,12 @@ export function AddLearningScreen({ navigation }: Props) {
         </View>
       )}
 
-      <PrimaryButton label="Generate 1 Question" onPress={() => submit(1)} />
-      <PrimaryButton label="Generate 3 Questions" onPress={() => submit(3)} />
+      <PrimaryButton label={generationLocked ? "Tonight is full" : "Generate 1 Question"} onPress={() => submit(1)} disabled={generationLocked} />
+      <PrimaryButton
+        label={generationLocked ? "Tonight is full" : "Generate up to 3 Questions"}
+        onPress={() => submit(3)}
+        disabled={generationLocked}
+      />
     </ScreenContainer>
   );
 }

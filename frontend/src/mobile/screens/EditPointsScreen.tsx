@@ -10,6 +10,7 @@ import { QuantitySelector } from "../components/QuantitySelector";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
+import { useUsageLimits } from "../hooks/useUsageLimits";
 import { fetchSavedInputDetail, fetchSavedTopicSource } from "../services/reviewService";
 import { createStudyInput } from "../services/studyService";
 import { useReviewStore } from "../store/reviewStore";
@@ -48,13 +49,9 @@ const toInitialPoints = (texts: string[]): ReviewDraftPoint[] =>
   }));
 
 export function EditPointsScreen({ route, navigation }: Props) {
+  const usageLimits = useUsageLimits();
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
-  const nightlyGenerationSessionCount = useReviewStore((state) =>
-    state.nightlyGenerationSessionDate === new Intl.DateTimeFormat("sv-SE").format(new Date())
-      ? state.nightlyGenerationSessionCount
-      : 0,
-  );
   const setTopics = useTopicsStore((state) => state.setTopics);
   const upsertSavedInput = useTopicsStore((state) => state.upsertSavedInput);
   const [loading, setLoading] = useState(route.params.variant === "saved");
@@ -134,8 +131,8 @@ export function EditPointsScreen({ route, navigation }: Props) {
   }, [navigation, route.params]);
 
   const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
-  const remainingTonightCapacity = Math.max(0, 3 - nightlyGenerationSessionCount);
-  const tonightIsFull = remainingTonightCapacity <= 0;
+  const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
+  const tonightIsFull = remainingQuestionsTonight <= 0;
   const usablePointCount = newPoints.filter((point) => point.text.trim()).length;
   const normalizedSourcePreview =
     route.params.variant === "new"
@@ -209,7 +206,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
 
   const generateQuestions = () => {
     if (tonightIsFull) {
-      Alert.alert("Tonight is full", "You already made 3 question sets for tonight. You can keep reviewing what's ready.");
+      Alert.alert("Tonight is full", "You already made 3 questions tonight. You can keep reviewing what's ready.");
       return;
     }
 
@@ -225,7 +222,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         mode: route.params.mode,
         sourceText: sourceDraft,
         points: newPoints,
-        selectedQuestionCount: Math.min(selectedQuestionCount, remainingTonightCapacity),
+        selectedQuestionCount: Math.min(selectedQuestionCount, remainingQuestionsTonight),
         imageBase64: route.params.imageBase64,
         imageMimeType: route.params.imageMimeType,
       });
@@ -242,7 +239,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
       studyInputId: route.params.studyInputId,
       topicId: route.params.topicId,
       selectedTopicIds,
-      selectedQuestionCount: Math.min(selectedQuestionCount, remainingTonightCapacity),
+      selectedQuestionCount: Math.min(selectedQuestionCount, remainingQuestionsTonight),
     });
   };
 
@@ -354,7 +351,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
           <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Question count</Text>
             <Text style={styles.summaryBody}>Start with 1 question. You can make up to 3 if you want.</Text>
-            <Text style={styles.summaryCapacity}>{`${remainingTonightCapacity} of 3 slots left tonight.`}</Text>
+            <Text style={styles.summaryCapacity}>{`${remainingQuestionsTonight} of 3 questions left tonight.`}</Text>
             {activeQuestionCount > 0 ? (
               <Text style={styles.summaryHelper}>
                 {activeQuestionCount} question{activeQuestionCount > 1 ? "s are" : " is"} already ready.
@@ -363,7 +360,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
             <QuantitySelector
               values={[1, 2, 3]}
               selectedValue={selectedQuestionCount}
-              maxEnabledValue={remainingTonightCapacity}
+              maxEnabledValue={remainingQuestionsTonight}
               disabled={tonightIsFull}
               onChange={setSelectedQuestionCount}
             />

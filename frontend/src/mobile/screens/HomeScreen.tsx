@@ -9,6 +9,7 @@ import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useTonightQuestion } from "../hooks/useTonightQuestion";
+import { useUsageLimits } from "../hooks/useUsageLimits";
 import { fetchStats } from "../services/statsService";
 import { useReminderStore } from "../store/reminderStore";
 import { useReviewStore } from "../store/reviewStore";
@@ -20,15 +21,11 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 export function HomeScreen({ navigation }: Props) {
   const loadTonightQuestion = useTonightQuestion();
+  const usageLimits = useUsageLimits();
   const reminderTime = useReminderStore((state) => state.reminderTime);
   const sessionSource = useReviewStore((state) => state.sessionSource);
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
-  const nightlyGenerationSessionCount = useReviewStore((state) =>
-    state.nightlyGenerationSessionDate === new Intl.DateTimeFormat("sv-SE").format(new Date())
-      ? state.nightlyGenerationSessionCount
-      : 0,
-  );
   const streak = useStatsStore((state) => state.streak);
   const answeredToday = useStatsStore((state) => state.answeredToday);
   const setStats = useStatsStore((state) => state.setStats);
@@ -93,7 +90,7 @@ export function HomeScreen({ navigation }: Props) {
       : currentQuestion
         ? 1
         : 0;
-  const remainingTonightCapacity = Math.max(0, 3 - nightlyGenerationSessionCount);
+  const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
   const todayLabel = useMemo(
     () =>
       new Intl.DateTimeFormat("en-US", {
@@ -113,8 +110,8 @@ export function HomeScreen({ navigation }: Props) {
             : "Take 20 seconds before sleep and pull it back.",
         primaryLabel: "Start recall",
         primaryAction: () => navigation.navigate("Review", { mode: "auto" }),
-        secondaryLabel: remainingTonightCapacity > 0 ? "Create another question" : null,
-        secondaryAction: remainingTonightCapacity > 0 ? () => navigation.navigate("Create") : null,
+        secondaryLabel: remainingQuestionsTonight > 0 ? "Create another question" : null,
+        secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Create") : null,
       }
     : answeredToday
       ? {
@@ -123,8 +120,8 @@ export function HomeScreen({ navigation }: Props) {
           body: "Your nightly review is done. You can stop here or make one more prompt for tomorrow.",
           primaryLabel: null,
           primaryAction: null,
-          secondaryLabel: remainingTonightCapacity > 0 ? "Create another question" : null,
-          secondaryAction: remainingTonightCapacity > 0 ? () => navigation.navigate("Create") : null,
+          secondaryLabel: remainingQuestionsTonight > 0 ? "Create another question" : null,
+          secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Create") : null,
         }
       : {
           eyebrow: "Prepare tonight",
@@ -175,8 +172,8 @@ export function HomeScreen({ navigation }: Props) {
 
           <View style={styles.summaryStrip}>
             <View style={styles.summaryStat}>
-              <Text style={styles.summaryValue}>{remainingTonightCapacity}</Text>
-              <Text style={styles.summaryText}>Slots left</Text>
+              <Text style={styles.summaryValue}>{remainingQuestionsTonight}</Text>
+              <Text style={styles.summaryText}>Questions left</Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryStat}>
@@ -241,16 +238,16 @@ export function HomeScreen({ navigation }: Props) {
         <Pressable
           style={({ pressed }) => [
             styles.scheduleCard,
-            remainingTonightCapacity === 0 && styles.scheduleCardDisabled,
-            pressed && remainingTonightCapacity > 0 && styles.cardPressed,
+            remainingQuestionsTonight === 0 && styles.scheduleCardDisabled,
+            pressed && remainingQuestionsTonight > 0 && styles.cardPressed,
           ]}
           onPress={() => {
-            if (remainingTonightCapacity === 0) {
+            if (remainingQuestionsTonight === 0) {
               return;
             }
             navigation.navigate("Create");
           }}
-          disabled={remainingTonightCapacity === 0}
+          disabled={remainingQuestionsTonight === 0}
         >
           <View style={styles.scheduleImageStub}>
             <MaterialIcons name="add-photo-alternate" size={32} color="#FFFFFF" />
@@ -259,9 +256,9 @@ export function HomeScreen({ navigation }: Props) {
             <Text style={styles.scheduleTitle}>Create another prompt for tonight</Text>
             <Text style={styles.scheduleBody}>Capture a note or photo and turn it into one clean question.</Text>
             <Text style={styles.scheduleMeta}>
-              {remainingTonightCapacity === 0
-                ? "Tonight is full"
-                : `${remainingTonightCapacity} slot${remainingTonightCapacity === 1 ? "" : "s"} available`}
+              {remainingQuestionsTonight === 0
+                ? "Tonight's questions are full"
+                : `${remainingQuestionsTonight} question${remainingQuestionsTonight === 1 ? "" : "s"} left tonight`}
             </Text>
           </View>
         </Pressable>

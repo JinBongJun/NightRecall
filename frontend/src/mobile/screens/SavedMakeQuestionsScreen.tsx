@@ -9,6 +9,7 @@ import { HeroCard } from "../components/HeroCard";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { useUsageLimits } from "../hooks/useUsageLimits";
 import {
   fetchSavedInputDetail,
   fetchSavedTopicSource,
@@ -39,11 +40,7 @@ const parseRawContent = (inputType: "keywords" | "notes", rawContent: string): s
 
 export function SavedCardDetailScreen({ route, navigation }: Props) {
   const { studyInputId, topicId } = route.params;
-  const nightlyGenerationSessionCount = useReviewStore((state) =>
-    state.nightlyGenerationSessionDate === new Intl.DateTimeFormat("sv-SE").format(new Date())
-      ? state.nightlyGenerationSessionCount
-      : 0,
-  );
+  const usageLimits = useUsageLimits();
 
   const [loading, setLoading] = useState(true);
   const [inputType, setInputType] = useState<"keywords" | "notes">("notes");
@@ -111,7 +108,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
     };
   }, [navigation, studyInputId, topicId]);
 
-  const remainingTonightCapacity = Math.max(0, 3 - nightlyGenerationSessionCount);
+  const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
   const normalizedSourceText = useMemo(() => parseRawContent(inputType, rawContent), [inputType, rawContent]);
 
   return (
@@ -142,7 +139,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
             iconName="auto-stories"
             titleMaxWidth={220}
             meta={
-              `${remainingTonightCapacity} of 3 slots left tonight.`
+              `${remainingQuestionsTonight} of 3 questions left tonight.`
             }
           >
             <View style={styles.summaryRow}>
@@ -151,8 +148,8 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
                 <Text style={styles.summaryLabel}>Bookmarked</Text>
               </View>
               <View style={styles.summaryPill}>
-                <Text style={styles.summaryValue}>{remainingTonightCapacity}</Text>
-                <Text style={styles.summaryLabel}>Slots left</Text>
+                <Text style={styles.summaryValue}>{remainingQuestionsTonight}</Text>
+                <Text style={styles.summaryLabel}>Questions left</Text>
               </View>
               <View style={styles.summaryPill}>
                 <Text style={styles.summaryValue}>{sourceImageData ? "Photo" : "Note"}</Text>

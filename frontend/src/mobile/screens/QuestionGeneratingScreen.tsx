@@ -28,7 +28,6 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
   const addSessionQuestions = useReviewStore((state) => state.addSessionQuestions);
   const setTonightQuestion = useReviewStore((state) => state.setTonightQuestion);
   const setSessionQuestions = useReviewStore((state) => state.setSessionQuestions);
-  const recordNightlyGenerationSession = useReviewStore((state) => state.recordNightlyGenerationSession);
   const selectedQuestionCount = route.params.selectedQuestionCount;
 
   const title = useMemo(
@@ -130,8 +129,6 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
       if (!questions.length || cancelled) {
         return;
       }
-
-      recordNightlyGenerationSession();
 
       const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
       if (activeQuestionCount > 0) {

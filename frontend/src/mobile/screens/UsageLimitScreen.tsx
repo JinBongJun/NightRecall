@@ -22,8 +22,8 @@ export function UsageLimitScreen({ route, navigation }: Props) {
   const subtitle = isPhotoLimit
     ? "You can still write the key point yourself and keep tonight moving."
     : route.params.reason === "question_generation_monthly"
-      ? "You already made enough fresh question sets this month. You can keep reviewing what's ready."
-      : "You already made enough fresh question sets for tonight. You can keep reviewing what's ready.";
+      ? "You already made 30 new questions this month. You can keep reviewing what's ready."
+      : "You already made 3 new questions tonight. You can keep reviewing what's ready.";
 
   const iconName = isPhotoLimit ? "photo-library" : "nights-stay";
   const primaryLabel = isPhotoLimit ? "Write it down instead" : hasReviewReady ? "Review what's ready" : "Go home";
@@ -69,7 +69,7 @@ export function UsageLimitScreen({ route, navigation }: Props) {
             <Text style={styles.messageBody}>
               {isPhotoLimit
                 ? "Tonight's new photo reads are set. Add one short note yourself, or come back tomorrow for a fresh image pass."
-                : "Your new question sets are already in a good place. Review what's ready now, or come back tomorrow for a fresh start."}
+                : "Your new questions are already in a good place. Review what's ready now, or come back tomorrow for a fresh start."}
             </Text>
           </View>
         </View>

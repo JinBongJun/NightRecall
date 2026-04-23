@@ -70,13 +70,19 @@ def test_question_generation_is_limited_per_day(client, monkeypatch) -> None:
 
     monkeypatch.setattr(LLMService, "generate_question", fake_generate_question)
 
-    payload = {"study_input_id": "si_limit", "count": 1}
+    first_payload = {"study_input_id": "si_limit", "count": 2}
+    second_payload = {"study_input_id": "si_limit", "count": 1}
+    blocked_payload = {"study_input_id": "si_limit", "count": 1}
 
-    for _ in range(3):
-        response = test_client.post("/v1/questions/generate", json=payload)
-        assert response.status_code == 201
+    first = test_client.post("/v1/questions/generate", json=first_payload)
+    assert first.status_code == 201
+    assert len(first.json()["questions"]) == 2
 
-    limited = test_client.post("/v1/questions/generate", json=payload)
+    second = test_client.post("/v1/questions/generate", json=second_payload)
+    assert second.status_code == 201
+    assert len(second.json()["questions"]) == 1
+
+    limited = test_client.post("/v1/questions/generate", json=blocked_payload)
     assert limited.status_code == 422
     assert limited.json()["detail"] == "question_generation_daily_limit_reached"
 
@@ -115,6 +121,56 @@ def test_usage_limits_endpoint_reports_remaining(client, monkeypatch) -> None:
     data = response.json()
     assert data["photo_extract_daily"]["used"] == 1
     assert data["photo_extract_daily"]["remaining"] == 2
+
+
+def test_question_limits_endpoint_reports_generated_question_count(client, monkeypatch) -> None:
+    test_client, db = client
+
+    from app.db.schemas.questions import QuestionOutput
+    from app.services.llm_service import LLMService
+
+    db.add(
+        StudyInput(
+            id="si_limit_usage",
+            user_id="usr_test",
+            input_type="notes",
+            raw_content="This is a sufficiently long note for question generation usage reporting coverage.",
+            source_kind="manual",
+        )
+    )
+    db.add(
+        StudyTopic(
+            id="tp_limit_usage",
+            study_input_id="si_limit_usage",
+            user_id="usr_test",
+            topic_text="Wheel lock detail",
+            is_starred=True,
+        )
+    )
+    db.commit()
+
+    def fake_generate_question(**kwargs):  # noqa: ANN003
+        return QuestionOutput(
+            id="pending",
+            question_type="mcq",
+            question_text="Which detail matches the note?",
+            choices=["Wheel lock", "Helmet color", "Fuel gauge", "License plate"],
+            answer_index=0,
+            answer_text=None,
+            explanation="The note mentioned the wheel lock.",
+        )
+
+    monkeypatch.setattr(LLMService, "generate_question", fake_generate_question)
+
+    generated = test_client.post("/v1/questions/generate", json={"study_input_id": "si_limit_usage", "count": 2})
+    assert generated.status_code == 201
+
+    response = test_client.get("/v1/usage/limits")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["question_generation_daily"]["limit"] == 3
+    assert data["question_generation_daily"]["used"] == 2
+    assert data["question_generation_daily"]["remaining"] == 1
 
 
 def test_entitlements_endpoint_defaults_to_free(client) -> None:

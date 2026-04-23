@@ -27,7 +27,7 @@ class QuestionService:
         topics = self.study_repository.get_topics_for_input(payload.study_input_id)
         if not topics:
             raise ValueError("no topics found for study input")
-        self._assert_and_record_generation_session(user_id)
+        limit_service = self._assert_generation_capacity(user_id, payload.count)
 
         generated: list[Question] = []
         schedules: list[QuestionSchedule] = []
@@ -78,6 +78,7 @@ class QuestionService:
 
         self.question_repository.add_questions(generated)
         self.question_repository.add_schedules(schedules)
+        limit_service.record_question_generation(user_id, len(generated))
         self.db.commit()
         return QuestionGenerateResponse(questions=outputs)
 
@@ -101,7 +102,7 @@ class QuestionService:
 
         if not selected_topics:
             raise ValueError("no selected topics found for study input")
-        self._assert_and_record_generation_session(user_id)
+        limit_service = self._assert_generation_capacity(user_id, count)
 
         generated: list[Question] = []
         schedules: list[QuestionSchedule] = []
@@ -152,6 +153,7 @@ class QuestionService:
 
         self.question_repository.add_questions(generated)
         self.question_repository.add_schedules(schedules)
+        limit_service.record_question_generation(user_id, len(generated))
         self.db.commit()
         return QuestionGenerateResponse(questions=outputs)
 
@@ -171,7 +173,7 @@ class QuestionService:
 
         if not selected_topics:
             raise ValueError("no selected topics found for study input")
-        self._assert_and_record_generation_session(user_id)
+        limit_service = self._assert_generation_capacity(user_id, count)
 
         generated: list[Question] = []
         schedules: list[QuestionSchedule] = []
@@ -222,13 +224,14 @@ class QuestionService:
 
         self.question_repository.add_questions(generated)
         self.question_repository.add_schedules(schedules)
+        limit_service.record_question_generation(user_id, len(generated))
         self.db.commit()
         return QuestionGenerateResponse(questions=outputs)
 
-    def _assert_and_record_generation_session(self, user_id: str) -> None:
+    def _assert_generation_capacity(self, user_id: str, requested_count: int) -> UsageLimitService:
         user = self.db.get(User, user_id)
         if not user:
             raise ValueError("user not found")
         limit_service = UsageLimitService(self.db)
-        limit_service.assert_can_generate_questions(user)
-        limit_service.record_question_generation_session(user.id)
+        limit_service.assert_can_generate_questions(user, requested_count=requested_count)
+        return limit_service

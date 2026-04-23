@@ -2,18 +2,10 @@ import { create } from "zustand";
 
 import { AnswerResponse, Question, Topic } from "../types/api";
 
-function getNightKey() {
-  return new Intl.DateTimeFormat("sv-SE").format(new Date());
-}
-
-const NIGHTLY_GENERATION_SESSION_LIMIT = 3;
-
 type ReviewState = {
   sessionQuestions: Question[];
   sessionIndex: number;
   sessionSource: "server" | "local" | null;
-  nightlyGenerationSessionCount: number;
-  nightlyGenerationSessionDate: string;
   tonightQuestion: Question | null;
   currentQuestion: Question | null;
   retryQuestion: Question | null;
@@ -31,7 +23,6 @@ type ReviewState = {
   queueRetryQuestion: (question: Question) => void;
   consumeRetryQuestion: () => boolean;
   resetSession: () => void;
-  recordNightlyGenerationSession: () => void;
   setTonightQuestion: (question: Question | null) => void;
   setServerTonightQuestion: (question: Question | null) => void;
   setPickableTopics: (topics: Topic[]) => void;
@@ -46,8 +37,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
   sessionQuestions: [],
   sessionIndex: 0,
   sessionSource: null,
-  nightlyGenerationSessionCount: 0,
-  nightlyGenerationSessionDate: getNightKey(),
   tonightQuestion: null,
   currentQuestion: null,
   retryQuestion: null,
@@ -165,16 +154,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
       loading: false,
       error: null,
     })),
-  recordNightlyGenerationSession: () =>
-    set((state) => {
-      const nextNightKey = getNightKey();
-      const currentCount = state.nightlyGenerationSessionDate === nextNightKey ? state.nightlyGenerationSessionCount : 0;
-      const nextCount = Math.min(NIGHTLY_GENERATION_SESSION_LIMIT, currentCount + 1);
-      return {
-        nightlyGenerationSessionDate: nextNightKey,
-        nightlyGenerationSessionCount: nextCount,
-      };
-    }),
   setTonightQuestion: (question) =>
     set(() => ({
       sessionSource: question ? "local" : null,

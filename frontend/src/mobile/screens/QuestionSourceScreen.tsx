@@ -6,6 +6,7 @@ import { CenteredHeroCard } from "../components/CenteredHeroCard";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
+import { useUsageLimits } from "../hooks/useUsageLimits";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
@@ -13,15 +14,11 @@ import { RootStackParamList } from "../types/navigation";
 type Props = NativeStackScreenProps<RootStackParamList, "Create">;
 
 export function CreateScreen({ navigation }: Props) {
+  const usageLimits = useUsageLimits();
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
-  const nightlyGenerationSessionCount = useReviewStore((state) =>
-    state.nightlyGenerationSessionDate === new Intl.DateTimeFormat("sv-SE").format(new Date())
-      ? state.nightlyGenerationSessionCount
-      : 0,
-  );
   const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
-  const remainingTonightCapacity = Math.max(0, 3 - nightlyGenerationSessionCount);
+  const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
 
   return (
     <ScreenContainer>
@@ -34,10 +31,10 @@ export function CreateScreen({ navigation }: Props) {
 
       <CenteredHeroCard
         badgeLabel="Tonight"
-        title={`${remainingTonightCapacity} of 3 slots left`}
+        title={`${remainingQuestionsTonight} of 3 questions left`}
         body={
-          remainingTonightCapacity === 0
-            ? "You already made 3 questions for tonight."
+          remainingQuestionsTonight === 0
+            ? "You already made 3 questions tonight."
             : activeQuestionCount > 0
             ? `${activeQuestionCount} question${activeQuestionCount > 1 ? "s are" : " is"} already ready.`
             : "Nothing is queued yet."
@@ -47,12 +44,12 @@ export function CreateScreen({ navigation }: Props) {
       />
 
       <Pressable
-        style={({ pressed }) => [styles.optionCard, styles.optionCardPrimary, remainingTonightCapacity === 0 && styles.optionDisabled, pressed && remainingTonightCapacity > 0 && styles.optionPressed]}
+        style={({ pressed }) => [styles.optionCard, styles.optionCardPrimary, remainingQuestionsTonight === 0 && styles.optionDisabled, pressed && remainingQuestionsTonight > 0 && styles.optionPressed]}
         onPress={() => {
-          if (remainingTonightCapacity === 0) return;
+          if (remainingQuestionsTonight === 0) return;
           navigation.navigate("Capture");
         }}
-        disabled={remainingTonightCapacity === 0}
+        disabled={remainingQuestionsTonight === 0}
       >
         <View style={styles.optionGlow} />
         <View style={styles.optionOrbit} />
@@ -66,12 +63,12 @@ export function CreateScreen({ navigation }: Props) {
       </Pressable>
 
       <Pressable
-        style={({ pressed }) => [styles.optionCard, styles.optionCardSecondary, remainingTonightCapacity === 0 && styles.optionDisabled, pressed && remainingTonightCapacity > 0 && styles.optionPressed]}
+        style={({ pressed }) => [styles.optionCard, styles.optionCardSecondary, remainingQuestionsTonight === 0 && styles.optionDisabled, pressed && remainingQuestionsTonight > 0 && styles.optionPressed]}
         onPress={() => {
-          if (remainingTonightCapacity === 0) return;
+          if (remainingQuestionsTonight === 0) return;
           navigation.navigate("Library");
         }}
-        disabled={remainingTonightCapacity === 0}
+        disabled={remainingQuestionsTonight === 0}
       >
         <View style={styles.optionOrbitSoft} />
         <View style={[styles.optionIconTile, styles.optionIconTileSecondary]}>
