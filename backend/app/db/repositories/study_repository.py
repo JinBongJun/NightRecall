@@ -21,8 +21,12 @@ class StudyRepository:
     def get_input(self, study_input_id: str) -> StudyInput | None:
         return self.db.scalar(select(StudyInput).where(StudyInput.id == study_input_id))
 
-    def get_inputs_for_user(self, user_id: str) -> list[StudyInput]:
+    def get_inputs_for_user(self, user_id: str, limit: int | None = None, offset: int | None = None) -> list[StudyInput]:
         stmt = select(StudyInput).where(StudyInput.user_id == user_id).order_by(StudyInput.created_at.desc())
+        if limit is not None:
+            stmt = stmt.limit(limit)
+        if offset is not None:
+            stmt = stmt.offset(offset)
         return list(self.db.scalars(stmt))
 
     def get_topic(self, topic_id: str) -> StudyTopic | None:

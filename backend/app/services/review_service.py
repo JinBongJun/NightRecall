@@ -148,10 +148,28 @@ class ReviewService:
         questions.sort(key=lambda item: item.created_at, reverse=True)
         return ReviewQuestionResponse(mode="picked", question=self._to_output(questions[0]))
 
-    def list_saved_inputs(self, user_id: str) -> SavedStudyInputsResponse:
+    def list_saved_inputs(self, user_id: str, page: int = 1, limit: int = 20) -> SavedStudyInputsResponse:
+        page = max(1, page)
+        limit = max(1, min(limit, 50))
+        offset = (page - 1) * limit
         items: list[SavedStudyInputSummaryResponse] = []
-        study_inputs = self.study_repository.get_inputs_for_user(user_id)
+        study_inputs = self.study_repository.get_inputs_for_user(user_id, limit=limit + 1, offset=offset)
         topics_by_input = self.study_repository.get_topics_for_inputs([study_input.id for study_input in study_inputs])
+        total_count = int(
+            self.db.scalar(
+                select(func.count(func.distinct(StudyInput.id)))
+                .select_from(StudyInput)
+                .join(StudyTopic, StudyTopic.study_input_id == StudyInput.id)
+                .where(
+                    StudyInput.user_id == user_id,
+                    StudyTopic.user_id == user_id,
+                    StudyTopic.is_starred.is_(True),
+                )
+            )
+            or 0
+        )
+        has_more = len(study_inputs) > limit
+        study_inputs = study_inputs[:limit]
 
         for study_input in study_inputs:
             topics = topics_by_input.get(study_input.id, [])
@@ -188,7 +206,7 @@ class ReviewService:
                 )
             )
 
-        return SavedStudyInputsResponse(items=items)
+        return SavedStudyInputsResponse(items=items, page=page, limit=limit, has_more=has_more, total_count=total_count)
 
     def get_saved_topic_source(self, user_id: str, topic_id: str) -> SavedTopicSourceResponse:
         topic = self.study_repository.get_topic(topic_id)

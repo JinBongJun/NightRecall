@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, get_db
@@ -58,8 +58,13 @@ def get_pickable_topics(current_user: User = Depends(get_current_user), db: Sess
 
 
 @router.get("/saved-inputs", response_model=SavedStudyInputsResponse)
-def get_saved_inputs(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> SavedStudyInputsResponse:
-    return ReviewService(db).list_saved_inputs(current_user.id)
+def get_saved_inputs(
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=50),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> SavedStudyInputsResponse:
+    return ReviewService(db).list_saved_inputs(current_user.id, page=page, limit=limit)
 
 
 @router.post("/from-topic", response_model=ReviewQuestionResponse)

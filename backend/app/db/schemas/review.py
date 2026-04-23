@@ -43,6 +43,10 @@ class SavedStudyInputSummaryResponse(APIModel):
 
 class SavedStudyInputsResponse(APIModel):
     items: list[SavedStudyInputSummaryResponse]
+    page: int
+    limit: int
+    has_more: bool
+    total_count: int
 
 
 class SavedStudyInputDetailResponse(APIModel):

@@ -34,13 +34,19 @@ import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Library">;
 
+const PAGE_SIZE = 20;
+
 export function LibraryScreen({ navigation }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [savedInputs, setSavedInputs] = useState<SavedStudyInputSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [deletingStudyInputId, setDeletingStudyInputId] = useState<string | null>(null);
   const [usingLegacyFallback, setUsingLegacyFallback] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const scrollRef = useRef<ScrollView | null>(null);
   const searchInputRef = useRef<TextInput | null>(null);
@@ -99,9 +105,12 @@ export function LibraryScreen({ navigation }: Props) {
       setSyncing(hasImmediateItems);
 
       try {
-        const response = await fetchSavedInputs();
+        const response = await fetchSavedInputs({ page: 1, limit: PAGE_SIZE });
         if (!cancelled) {
           setSavedInputs(response.items);
+          setPage(response.page);
+          setHasMore(response.has_more);
+          setTotalCount(response.total_count);
           setSavedInputsCache(response.items);
           setUsingLegacyFallback(false);
         }
@@ -125,6 +134,32 @@ export function LibraryScreen({ navigation }: Props) {
   }, [setSavedInputsCache]);
 
   useFocusEffect(loadSavedInputs);
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) {
+      return;
+    }
+
+    try {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      const response = await fetchSavedInputs({ page: nextPage, limit: PAGE_SIZE });
+      const merged = [...savedInputs, ...response.items];
+      setSavedInputs(merged);
+      setPage(response.page);
+      setHasMore(response.has_more);
+      setTotalCount(response.total_count);
+      setSavedInputsCache(merged);
+    } catch (error) {
+      const detail =
+        axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
+          ? error.response.data.detail
+          : "NightRecall could not load more saved learning right now.";
+      Alert.alert("Could not load more", detail);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
@@ -195,6 +230,7 @@ export function LibraryScreen({ navigation }: Props) {
       await deleteTopic(topicId);
       removeTopic(topicId);
       setSavedInputs((current) => current.filter((item) => item.topic_id !== topicId));
+      setTotalCount((current) => Math.max(0, current - 1));
     } catch (error) {
       const detail =
         axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
@@ -210,6 +246,7 @@ export function LibraryScreen({ navigation }: Props) {
       await deleteSavedInput(studyInputId);
       setSavedInputs((current) => current.filter((item) => item.study_input_id !== studyInputId));
       removeSavedInput(studyInputId);
+      setTotalCount((current) => Math.max(0, current - 1));
     } catch (error) {
       const detail =
         axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
@@ -257,12 +294,12 @@ export function LibraryScreen({ navigation }: Props) {
         <View style={styles.overviewCard}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryPill}>
-              <Text style={styles.summaryValue}>{savedInputs.length}</Text>
+              <Text style={styles.summaryValue}>{totalCount}</Text>
               <Text style={styles.summaryLabel}>Cards</Text>
             </View>
             <View style={styles.summaryPill}>
               <Text style={styles.summaryValue}>{totalBookmarkedCount}</Text>
-              <Text style={styles.summaryLabel}>Saved points</Text>
+              <Text style={styles.summaryLabel}>Loaded points</Text>
             </View>
             <View style={styles.summaryPill}>
               <Text style={styles.summaryValue}>{filteredInputs.length}</Text>
@@ -278,7 +315,7 @@ export function LibraryScreen({ navigation }: Props) {
       ) : null}
 
       <View style={styles.section}>
-        <SectionRow title="Saved cards" actionLabel={`${savedInputs.length} total`} />
+        <SectionRow title="Saved cards" actionLabel={`${totalCount} total`} />
         {syncing ? <Text style={styles.syncingText}>Syncing...</Text> : null}
 
         <SearchField
@@ -320,8 +357,14 @@ export function LibraryScreen({ navigation }: Props) {
                 ? "Try a different word or clear the search."
                 : "Saved cards will appear here after you extract points and save at least one of them."
             }
-          />
-        )}
+            />
+          )}
+
+        {hasMore && !loading ? (
+          <Pressable style={({ pressed }) => [styles.loadMoreButton, pressed && styles.loadMoreButtonPressed]} onPress={() => void loadMore()}>
+            <Text style={styles.loadMoreText}>{loadingMore ? "Loading more..." : "Load more"}</Text>
+          </Pressable>
+        ) : null}
       </View>
     </ScreenContainer>
   );
@@ -385,5 +428,24 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 15,
     fontWeight: "700",
+  },
+  loadMoreButton: {
+    alignSelf: "center",
+    marginTop: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceLow,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  loadMoreButtonPressed: {
+    opacity: 0.92,
+    transform: [{ scale: 0.99 }],
+  },
+  loadMoreText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: "800",
   },
 });

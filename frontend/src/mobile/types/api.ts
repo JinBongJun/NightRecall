@@ -29,6 +29,10 @@ export type SavedStudyInputSummary = {
 
 export type SavedStudyInputsResponse = {
   items: SavedStudyInputSummary[];
+  page: number;
+  limit: number;
+  has_more: boolean;
+  total_count: number;
 };
 
 export type SavedStudyInputDetail = {

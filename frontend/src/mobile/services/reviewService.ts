@@ -30,8 +30,8 @@ export async function fetchSavedTopicSource(topicId: string) {
   return response.data as SavedTopicSource;
 }
 
-export async function fetchSavedInputs() {
-  const response = await apiClient.get("/review/saved-inputs");
+export async function fetchSavedInputs(params?: { page?: number; limit?: number }) {
+  const response = await apiClient.get("/review/saved-inputs", { params });
   return response.data as SavedStudyInputsResponse;
 }
 
