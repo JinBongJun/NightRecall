@@ -164,7 +164,6 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             input_type: "keywords" | "notes";
             source_kind: "photo" | "manual";
             source_preview_text: string | null;
-            source_image_ref: string | null;
             title: string;
             preview: string;
             bookmarked_count: number;
@@ -210,7 +209,6 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
               input_type: payload.input_type,
               source_kind: studyInput.source_kind ?? (route.params.mode === "photo" ? "photo" : "manual"),
               source_preview_text: studyInput.source_preview_text ?? normalizedSourcePreview ?? null,
-              source_image_ref: studyInput.source_image_ref ?? sourceImageRef,
               title: studyInput.source_preview_text ?? normalizedSourcePreview ?? usablePoints[0]?.text.trim() ?? "Saved learning",
               preview:
                 usablePoints.find((point) => point.text.trim() !== (studyInput.source_preview_text ?? normalizedSourcePreview ?? "").trim())?.text.trim() ?? "",
@@ -237,7 +235,6 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
               input_type: pendingSavedInput.input_type,
               source_kind: pendingSavedInput.source_kind,
               source_preview_text: pendingSavedInput.source_preview_text,
-              source_image_ref: pendingSavedInput.source_image_ref,
               title: pendingSavedInput.title,
               preview: pendingSavedInput.preview,
               bookmarked_count: pendingSavedInput.bookmarked_count,
@@ -288,7 +285,6 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
                 input_type: pendingSavedInput.input_type,
                 source_kind: pendingSavedInput.source_kind,
                 source_preview_text: pendingSavedInput.source_preview_text,
-                source_image_ref: pendingSavedInput.source_image_ref,
                 title: pendingSavedInput.title,
                 preview: pendingSavedInput.preview,
                 bookmarked_count: pendingSavedInput.bookmarked_count,

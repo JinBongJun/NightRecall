@@ -188,7 +188,6 @@ export function EditPointsScreen({ route, navigation }: Props) {
         input_type: payload.input_type,
         source_kind: studyInput.source_kind ?? (route.params.mode === "photo" ? "photo" : "manual"),
         source_preview_text: studyInput.source_preview_text ?? normalizedSourcePreview ?? null,
-        source_image_ref: studyInput.source_image_ref ?? sourceImageRef ?? null,
         title: studyInput.source_preview_text ?? normalizedSourcePreview ?? usablePoints[0].text.trim(),
         preview:
           usablePoints.find((point) => point.text.trim() !== (studyInput.source_preview_text ?? normalizedSourcePreview ?? "").trim())?.text.trim() ?? "",
