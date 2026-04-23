@@ -12,7 +12,6 @@ export async function createStudyInput(payload: {
   starred_indices: number[];
   source_kind?: "photo" | "manual";
   source_preview_text?: string;
-  source_image_data?: string;
 }) {
   const response = await apiClient.post("/study-inputs", payload);
   return response.data as {

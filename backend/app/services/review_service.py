@@ -179,7 +179,7 @@ class ReviewService:
                     input_type=study_input.input_type,
                     source_kind=study_input.source_kind,
                     source_preview_text=study_input.source_preview_text,
-                    source_image_data=study_input.source_image_data,
+                    source_image_data=None,
                     title=title,
                     preview=preview,
                     bookmarked_count=len(starred_topics),
@@ -206,7 +206,7 @@ class ReviewService:
             raw_content=study_input.raw_content,
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
-            source_image_data=study_input.source_image_data,
+            source_image_data=None,
             topics=[TopicResponse.model_validate(item) for item in topics],
         )
 
@@ -222,7 +222,7 @@ class ReviewService:
             raw_content=study_input.raw_content,
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
-            source_image_data=study_input.source_image_data,
+            source_image_data=None,
             topics=[TopicResponse.model_validate(item) for item in topics],
         )
 

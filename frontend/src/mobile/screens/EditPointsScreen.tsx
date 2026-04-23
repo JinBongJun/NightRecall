@@ -188,16 +188,11 @@ export function EditPointsScreen({ route, navigation }: Props) {
         return;
       }
 
-      const sourceImageData =
-        route.params.mode === "photo" && route.params.imageBase64
-          ? `data:${route.params.imageMimeType && route.params.imageMimeType.startsWith("image/") ? route.params.imageMimeType : "image/jpeg"};base64,${route.params.imageBase64}`
-          : undefined;
       const studyInput = await createStudyInput({
         ...payload,
         starred_indices: starredIndices,
         source_kind: route.params.mode === "photo" ? "photo" : "manual",
         source_preview_text: normalizedSourcePreview,
-        source_image_data: sourceImageData,
       });
       setTopics(studyInput.topics);
       upsertSavedInput({
@@ -205,7 +200,6 @@ export function EditPointsScreen({ route, navigation }: Props) {
         input_type: payload.input_type,
         source_kind: studyInput.source_kind ?? (route.params.mode === "photo" ? "photo" : "manual"),
         source_preview_text: studyInput.source_preview_text ?? normalizedSourcePreview ?? null,
-        source_image_data: studyInput.source_image_data ?? sourceImageData ?? null,
         title: studyInput.source_preview_text ?? normalizedSourcePreview ?? usablePoints[0].text.trim(),
         preview:
           usablePoints.find((point) => point.text.trim() !== (studyInput.source_preview_text ?? normalizedSourcePreview ?? "").trim())?.text.trim() ?? "",

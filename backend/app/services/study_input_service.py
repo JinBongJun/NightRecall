@@ -22,7 +22,7 @@ class StudyInputService:
             raw_content=json.dumps(payload.content, ensure_ascii=False) if isinstance(payload.content, list) else payload.content,
             source_kind=payload.source_kind,
             source_preview_text=payload.source_preview_text,
-            source_image_data=payload.source_image_data,
+            source_image_data=None,
         )
         self.repository.create_input(study_input)
 
@@ -44,7 +44,7 @@ class StudyInputService:
             topics=[TopicResponse.model_validate(topic) for topic in topics],
             source_kind=study_input.source_kind,
             source_preview_text=study_input.source_preview_text,
-            source_image_data=study_input.source_image_data,
+            source_image_data=None,
         )
 
     def redact_study_input_source(self, user_id: str, study_input_id: str) -> None:
