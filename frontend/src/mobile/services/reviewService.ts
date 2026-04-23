@@ -8,6 +8,8 @@ import {
   TonightQuestionResponse,
 } from "../types/api";
 
+const QUESTION_GENERATION_TIMEOUT_MS = 60000;
+
 export async function fetchTonightQuestion() {
   const response = await apiClient.get("/review/tonight");
   return response.data as TonightQuestionResponse;
@@ -39,12 +41,16 @@ export async function fetchSavedInputDetail(studyInputId: string) {
 }
 
 export async function generateQuestionsFromSavedTopic(payload: { topic_id: string; selected_topic_ids: string[]; count: number }) {
-  const response = await apiClient.post("/review/from-saved-topic", payload);
+  const response = await apiClient.post("/review/from-saved-topic", payload, {
+    timeout: QUESTION_GENERATION_TIMEOUT_MS,
+  });
   return response.data as GeneratedQuestionsResponse;
 }
 
 export async function generateQuestionsFromSavedInput(payload: { study_input_id: string; selected_topic_ids: string[]; count: number }) {
-  const response = await apiClient.post("/review/from-saved-input", payload);
+  const response = await apiClient.post("/review/from-saved-input", payload, {
+    timeout: QUESTION_GENERATION_TIMEOUT_MS,
+  });
   return response.data as GeneratedQuestionsResponse;
 }
 

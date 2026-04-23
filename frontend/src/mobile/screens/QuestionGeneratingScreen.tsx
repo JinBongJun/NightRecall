@@ -4,7 +4,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 
 import { ScreenContainer } from "../components/ScreenContainer";
-import { generateQuestionsFromSavedInput, generateQuestionsFromSavedTopic } from "../services/reviewService";
+import { deleteSavedInput, generateQuestionsFromSavedInput, generateQuestionsFromSavedTopic } from "../services/reviewService";
 import { createStudyInput, generateQuestions, redactStudyInputSource } from "../services/studyService";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
@@ -257,12 +257,36 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
 
         finishWithQuestions(generated.questions);
       } catch (error) {
-        if (shouldRedactSource && transientStudyInputId) {
+        if (transientStudyInputId) {
           try {
-            await redactStudyInputSource(transientStudyInputId);
+            if (pendingSavedInput) {
+              upsertSavedInput({
+                study_input_id: pendingSavedInput.study_input_id,
+                input_type: pendingSavedInput.input_type,
+                source_kind: pendingSavedInput.source_kind,
+                source_preview_text: pendingSavedInput.source_preview_text,
+                source_image_data: pendingSavedInput.source_image_data,
+                title: pendingSavedInput.title,
+                preview: pendingSavedInput.preview,
+                bookmarked_count: pendingSavedInput.bookmarked_count,
+                topic_id: pendingSavedInput.topic_id,
+              });
+            } else if (shouldRedactSource) {
+              await deleteSavedInput(transientStudyInputId);
+            } else {
+              await redactStudyInputSource(transientStudyInputId);
+            }
           } catch {
             // Do not hide the original generation failure behind cleanup errors.
           }
+        }
+        if (axios.isAxiosError(error) && error.code === "ECONNABORTED") {
+          Alert.alert(
+            "Question generation is taking longer than expected",
+            "NightRecall is still warming up the first generation request. Try again in a moment.",
+            [{ text: "OK", onPress: () => navigation.goBack() }],
+          );
+          return;
         }
         const detail =
           axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"

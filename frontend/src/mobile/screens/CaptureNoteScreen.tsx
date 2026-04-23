@@ -60,7 +60,7 @@ export function CaptureNoteScreen({ navigation }: Props) {
           style={styles.input}
           multiline
           textAlignVertical="top"
-          placeholder="Type or paste one important idea from today."
+          placeholder="Type or paste one saved idea from today."
           placeholderTextColor="rgba(64,72,72,0.4)"
         />
         <Text style={styles.hint}>Aim for one direct idea, not a full paragraph.</Text>

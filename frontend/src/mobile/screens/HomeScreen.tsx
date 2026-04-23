@@ -91,6 +91,7 @@ export function HomeScreen({ navigation }: Props) {
         ? 1
         : 0;
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
+  const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
   const todayLabel = useMemo(
     () =>
       new Intl.DateTimeFormat("en-US", {
@@ -177,8 +178,8 @@ export function HomeScreen({ navigation }: Props) {
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryStat}>
-              <Text style={styles.summaryValue}>{streak}</Text>
-              <Text style={styles.summaryText}>Day streak</Text>
+              <Text style={styles.summaryValue}>{remainingPhotoReadsTonight}</Text>
+              <Text style={styles.summaryText}>Photo reads left</Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryStat}>
@@ -186,6 +187,8 @@ export function HomeScreen({ navigation }: Props) {
               <Text style={styles.summaryText}>Ready now</Text>
             </View>
           </View>
+
+          <Text style={styles.summarySubtext}>{streak}-day streak still active</Text>
         </View>
       </Animated.View>
 
@@ -340,6 +343,12 @@ const styles = StyleSheet.create({
     width: 1,
     height: 42,
     backgroundColor: colors.line,
+  },
+  summarySubtext: {
+    color: colors.mutedSoft,
+    fontSize: 12,
+    fontWeight: "700",
+    textAlign: "center",
   },
   contentStack: {
     gap: 16,

@@ -19,6 +19,7 @@ export function CreateScreen({ navigation }: Props) {
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
+  const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
 
   return (
     <ScreenContainer>
@@ -37,7 +38,7 @@ export function CreateScreen({ navigation }: Props) {
             ? "You already made 3 questions tonight."
             : activeQuestionCount > 0
             ? `${activeQuestionCount} question${activeQuestionCount > 1 ? "s are" : " is"} already ready.`
-            : "Nothing is queued yet."
+            : `${remainingPhotoReadsTonight} of 3 photo reads are still available.`
         }
         tone="neutral"
         iconName="schedule"

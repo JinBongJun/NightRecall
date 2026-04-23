@@ -25,7 +25,7 @@ export function TopicCard({ topic, onPress, ctaLabel = "Pick", subtitle, disable
       <View style={styles.copy}>
         <View style={styles.row}>
           <Text style={styles.title}>{title}</Text>
-          {topic.is_starred ? <Text style={styles.badge}>Important</Text> : null}
+          {topic.is_starred ? <Text style={styles.badge}>Saved</Text> : null}
         </View>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       </View>

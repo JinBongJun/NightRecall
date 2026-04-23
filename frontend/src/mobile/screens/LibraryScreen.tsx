@@ -249,7 +249,7 @@ export function LibraryScreen({ navigation }: Props) {
 
       <ScreenHeader
         title="Saved learning"
-        subtitle="Only the photos or notes you marked as important appear here. Open one card to review its saved points."
+        subtitle="Only the photos or notes where you saved points appear here. Open one card to review those saved points."
       />
 
       {!keyboardVisible ? (
@@ -317,7 +317,7 @@ export function LibraryScreen({ navigation }: Props) {
             body={
               savedInputs.length
                 ? "Try a different word or clear the search."
-                : "Saved cards will appear here after you extract points and mark the important ones."
+                : "Saved cards will appear here after you extract points and save at least one of them."
             }
           />
         )}

@@ -1,6 +1,8 @@
 import { apiClient } from "./api";
 import { StudyInputExtractResponse, Topic } from "../types/api";
 
+const QUESTION_GENERATION_TIMEOUT_MS = 60000;
+
 export async function createStudyInput(payload: {
   input_type: "keywords" | "notes";
   content: string[] | string;
@@ -24,7 +26,9 @@ export async function redactStudyInputSource(studyInputId: string) {
 }
 
 export async function generateQuestions(payload: { study_input_id: string; count: number }) {
-  const response = await apiClient.post("/questions/generate", payload);
+  const response = await apiClient.post("/questions/generate", payload, {
+    timeout: QUESTION_GENERATION_TIMEOUT_MS,
+  });
   return response.data;
 }
 

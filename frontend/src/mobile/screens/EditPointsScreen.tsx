@@ -41,12 +41,28 @@ const parseRawContent = (inputType: "keywords" | "notes", rawContent: string): s
   return rawContent;
 };
 
+const topicFallbacksFromSource = (sourceText: string): string[] =>
+  sourceText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+const resolveTopicText = (topic: Topic, index: number, sourceText: string): string => {
+  if (typeof topic.text === "string" && topic.text.trim()) {
+    return topic.text.trim();
+  }
+
+  return topicFallbacksFromSource(sourceText)[index] ?? "Saved point";
+};
+
 const toInitialPoints = (texts: string[]): ReviewDraftPoint[] =>
   (texts.length ? texts : [""]).map((point, index) => ({
     id: `${index}`,
     text: point,
     isStarred: false,
   }));
+
+type SaveDestination = "library" | "back";
 
 export function EditPointsScreen({ route, navigation }: Props) {
   const usageLimits = useUsageLimits();
@@ -132,6 +148,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
 
   const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
+  const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
   const tonightIsFull = remainingQuestionsTonight <= 0;
   const usablePointCount = newPoints.filter((point) => point.text.trim()).length;
   const normalizedSourcePreview =
@@ -153,7 +170,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
     });
   };
 
-  const saveToLibrary = async () => {
+  const saveToLibrary = async (destination: SaveDestination = "library") => {
     if (route.params.variant !== "new") {
       return;
     }
@@ -168,7 +185,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
 
       const starredIndices = usablePoints.flatMap((point, index) => (point.isStarred ? [index] : []));
       if (!starredIndices.length) {
-        Alert.alert("Mark one point first", "Choose at least one important point before saving to your library.");
+        Alert.alert("Mark one point first", "Choose at least one saved point before saving to your library.");
         return;
       }
 
@@ -196,12 +213,41 @@ export function EditPointsScreen({ route, navigation }: Props) {
         bookmarked_count: starredIndices.length,
         topic_id: studyInput.topics.find((topic) => topic.is_starred)?.id ?? studyInput.topics[0]?.id ?? "",
       });
-      navigation.navigate("Library");
+      if (destination === "library") {
+        navigation.navigate("Library");
+      } else {
+        navigation.goBack();
+      }
     } catch {
       Alert.alert("Could not save", "NightRecall could not save this learning to your library.");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleNotNow = () => {
+    if (route.params.variant !== "new") {
+      navigation.goBack();
+      return;
+    }
+
+    const { usablePoints } = toStudyInputPayload(newPoints);
+    const bookmarkedCount = usablePoints.filter((point) => point.isStarred).length;
+
+    if (!bookmarkedCount) {
+      navigation.goBack();
+      return;
+    }
+
+    Alert.alert(
+      "Save bookmarked points for later?",
+      "Your photo read is already counted. Save the bookmarked points now, or close without saving.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Close without saving", style: "destructive", onPress: () => navigation.goBack() },
+        { text: "Save and close", onPress: () => void saveToLibrary("back") },
+      ],
+    );
   };
 
   const generateQuestions = () => {
@@ -252,7 +298,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         subtitle={
           route.params.variant === "new"
             ? "Check the source, adjust the points, then generate a clean recall."
-            : "Review the saved source, choose the right points, then generate tonight's recall."
+            : "Review the saved source, choose the saved points you want, then generate tonight's recall."
         }
       />
 
@@ -340,7 +386,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
                           <MaterialIcons name={selected ? "check" : "add"} size={18} color={selected ? "#FFFFFF" : colors.primary} />
                         </View>
                       </View>
-                      <Text style={styles.topicText}>{topic.text || "Saved point"}</Text>
+                      <Text style={styles.topicText}>{resolveTopicText(topic, index, normalizedSavedSourceText)}</Text>
                     </Pressable>
                   );
                 })}
@@ -352,6 +398,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
             <Text style={styles.summaryLabel}>Question count</Text>
             <Text style={styles.summaryBody}>Start with 1 question. You can make up to 3 if you want.</Text>
             <Text style={styles.summaryCapacity}>{`${remainingQuestionsTonight} of 3 questions left tonight.`}</Text>
+            <Text style={styles.summaryHelper}>{`${remainingPhotoReadsTonight} of 3 photo reads left tonight.`}</Text>
             {activeQuestionCount > 0 ? (
               <Text style={styles.summaryHelper}>
                 {activeQuestionCount} question{activeQuestionCount > 1 ? "s are" : " is"} already ready.
@@ -375,7 +422,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
           {route.params.variant === "new" ? (
             <ActionButton label="Save to library" onPress={() => void saveToLibrary()} disabled={submitting} variant="secondary" iconName="bookmark" />
           ) : null}
-          <ActionButton label="Not now" onPress={() => navigation.goBack()} variant="tertiary" />
+          <ActionButton label="Not now" onPress={handleNotNow} variant="tertiary" />
         </>
       )}
     </ScreenContainer>

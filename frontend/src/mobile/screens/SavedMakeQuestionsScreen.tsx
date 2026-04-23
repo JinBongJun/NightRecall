@@ -38,6 +38,20 @@ const parseRawContent = (inputType: "keywords" | "notes", rawContent: string): s
   return rawContent;
 };
 
+const topicFallbacksFromSource = (sourceText: string): string[] =>
+  sourceText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+const resolveTopicText = (topic: Topic, index: number, sourceText: string): string => {
+  if (typeof topic.text === "string" && topic.text.trim()) {
+    return topic.text.trim();
+  }
+
+  return topicFallbacksFromSource(sourceText)[index] ?? "Saved point";
+};
+
 export function SavedCardDetailScreen({ route, navigation }: Props) {
   const { studyInputId, topicId } = route.params;
   const usageLimits = useUsageLimits();
@@ -110,6 +124,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
 
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
   const normalizedSourceText = useMemo(() => parseRawContent(inputType, rawContent), [inputType, rawContent]);
+  const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
 
   return (
     <ScreenContainer>
@@ -123,7 +138,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
 
       <ScreenHeader
         title="Review saved learning"
-        subtitle="Open the saved source, review the bookmarked parts, then continue to shape tonight's question."
+        subtitle="Open the saved source, review the saved parts, then make a question from them."
       />
 
       {loading ? (
@@ -139,7 +154,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
             iconName="auto-stories"
             titleMaxWidth={220}
             meta={
-              `${remainingQuestionsTonight} of 3 questions left tonight.`
+              `${remainingQuestionsTonight} questions left, ${remainingPhotoReadsTonight} photo reads left tonight.`
             }
           >
             <View style={styles.summaryRow}>
@@ -152,8 +167,8 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
                 <Text style={styles.summaryLabel}>Questions left</Text>
               </View>
               <View style={styles.summaryPill}>
-                <Text style={styles.summaryValue}>{sourceImageData ? "Photo" : "Note"}</Text>
-                <Text style={styles.summaryLabel}>Source</Text>
+                <Text style={styles.summaryValue}>{remainingPhotoReadsTonight}</Text>
+                <Text style={styles.summaryLabel}>Photo reads left</Text>
               </View>
             </View>
           </HeroCard>
@@ -167,7 +182,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
 
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Bookmarked points</Text>
-            <Text style={styles.sectionHelper}>These are the parts you already marked as important for later review.</Text>
+            <Text style={styles.sectionHelper}>These are the saved points from this card.</Text>
             <ScrollView contentContainerStyle={styles.topicList} showsVerticalScrollIndicator={false}>
               {topics.map((topic, index) => {
                 return (
@@ -175,19 +190,13 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
                     <View style={styles.pointHeader}>
                       <Text style={styles.pointLabel}>{index === 0 ? "Main point" : `Point ${index + 1}`}</Text>
                       <View style={styles.pointActions}>
-                        {topic.is_starred ? (
-                          <View style={styles.importantBadge}>
-                            <MaterialIcons name="bookmark" size={14} color={colors.primary} />
-                            <Text style={styles.importantText}>Important</Text>
-                          </View>
-                        ) : null}
-                        <View style={styles.importantBadge}>
+                        <View style={styles.savedBadge}>
                           <MaterialIcons name="bookmark" size={14} color={colors.primary} />
-                          <Text style={styles.importantText}>Saved</Text>
+                          <Text style={styles.savedBadgeText}>Saved</Text>
                         </View>
                       </View>
                     </View>
-                    <Text style={styles.pointText}>{typeof topic.text === "string" && topic.text.trim() ? topic.text : "Bookmarked point"}</Text>
+                    <Text style={styles.pointText}>{resolveTopicText(topic, index, normalizedSourceText)}</Text>
                   </View>
                 );
               })}
@@ -195,7 +204,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
           </View>
 
           <PrimaryButton
-            label="Continue to edit points"
+            label="Make question"
             onPress={() =>
               navigation.navigate("EditPoints", {
                 variant: "saved",
@@ -351,7 +360,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1.1,
   },
-  importantBadge: {
+  savedBadge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
@@ -360,7 +369,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
-  importantText: {
+  savedBadgeText: {
     color: colors.primary,
     fontSize: 12,
     fontWeight: "800",
