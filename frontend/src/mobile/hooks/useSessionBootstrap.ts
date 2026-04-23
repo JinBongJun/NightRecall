@@ -1,28 +1,36 @@
 import { useEffect } from "react";
 
-import { clearApiBaseUrl } from "../services/apiBaseUrlStorage";
-import { getDefaultApiBaseUrl, setApiBaseUrl } from "../services/api";
+import { restorePersistedSession } from "../services/authSessionService";
 import { fetchEntitlements } from "../services/entitlementsService";
-import { loadSession } from "../services/sessionStorage";
+import { bootstrapSession } from "../services/bootstrapSession";
 import { useAuthStore } from "../store/authStore";
 
 export function useSessionBootstrap() {
-  const setSession = useAuthStore((state) => state.setSession);
+  const finishBootstrap = useAuthStore((state) => state.finishBootstrap);
   const setPlan = useAuthStore((state) => state.setPlan);
 
   useEffect(() => {
-    void Promise.all([loadSession(), clearApiBaseUrl()]).then(([session]) => {
-      setApiBaseUrl(getDefaultApiBaseUrl());
+    let active = true;
 
-      if (!session) {
-        return;
-      }
-      setSession(session);
-      void fetchEntitlements()
-        .then((entitlements) => setPlan(entitlements.plan))
-        .catch(() => {
-          // Keep defaults if the contract is unavailable.
-        });
-    });
-  }, [setPlan, setSession]);
+    void (async () => {
+      await bootstrapSession({
+        restoreSession: restorePersistedSession,
+        fetchPlan: fetchEntitlements,
+        setPlan: (plan) => {
+          if (active) {
+            setPlan(plan);
+          }
+        },
+        finishBootstrap: () => {
+          if (active) {
+            finishBootstrap();
+          }
+        },
+      });
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [finishBootstrap, setPlan]);
 }

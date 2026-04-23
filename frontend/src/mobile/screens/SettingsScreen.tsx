@@ -9,9 +9,9 @@ import { Alert, Linking, Platform, Pressable, StyleSheet, Switch, Text, View } f
 import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { clearPersistedSession, persistSession } from "../services/authSessionService";
 import { useGoogleIdTokenRequest } from "../services/googleAuthService";
 import { cancelNightlyReminder, scheduleLocalReminder } from "../services/reminderService";
-import { clearSessionStorage, saveSession } from "../services/sessionStorage";
 import { updateReminderSettings } from "../services/settingsService";
 import { deleteMyAccount, fetchMe, linkGoogleIdToken, logoutSession } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
@@ -30,8 +30,6 @@ export function SettingsScreen({ navigation }: Props) {
   const provider = useAuthStore((state) => state.provider);
   const accessToken = useAuthStore((state) => state.accessToken);
   const refreshToken = useAuthStore((state) => state.refreshToken);
-  const setSession = useAuthStore((state) => state.setSession);
-  const clearSession = useAuthStore((state) => state.clearSession);
   const setOnboardingReminderTime = useOnboardingStore((state) => state.setReminderTime);
   const reminderTime = useReminderStore((state) => state.reminderTime);
   const notificationsEnabled = useReminderStore((state) => state.notificationsEnabled);
@@ -249,8 +247,11 @@ export function SettingsScreen({ navigation }: Props) {
         refreshToken: linked.tokens.refresh_token,
         provider: "google" as const,
       };
-      setSession(payload);
-      await saveSession(payload);
+      try {
+        await persistSession(payload);
+      } catch {
+        useAuthStore.getState().setSession(payload);
+      }
     } catch {
       Alert.alert("Link failed", "Google account could not be linked.");
     }
@@ -264,23 +265,20 @@ export function SettingsScreen({ navigation }: Props) {
         // Best-effort revoke. Local logout should still complete.
       }
     }
-    clearSession();
-    await clearSessionStorage();
+    await clearPersistedSession();
   };
 
   const deleteAccount = async () => {
     try {
       await deleteMyAccount();
-      clearSession();
-      await clearSessionStorage();
+      await clearPersistedSession();
     } catch {
       Alert.alert("Delete failed", "Account deletion could not be completed.");
     }
   };
 
   const resetOnboarding = async () => {
-    clearSession();
-    await clearSessionStorage();
+    await clearPersistedSession();
     await cancelNightlyReminder();
     setReminder("22:30", false);
     setOnboardingReminderTime("22:30");

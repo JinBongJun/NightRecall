@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 
-type TabKey = "Home" | "Capture" | "Library";
+type TabKey = "Home" | "Create" | "Library";
 
 type Props = {
   active: TabKey;
@@ -13,7 +13,7 @@ type Props = {
 };
 
 const tabs: Array<{ key: TabKey; label: string; icon: keyof typeof MaterialIcons.glyphMap }> = [
-  { key: "Capture", label: "Capture", icon: "add-circle" },
+  { key: "Create", label: "Create", icon: "add-circle" },
   { key: "Home", label: "Home", icon: "home" },
   { key: "Library", label: "Library", icon: "auto-stories" },
 ];

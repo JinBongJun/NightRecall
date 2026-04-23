@@ -29,7 +29,8 @@ export function UsageLimitScreen({ route, navigation }: Props) {
   const primaryLabel = isPhotoLimit ? "Write it down instead" : hasReviewReady ? "Review what's ready" : "Go home";
   const primaryAction = () => {
     if (isPhotoLimit) {
-      navigation.replace("MakeQuestions", {
+      navigation.replace("EditPoints", {
+        variant: "new",
         mode: "photo",
         sourceText: route.params.sourceText ?? "",
         extractedPoints: [],

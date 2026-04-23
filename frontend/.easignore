@@ -1,0 +1,28 @@
+# EAS Build upload ignore rules for the mobile app project root.
+# This mirrors the monorepo root rules so frontend builds don't try to archive
+# backend test caches or local virtualenvs on Windows.
+
+.git/
+.vscode/
+.idea/
+
+.expo/
+.npm-cache/
+node_modules/
+
+../.git/
+../.vscode/
+../.idea/
+../.tmp/
+../__pycache__/
+../.pytest_cache/
+../pytest-cache-files-*/
+../backend/.pytest_cache/
+../backend/pytest-cache-files-*/
+../.venv/
+../backend/.venv/
+../backend/.venv-test/
+../backend/*.db
+../backend/*.log
+../*.log
+../*.db

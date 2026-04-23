@@ -113,8 +113,8 @@ export function HomeScreen({ navigation }: Props) {
             : "Take 20 seconds before sleep and pull it back.",
         primaryLabel: "Start recall",
         primaryAction: () => navigation.navigate("Review", { mode: "auto" }),
-        secondaryLabel: remainingTonightCapacity > 0 ? "Make another question" : null,
-        secondaryAction: remainingTonightCapacity > 0 ? () => navigation.navigate("QuestionSource") : null,
+        secondaryLabel: remainingTonightCapacity > 0 ? "Create another question" : null,
+        secondaryAction: remainingTonightCapacity > 0 ? () => navigation.navigate("Create") : null,
       }
     : answeredToday
       ? {
@@ -123,26 +123,26 @@ export function HomeScreen({ navigation }: Props) {
           body: "Your nightly review is done. You can stop here or make one more prompt for tomorrow.",
           primaryLabel: null,
           primaryAction: null,
-          secondaryLabel: remainingTonightCapacity > 0 ? "Make another question" : null,
-          secondaryAction: remainingTonightCapacity > 0 ? () => navigation.navigate("QuestionSource") : null,
+          secondaryLabel: remainingTonightCapacity > 0 ? "Create another question" : null,
+          secondaryAction: remainingTonightCapacity > 0 ? () => navigation.navigate("Create") : null,
         }
       : {
           eyebrow: "Prepare tonight",
           title: "Make your next question before the day fades",
           body: "Start with a photo, note, or saved learning and turn it into a single focused recall.",
-          primaryLabel: "Make tonight's question",
-          primaryAction: () => navigation.navigate("QuestionSource"),
+          primaryLabel: "Create tonight's question",
+          primaryAction: () => navigation.navigate("Create"),
           secondaryLabel: "Use saved learning",
           secondaryAction: () => navigation.navigate("Library"),
         };
 
   return (
     <ScreenContainer footer={<BottomDock active="Home" navigation={navigation} />}>
-      <TopBar
+        <TopBar
         leftIcon="settings"
         onLeftPress={() => navigation.navigate("Settings")}
         rightIcon="account-circle"
-        onRightPress={() => navigation.navigate("Profile")}
+        onRightPress={() => navigation.navigate("Account")}
       />
 
       <Animated.View
@@ -248,7 +248,7 @@ export function HomeScreen({ navigation }: Props) {
             if (remainingTonightCapacity === 0) {
               return;
             }
-            navigation.navigate("QuestionSource");
+            navigation.navigate("Create");
           }}
           disabled={remainingTonightCapacity === 0}
         >

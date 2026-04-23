@@ -19,9 +19,9 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { BrandWordmark } from "../components/BrandWordmark";
+import { persistSession } from "../services/authSessionService";
 import { useGoogleIdTokenRequest } from "../services/googleAuthService";
 import { scheduleLocalReminder } from "../services/reminderService";
-import { saveSession } from "../services/sessionStorage";
 import { createGuestSession, signInWithGoogleIdToken } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
 import { useReminderStore } from "../store/reminderStore";
@@ -113,8 +113,6 @@ export function OnboardingScreen({ navigation }: Props) {
       provider: "guest" as const,
     };
 
-    setSession(payload);
-
     let notificationsEnabled = false;
     try {
       notificationsEnabled = await scheduleLocalReminder(22, 30);
@@ -123,8 +121,9 @@ export function OnboardingScreen({ navigation }: Props) {
     }
 
     try {
-      await saveSession(payload);
+      await persistSession(payload);
     } catch {
+      setSession(payload);
       // Keep the user moving even if secure storage fails on this device.
     }
 
@@ -162,8 +161,11 @@ export function OnboardingScreen({ navigation }: Props) {
         refreshToken: session.tokens.refresh_token,
         provider: "google" as const,
       };
-      setSession(payload);
-      await saveSession(payload);
+      try {
+        await persistSession(payload);
+      } catch {
+        setSession(payload);
+      }
       navigation.replace("Home");
     } catch {
       Alert.alert("Google sign-in failed", "Google account connection could not be completed.");

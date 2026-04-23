@@ -2,8 +2,21 @@ import { create } from "zustand";
 
 type AuthMode = "guest" | "signed_in";
 type PlanName = "free" | "plus";
+type BootstrapStatus = "bootstrapping" | "ready";
+
+const defaultAuthState = {
+  userId: null,
+  authMode: "guest" as AuthMode,
+  plan: "free" as PlanName,
+  locale: "en",
+  timezone: "UTC",
+  accessToken: null,
+  refreshToken: null,
+  provider: null as "guest" | "google" | null,
+};
 
 type AuthState = {
+  bootstrapStatus: BootstrapStatus;
   userId: string | null;
   authMode: AuthMode;
   plan: PlanName;
@@ -13,6 +26,7 @@ type AuthState = {
   refreshToken: string | null;
   provider: "guest" | "google" | null;
   setPlan: (plan: PlanName) => void;
+  finishBootstrap: () => void;
   setSession: (input: {
     userId: string;
     timezone: string;
@@ -25,24 +39,15 @@ type AuthState = {
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  userId: null,
-  authMode: "guest",
-  plan: "free",
-  locale: "en",
-  timezone: "UTC",
-  accessToken: null,
-  refreshToken: null,
-  provider: null,
+  bootstrapStatus: "bootstrapping",
+  ...defaultAuthState,
   setPlan: (plan) => set({ plan }),
+  finishBootstrap: () => set({ bootstrapStatus: "ready" }),
   setSession: ({ userId, timezone, authMode, accessToken, refreshToken, provider }) =>
-    set({ userId, timezone, authMode, accessToken, refreshToken, provider }),
+    set({ userId, timezone, authMode, accessToken, refreshToken, provider, bootstrapStatus: "ready" }),
   clearSession: () =>
     set({
-      userId: null,
-      accessToken: null,
-      refreshToken: null,
-      provider: null,
-      authMode: "guest",
-      plan: "free",
+      ...defaultAuthState,
+      bootstrapStatus: "ready",
     }),
 }));

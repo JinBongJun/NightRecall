@@ -244,7 +244,7 @@ export function LibraryScreen({ navigation }: Props) {
         leftIcon="settings"
         onLeftPress={() => navigation.navigate("Settings")}
         rightIcon="account-circle"
-        onRightPress={() => navigation.navigate("Profile")}
+        onRightPress={() => navigation.navigate("Account")}
       />
 
       <ScreenHeader
@@ -304,7 +304,7 @@ export function LibraryScreen({ navigation }: Props) {
               deleting={!usingLegacyFallback && deletingStudyInputId === item.study_input_id}
               onDelete={() => (usingLegacyFallback ? confirmLegacyDelete(item.topic_id, item.title) : confirmDelete(item))}
               onPress={() =>
-                navigation.navigate("SavedMakeQuestions", {
+                navigation.navigate("SavedCardDetail", {
                   ...(item.study_input_id ? { studyInputId: item.study_input_id } : {}),
                   topicId: item.topic_id,
                 })

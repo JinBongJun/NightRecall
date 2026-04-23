@@ -1,7 +1,7 @@
 export type RootStackParamList = {
   Onboarding: undefined;
   Home: undefined;
-  QuestionSource: undefined;
+  Create: undefined;
   Capture: undefined;
   CaptureNote: undefined;
   Processing: {
@@ -30,14 +30,26 @@ export type RootStackParamList = {
     | {
         reason: "question_generation_daily" | "question_generation_monthly";
       };
-  MakeQuestions: {
-    mode: "photo" | "manual";
-    sourceText: string;
-    extractedPoints?: string[];
-    imageUri?: string;
-    imageBase64?: string;
-    imageMimeType?: string;
+  SavedCardDetail: {
+    studyInputId?: string;
+    topicId?: string;
   };
+  EditPoints:
+    | {
+        variant: "new";
+        mode: "photo" | "manual";
+        sourceText: string;
+        extractedPoints?: string[];
+        imageUri?: string;
+        imageBase64?: string;
+        imageMimeType?: string;
+      }
+    | {
+        variant: "saved";
+        studyInputId?: string;
+        topicId?: string;
+        selectedTopicIds?: string[];
+      };
   QuestionGenerating:
     | {
         variant: "new";
@@ -56,14 +68,10 @@ export type RootStackParamList = {
         selectedQuestionCount: number;
       };
   Library: undefined;
-  SavedMakeQuestions: {
-    studyInputId?: string;
-    topicId?: string;
-  };
   Review: { mode?: "auto" | "picked" } | undefined;
   Result: undefined;
   Stats: undefined;
   Settings: undefined;
   PrivacyPolicy: undefined;
-  Profile: undefined;
+  Account: undefined;
 };

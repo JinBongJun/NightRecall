@@ -10,9 +10,9 @@ import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 
-type Props = NativeStackScreenProps<RootStackParamList, "QuestionSource">;
+type Props = NativeStackScreenProps<RootStackParamList, "Create">;
 
-export function QuestionSourceScreen({ navigation }: Props) {
+export function CreateScreen({ navigation }: Props) {
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const nightlyGenerationSessionCount = useReviewStore((state) =>
@@ -28,7 +28,7 @@ export function QuestionSourceScreen({ navigation }: Props) {
       <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} />
 
       <ScreenHeader
-        title="Make questions"
+        title="Create tonight's question"
         subtitle="Start with something new, or use saved learning from your library."
       />
 
@@ -60,8 +60,8 @@ export function QuestionSourceScreen({ navigation }: Props) {
           <MaterialIcons name="add-photo-alternate" size={28} color="#FFFFFF" />
         </View>
         <View style={styles.optionCopy}>
-          <Text style={styles.optionTitleLight}>Use new photo or note</Text>
-          <Text style={styles.optionBodyLight}>Add a photo or write a note, then AI will turn it into tonight&apos;s questions.</Text>
+          <Text style={styles.optionTitleLight}>Start from new input</Text>
+          <Text style={styles.optionBodyLight}>Take a photo or write a note, then turn it into tonight&apos;s questions.</Text>
         </View>
       </Pressable>
 
@@ -79,7 +79,7 @@ export function QuestionSourceScreen({ navigation }: Props) {
         </View>
         <View style={styles.optionCopy}>
           <Text style={styles.optionTitleDark}>Use saved learning</Text>
-          <Text style={styles.optionBodyDark}>Pick something you saved before and make one fresh question from it.</Text>
+          <Text style={styles.optionBodyDark}>Pick something you saved before and shape one fresh question from it.</Text>
         </View>
       </Pressable>
     </ScreenContainer>

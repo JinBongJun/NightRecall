@@ -17,7 +17,16 @@ export async function saveSession(session: StoredSession) {
 
 export async function loadSession(): Promise<StoredSession | null> {
   const raw = await SecureStore.getItemAsync(SESSION_KEY);
-  return raw ? (JSON.parse(raw) as StoredSession) : null;
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw) as StoredSession;
+  } catch {
+    await SecureStore.deleteItemAsync(SESSION_KEY);
+    return null;
+  }
 }
 
 export async function clearSessionStorage() {

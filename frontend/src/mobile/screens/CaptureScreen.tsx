@@ -114,8 +114,8 @@ export function CaptureScreen({ navigation }: Props) {
   };
 
   return (
-    <ScreenContainer footer={<BottomDock active="Capture" navigation={navigation} />}>
-      <TopBar leftIcon="settings" onLeftPress={() => navigation.navigate("Settings")} rightIcon="account-circle" onRightPress={() => navigation.navigate("Profile")} />
+    <ScreenContainer footer={<BottomDock active="Create" navigation={navigation} />}>
+      <TopBar leftIcon="settings" onLeftPress={() => navigation.navigate("Settings")} rightIcon="account-circle" onRightPress={() => navigation.navigate("Account")} />
 
       <ScreenHeader
         title="Capture today's learning"

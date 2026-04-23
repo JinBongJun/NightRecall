@@ -1,30 +1,18 @@
 import axios from "axios";
 import Constants from "expo-constants";
 
-import { clearSessionStorage, saveSession } from "./sessionStorage";
+import { clearPersistedSession, persistSession } from "./authSessionService";
 import { useAuthStore } from "../store/authStore";
 
 const publishSafeFallbackBaseURL = "https://example.invalid/v1";
 const defaultBaseURL = (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ?? publishSafeFallbackBaseURL;
 
-let runtimeBaseURL = defaultBaseURL;
-
-export function getDefaultApiBaseUrl() {
-  return defaultBaseURL;
-}
-
 export function getApiBaseUrl() {
-  return apiClient.defaults.baseURL ?? runtimeBaseURL;
-}
-
-export function setApiBaseUrl(baseURL: string) {
-  runtimeBaseURL = baseURL;
-  apiClient.defaults.baseURL = baseURL;
-  refreshClient.defaults.baseURL = baseURL;
+  return apiClient.defaults.baseURL ?? defaultBaseURL;
 }
 
 export const apiClient = axios.create({
-  baseURL: runtimeBaseURL,
+  baseURL: defaultBaseURL,
   timeout: 10000,
   // Mitigation for axios -> follow-redirects header leakage advisory (Node adapter).
   // For our API calls we do not expect redirects; treat redirects as errors instead.
@@ -32,7 +20,7 @@ export const apiClient = axios.create({
 });
 
 const refreshClient = axios.create({
-  baseURL: runtimeBaseURL,
+  baseURL: defaultBaseURL,
   timeout: 10000,
   maxRedirects: 0,
 });
@@ -74,14 +62,12 @@ apiClient.interceptors.response.use(
         refreshToken: refreshed.refresh_token,
         provider: auth.provider,
       } as const;
-      useAuthStore.getState().setSession(nextSession);
-      await saveSession(nextSession);
+      await persistSession(nextSession);
       originalRequest.headers = originalRequest.headers ?? {};
       originalRequest.headers.Authorization = `Bearer ${refreshed.access_token}`;
       return apiClient(originalRequest);
     } catch (refreshError) {
-      useAuthStore.getState().clearSession();
-      await clearSessionStorage();
+      await clearPersistedSession();
       return Promise.reject(refreshError);
     }
   },

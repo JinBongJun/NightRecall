@@ -15,7 +15,8 @@ export function ExtractionHelpScreen({ route, navigation }: Props) {
   const { imageUri, imageBase64, imageMimeType, detail, sourceText } = route.params;
 
   const continueManually = () => {
-    navigation.replace("MakeQuestions", {
+    navigation.replace("EditPoints", {
+      variant: "new",
       mode: "photo",
       sourceText: sourceText.trim(),
       extractedPoints: [],

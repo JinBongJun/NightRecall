@@ -9,9 +9,9 @@ import { useAuthStore } from "../store/authStore";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Profile">;
+type Props = NativeStackScreenProps<RootStackParamList, "Account">;
 
-export function ProfileScreen({ navigation }: Props) {
+export function AccountScreen({ navigation }: Props) {
   const provider = useAuthStore((state) => state.provider);
   const authMode = useAuthStore((state) => state.authMode);
   const timezone = useAuthStore((state) => state.timezone);
@@ -22,7 +22,7 @@ export function ProfileScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer>
-      <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} title="Profile" />
+      <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} title="Account" />
 
       <View style={styles.heroCard}>
         <View style={styles.avatarWrap}>
@@ -53,10 +53,10 @@ export function ProfileScreen({ navigation }: Props) {
           <MaterialIcons name="chevron-right" size={22} color={colors.muted} />
         </Pressable>
 
-        <Pressable style={styles.actionCard} onPress={() => navigation.navigate("Library")}>
+        <Pressable style={styles.actionCard} onPress={() => navigation.navigate("PrivacyPolicy")}>
           <View style={styles.actionCopy}>
-            <Text style={styles.actionTitle}>Saved topics</Text>
-            <Text style={styles.actionBody}>Browse the topics and ideas you are actively recalling.</Text>
+            <Text style={styles.actionTitle}>Privacy policy</Text>
+            <Text style={styles.actionBody}>Read how NightRecall handles your data.</Text>
           </View>
           <MaterialIcons name="chevron-right" size={22} color={colors.muted} />
         </Pressable>

@@ -111,14 +111,15 @@ export function ProcessingScreen({ route, navigation }: Props) {
           }
 
           if (!cancelled) {
-            navigation.replace("MakeQuestions", {
+            navigation.replace("EditPoints", {
+              variant: "new",
               mode: "manual",
-            sourceText,
-            extractedPoints: fallbackPoints,
-            imageUri,
-            imageBase64,
-            imageMimeType,
-          });
+              sourceText,
+              extractedPoints: fallbackPoints,
+              imageUri,
+              imageBase64,
+              imageMimeType,
+            });
           }
           return;
         }
@@ -136,7 +137,8 @@ export function ProcessingScreen({ route, navigation }: Props) {
         });
 
         if (!cancelled) {
-          navigation.replace("MakeQuestions", {
+          navigation.replace("EditPoints", {
+            variant: "new",
             mode: "photo",
             sourceText: extracted.source_preview || sourceText,
             extractedPoints: extracted.points.map((point) => point.text),
