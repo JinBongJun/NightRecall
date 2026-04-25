@@ -8,16 +8,17 @@ type Props = {
   preview: string;
   bookmarkedCount: number;
   imageUri?: string | null;
+  imageHeaders?: Record<string, string>;
   onPress: () => void;
   onDelete: () => void;
   deleting?: boolean;
 };
 
-export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, onPress, onDelete, deleting = false }: Props) {
+export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, imageHeaders, onPress, onDelete, deleting = false }: Props) {
   return (
     <Pressable style={({ pressed }) => [styles.card, pressed && styles.cardPressed]} onPress={onPress}>
       {imageUri ? (
-        <Image source={{ uri: imageUri }} style={styles.image} />
+        <Image source={{ uri: imageUri, headers: imageHeaders }} style={styles.image} />
       ) : (
         <View style={styles.imageFallback}>
           <MaterialIcons name="auto-stories" size={28} color={colors.primary} />

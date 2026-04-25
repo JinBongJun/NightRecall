@@ -15,6 +15,11 @@ export function getSourceImageUrl(sourceImageRef: string) {
   return `${getApiBaseUrl().replace(/\/$/, "")}/study-inputs/source-images/${sourceImageRef}`;
 }
 
+export function getSourceImageHeaders() {
+  const token = useAuthStore.getState().accessToken;
+  return token ? { Authorization: `Bearer ${token}` } : undefined;
+}
+
 export const apiClient = axios.create({
   baseURL: defaultBaseURL,
   timeout: 10000,

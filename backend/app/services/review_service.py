@@ -198,6 +198,7 @@ class ReviewService:
                     input_type=study_input.input_type,
                     source_kind=study_input.source_kind,
                     source_preview_text=study_input.source_preview_text,
+                    source_image_ref=study_input.source_image_ref,
                     title=title,
                     preview=preview,
                     bookmarked_count=len(starred_topics),

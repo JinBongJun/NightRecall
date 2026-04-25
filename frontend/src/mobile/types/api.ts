@@ -19,6 +19,7 @@ export type SavedStudyInputSummary = {
   input_type: "keywords" | "notes";
   source_kind?: "photo" | "manual" | null;
   source_preview_text?: string | null;
+  source_image_ref?: string | null;
   title: string;
   preview: string;
   bookmarked_count: number;

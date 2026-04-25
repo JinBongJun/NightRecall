@@ -26,6 +26,7 @@ import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SearchField } from "../components/SearchField";
 import { deleteSavedInput, deleteTopic, fetchSavedInputs } from "../services/reviewService";
+import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
 import { SavedStudyInputSummary, Topic } from "../types/api";
@@ -336,6 +337,8 @@ export function LibraryScreen({ navigation }: Props) {
               title={item.title}
               preview={item.preview || "Open to review the saved points from this learning."}
               bookmarkedCount={item.bookmarked_count}
+              imageUri={item.source_image_ref ? getSourceImageUrl(item.source_image_ref) : null}
+              imageHeaders={item.source_image_ref ? getSourceImageHeaders() : undefined}
               deleting={!usingLegacyFallback && deletingStudyInputId === item.study_input_id}
               onDelete={() => (usingLegacyFallback ? confirmLegacyDelete(item.topic_id, item.title) : confirmDelete(item))}
               onPress={() =>
