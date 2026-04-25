@@ -29,11 +29,7 @@ from app.db.session import engine
 from app.middleware.ops_middleware import ops_middleware
 
 
-def ensure_sqlite_schema() -> None:
-    settings = get_settings()
-    if not settings.sqlalchemy_database_url.startswith("sqlite"):
-        return
-
+def ensure_runtime_schema() -> None:
     inspector = inspect(engine)
     if "study_inputs" not in inspector.get_table_names():
         return
@@ -58,7 +54,7 @@ def ensure_sqlite_schema() -> None:
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
-    ensure_sqlite_schema()
+    ensure_runtime_schema()
     yield
 
 
