@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 import base64
-import hashlib
-import hmac
 import re
 from dataclasses import dataclass
-from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
-from urllib.parse import quote, urlparse
 
-import requests
+import boto3
+from botocore.client import Config
+from botocore.exceptions import ClientError
 
 from app.core.config import get_settings
 from app.utils.ids import make_id
@@ -69,9 +66,9 @@ class SourceImageStorageService:
             mime_type = self._mime_from_extension(path.suffix.lstrip("."))
             return StoredSourceImageBlob(content=path.read_bytes(), mime_type=mime_type)
 
-        response = self._request("GET", ref)
-        mime_type = response.headers.get("Content-Type", self._mime_from_extension(Path(ref).suffix.lstrip(".")))
-        return StoredSourceImageBlob(content=response.content, mime_type=mime_type)
+        response = self._object_client().get_object(Bucket=self._bucket(), Key=self._object_key(ref))
+        mime_type = response.get("ContentType") or self._mime_from_extension(Path(ref).suffix.lstrip("."))
+        return StoredSourceImageBlob(content=response["Body"].read(), mime_type=mime_type)
 
     def _store_bytes(self, ref: str, content: bytes, mime_type: str) -> None:
         if self._is_local():
@@ -79,7 +76,7 @@ class SourceImageStorageService:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
             return
-        self._request("PUT", ref, body=content, content_type=mime_type)
+        self._object_client().put_object(Bucket=self._bucket(), Key=self._object_key(ref), Body=content, ContentType=mime_type)
 
     def _is_local(self) -> bool:
         provider = (self.settings.source_image_storage_provider or "local").strip().lower()
@@ -92,94 +89,36 @@ class SourceImageStorageService:
             raise ValueError("invalid source image ref")
         return path
 
-    def _request(
-        self,
-        method: str,
-        ref: str,
-        *,
-        body: bytes | None = None,
-        content_type: str | None = None,
-        allow_not_found: bool = False,
-    ) -> requests.Response | None:
-        url = self._object_url(ref)
-        headers = self._signed_headers(method, ref, body=body, content_type=content_type)
-        response = requests.request(method, url, data=body, headers=headers, timeout=30)
-        if allow_not_found and response.status_code == 404:
-            return None
-        if response.status_code >= 400:
-            raise ValueError(f"source image storage request failed: {response.status_code}")
-        return response
+    def _request(self, method: str, ref: str, *, allow_not_found: bool = False) -> object | None:
+        client = self._object_client()
+        try:
+            if method == "HEAD":
+                return client.head_object(Bucket=self._bucket(), Key=self._object_key(ref))
+            if method == "DELETE":
+                return client.delete_object(Bucket=self._bucket(), Key=self._object_key(ref))
+        except ClientError as exc:
+            error_code = exc.response.get("Error", {}).get("Code")
+            if allow_not_found and error_code in {"404", "NoSuchKey", "NotFound"}:
+                return None
+            raise ValueError(f"source image storage request failed: {error_code or 'client_error'}") from exc
+        raise ValueError(f"unsupported source image storage method: {method}")
 
-    def _object_url(self, ref: str) -> str:
-        endpoint = self._require_object_setting("SOURCE_IMAGE_STORAGE_ENDPOINT_URL")
-        bucket = self._require_object_setting("SOURCE_IMAGE_STORAGE_BUCKET")
-        return f"{endpoint.rstrip('/')}/{bucket}/{self._object_key(ref)}"
-
-    def _signed_headers(
-        self,
-        method: str,
-        ref: str,
-        *,
-        body: bytes | None = None,
-        content_type: str | None = None,
-    ) -> dict[str, str]:
+    def _object_client(self):
         endpoint = self._require_object_setting("SOURCE_IMAGE_STORAGE_ENDPOINT_URL")
         access_key = self._require_object_setting("SOURCE_IMAGE_STORAGE_ACCESS_KEY_ID")
         secret_key = self._require_object_setting("SOURCE_IMAGE_STORAGE_SECRET_ACCESS_KEY")
         region = self._require_object_setting("SOURCE_IMAGE_STORAGE_REGION")
-
-        parsed = urlparse(endpoint)
-        host = parsed.netloc
-        amz_date = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-        date_stamp = amz_date[:8]
-        payload_hash = hashlib.sha256(body or b"").hexdigest()
-
-        canonical_uri = f"/{self.settings.source_image_storage_bucket}/{self._object_key(ref)}"
-        canonical_headers: dict[str, str] = {
-            "host": host,
-            "x-amz-content-sha256": payload_hash,
-            "x-amz-date": amz_date,
-        }
-        if content_type:
-            canonical_headers["content-type"] = content_type
-
-        signed_headers = ";".join(sorted(canonical_headers))
-        canonical_headers_string = "".join(f"{key}:{canonical_headers[key]}\n" for key in sorted(canonical_headers))
-        canonical_request = "\n".join(
-            [
-                method,
-                canonical_uri,
-                "",
-                canonical_headers_string,
-                signed_headers,
-                payload_hash,
-            ]
-        )
-        scope = f"{date_stamp}/{region}/s3/aws4_request"
-        string_to_sign = "\n".join(
-            [
-                "AWS4-HMAC-SHA256",
-                amz_date,
-                scope,
-                hashlib.sha256(canonical_request.encode("utf-8")).hexdigest(),
-            ]
-        )
-        signing_key = self._signing_key(secret_key, date_stamp, region, "s3")
-        signature = hmac.new(signing_key, string_to_sign.encode("utf-8"), hashlib.sha256).hexdigest()
-        authorization = (
-            f"AWS4-HMAC-SHA256 Credential={access_key}/{scope}, "
-            f"SignedHeaders={signed_headers}, Signature={signature}"
+        return boto3.client(
+            "s3",
+            endpoint_url=endpoint,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+            region_name=region,
+            config=Config(signature_version="s3v4"),
         )
 
-        headers = {
-            "Authorization": authorization,
-            "Host": host,
-            "x-amz-content-sha256": payload_hash,
-            "x-amz-date": amz_date,
-        }
-        if content_type:
-            headers["Content-Type"] = content_type
-        return headers
+    def _bucket(self) -> str:
+        return self._require_object_setting("SOURCE_IMAGE_STORAGE_BUCKET")
 
     def _require_object_setting(self, name: str) -> str:
         value = getattr(self.settings, self._settings_attr_name(name), None)
@@ -193,22 +132,12 @@ class SourceImageStorageService:
 
     def _object_key(self, ref: str) -> str:
         self._validate_ref(ref)
-        return quote(ref, safe="/-_.~")
+        return ref
 
     @staticmethod
     def _validate_ref(ref: str) -> None:
         if not ref or "/" in ref or ".." in ref:
             raise ValueError("invalid source image ref")
-
-    @staticmethod
-    def _signing_key(secret_key: str, date_stamp: str, region_name: str, service_name: str) -> bytes:
-        def sign(key: bytes, msg: str) -> bytes:
-            return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
-
-        k_date = sign(f"AWS4{secret_key}".encode("utf-8"), date_stamp)
-        k_region = sign(k_date, region_name)
-        k_service = sign(k_region, service_name)
-        return sign(k_service, "aws4_request")
 
     @staticmethod
     def _parse_data_uri(data_uri: str) -> tuple[str, str]:

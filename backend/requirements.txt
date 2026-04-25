@@ -8,6 +8,7 @@ psycopg[binary]==3.2.13
 pytest==9.0.3
 httpx==0.28.1
 requests==2.33.0
+boto3==1.41.5
 PyJWT==2.12.0
 passlib[bcrypt]==1.7.4
 google-auth==2.40.3
