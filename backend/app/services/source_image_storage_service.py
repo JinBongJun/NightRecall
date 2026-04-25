@@ -121,7 +121,7 @@ class SourceImageStorageService:
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
             region_name=region,
-            config=Config(signature_version="s3v4"),
+            config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
         )
 
     def _bucket(self) -> str:
@@ -138,7 +138,7 @@ class SourceImageStorageService:
         value = getattr(self.settings, self._settings_attr_name(name), None)
         if not value:
             raise ValueError(f"{name} is required for object storage")
-        return str(value)
+        return str(value).strip().strip("\"'")
 
     @staticmethod
     def _settings_attr_name(name: str) -> str:
