@@ -35,7 +35,11 @@ def upload_source_image(
     db: Session = Depends(get_db),
 ) -> StudyInputSourceImageUploadResponse:
     storage = SourceImageStorageService()
-    stored = storage.store_data_uri(f"data:{payload.image_mime_type};base64,{payload.image_base64}")
+    try:
+        stored = storage.store_data_uri(f"data:{payload.image_mime_type};base64,{payload.image_base64}")
+    except ValueError as exc:
+        logger.exception("study_inputs.source_image.upload_failed detail=%s", str(exc))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
     AnalyticsService(db).record(
         name="study_inputs.source_image.uploaded",
         user_id=current_user.id,

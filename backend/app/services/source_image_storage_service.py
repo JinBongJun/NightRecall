@@ -4,6 +4,7 @@ import base64
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
 import boto3
 from botocore.client import Config
@@ -66,7 +67,10 @@ class SourceImageStorageService:
             mime_type = self._mime_from_extension(path.suffix.lstrip("."))
             return StoredSourceImageBlob(content=path.read_bytes(), mime_type=mime_type)
 
-        response = self._object_client().get_object(Bucket=self._bucket(), Key=self._object_key(ref))
+        try:
+            response = self._object_client().get_object(Bucket=self._bucket(), Key=self._object_key(ref))
+        except ClientError as exc:
+            raise ValueError(self._client_error_message(exc)) from exc
         mime_type = response.get("ContentType") or self._mime_from_extension(Path(ref).suffix.lstrip("."))
         return StoredSourceImageBlob(content=response["Body"].read(), mime_type=mime_type)
 
@@ -76,7 +80,10 @@ class SourceImageStorageService:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
             return
-        self._object_client().put_object(Bucket=self._bucket(), Key=self._object_key(ref), Body=content, ContentType=mime_type)
+        try:
+            self._object_client().put_object(Bucket=self._bucket(), Key=self._object_key(ref), Body=content, ContentType=mime_type)
+        except ClientError as exc:
+            raise ValueError(self._client_error_message(exc)) from exc
 
     def _is_local(self) -> bool:
         provider = (self.settings.source_image_storage_provider or "local").strip().lower()
@@ -100,11 +107,11 @@ class SourceImageStorageService:
             error_code = exc.response.get("Error", {}).get("Code")
             if allow_not_found and error_code in {"404", "NoSuchKey", "NotFound"}:
                 return None
-            raise ValueError(f"source image storage request failed: {error_code or 'client_error'}") from exc
+            raise ValueError(self._client_error_message(exc)) from exc
         raise ValueError(f"unsupported source image storage method: {method}")
 
     def _object_client(self):
-        endpoint = self._require_object_setting("SOURCE_IMAGE_STORAGE_ENDPOINT_URL")
+        endpoint = self._normalized_endpoint_url()
         access_key = self._require_object_setting("SOURCE_IMAGE_STORAGE_ACCESS_KEY_ID")
         secret_key = self._require_object_setting("SOURCE_IMAGE_STORAGE_SECRET_ACCESS_KEY")
         region = self._require_object_setting("SOURCE_IMAGE_STORAGE_REGION")
@@ -120,6 +127,13 @@ class SourceImageStorageService:
     def _bucket(self) -> str:
         return self._require_object_setting("SOURCE_IMAGE_STORAGE_BUCKET")
 
+    def _normalized_endpoint_url(self) -> str:
+        endpoint = self._require_object_setting("SOURCE_IMAGE_STORAGE_ENDPOINT_URL").strip()
+        parsed = urlparse(endpoint)
+        if not parsed.scheme or not parsed.netloc:
+            raise ValueError("SOURCE_IMAGE_STORAGE_ENDPOINT_URL must be an absolute URL")
+        return urlunparse((parsed.scheme, parsed.netloc, "", "", "", ""))
+
     def _require_object_setting(self, name: str) -> str:
         value = getattr(self.settings, self._settings_attr_name(name), None)
         if not value:
@@ -133,6 +147,11 @@ class SourceImageStorageService:
     def _object_key(self, ref: str) -> str:
         self._validate_ref(ref)
         return ref
+
+    @staticmethod
+    def _client_error_message(exc: ClientError) -> str:
+        error_code = exc.response.get("Error", {}).get("Code")
+        return f"source image storage request failed: {error_code or 'client_error'}"
 
     @staticmethod
     def _validate_ref(ref: str) -> None:
