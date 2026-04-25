@@ -104,6 +104,16 @@ class Settings(BaseSettings):
     def inline_job_processing_enabled(self) -> bool:
         if self.job_inline_processing is not None:
             return self.job_inline_processing
+        hosted_markers = (
+            "RAILWAY_ENVIRONMENT",
+            "RAILWAY_PROJECT_ID",
+            "RAILWAY_SERVICE_ID",
+            "RENDER",
+            "FLY_APP_NAME",
+            "DYNO",  # Heroku
+        )
+        if any(os.getenv(key) for key in hosted_markers):
+            return False
         return self.is_development
 
 
