@@ -17,9 +17,6 @@ class StudyInputService:
 
     def create_study_input(self, user_id: str, payload: StudyInputCreateRequest) -> StudyInputCreateResponse:
         source_image_ref = payload.source_image_ref
-        if source_image_ref:
-            if not SourceImageStorageService().exists(source_image_ref):
-                raise ValueError("source image not found")
 
         study_input = StudyInput(
             id=make_id("si"),
