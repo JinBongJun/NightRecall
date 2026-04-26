@@ -1,6 +1,7 @@
 export type Topic = {
   id: string;
   text: string;
+  topic_text?: string;
   is_starred: boolean;
 };
 

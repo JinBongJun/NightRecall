@@ -204,14 +204,19 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
           transientStudyInputId = studyInput.study_input_id;
           shouldRedactSource = bookmarkedCount === 0;
           if (bookmarkedCount > 0) {
+            const firstSavedPointText =
+              usablePoints.find((point) => point.isStarred)?.text.trim() || usablePoints[0]?.text.trim() || "Saved learning";
+            const sourcePreview = studyInput.source_preview_text ?? normalizedSourcePreview ?? "";
             pendingSavedInput = {
               study_input_id: studyInput.study_input_id,
               input_type: payload.input_type,
               source_kind: studyInput.source_kind ?? (route.params.mode === "photo" ? "photo" : "manual"),
-              source_preview_text: studyInput.source_preview_text ?? normalizedSourcePreview ?? null,
-              title: studyInput.source_preview_text ?? normalizedSourcePreview ?? usablePoints[0]?.text.trim() ?? "Saved learning",
+              source_preview_text: sourcePreview || null,
+              title: firstSavedPointText,
               preview:
-                usablePoints.find((point) => point.text.trim() !== (studyInput.source_preview_text ?? normalizedSourcePreview ?? "").trim())?.text.trim() ?? "",
+                sourcePreview ||
+                usablePoints.find((point) => point.text.trim() && point.text.trim() !== firstSavedPointText)?.text.trim() ||
+                "",
               bookmarked_count: bookmarkedCount,
               topic_id: studyInput.topics.find((topic) => topic.is_starred)?.id ?? studyInput.topics[0]?.id ?? "",
             };

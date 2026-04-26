@@ -10,7 +10,7 @@ MAX_SOURCE_IMAGE_DATA_LENGTH = 4_000_000
 
 class TopicResponse(APIModel):
     id: str
-    text: str = Field(alias="topic_text")
+    text: str = Field(alias="topic_text", serialization_alias="text")
     is_starred: bool
 
 

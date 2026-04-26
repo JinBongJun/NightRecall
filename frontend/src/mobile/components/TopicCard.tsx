@@ -14,7 +14,10 @@ type Props = {
 };
 
 export function TopicCard({ topic, onPress, ctaLabel = "Pick", subtitle, disabled = false, titleOverride }: Props) {
-  const rawTitle = typeof topic.text === "string" ? topic.text : "";
+  const rawTitle =
+    (typeof topic.text === "string" && topic.text.trim()) ||
+    (typeof topic.topic_text === "string" && topic.topic_text.trim()) ||
+    "";
   const title = (titleOverride && titleOverride.trim()) || rawTitle.trim() || "Saved learning";
 
   return (

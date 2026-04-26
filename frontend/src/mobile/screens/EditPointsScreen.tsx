@@ -29,8 +29,11 @@ const resolveTopicText = (topic: Topic, index: number, sourceText: string): stri
   if (typeof topic.text === "string" && topic.text.trim()) {
     return topic.text.trim();
   }
+  if (typeof topic.topic_text === "string" && topic.topic_text.trim()) {
+    return topic.topic_text.trim();
+  }
 
-  return sourceText.trim() || `Saved point ${index + 1}`;
+  return sourceText.trim() || `Extracted point ${index + 1}`;
 };
 
 const toInitialPoints = (texts: string[]): ReviewDraftPoint[] =>
@@ -96,12 +99,11 @@ export function EditPointsScreen({ route, navigation }: Props) {
           return;
         }
 
-        const visibleTopics = source.topics.filter((topic) => topic.is_starred);
         setSavedInputType(source.input_type);
         setSavedSourcePreview(source.source_preview_text ?? "");
         setSavedSourceImageRef(source.source_image_ref ?? null);
-        setSavedTopics(visibleTopics);
-        setSelectedTopicIds((current) => (current.length ? current : visibleTopics.map((topic) => topic.id)));
+        setSavedTopics(source.topics);
+        setSelectedTopicIds((current) => (current.length ? current : source.topics.filter((topic) => topic.is_starred).map((topic) => topic.id)));
       } catch (error) {
         const detail =
           axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
@@ -182,15 +184,20 @@ export function EditPointsScreen({ route, navigation }: Props) {
         source_preview_text: normalizedSourcePreview,
         source_image_ref: sourceImageRef,
       });
+      const firstSavedPointText =
+        usablePoints.find((point) => point.isStarred)?.text.trim() || usablePoints[0]?.text.trim() || "Saved learning";
+      const sourcePreview = studyInput.source_preview_text ?? normalizedSourcePreview ?? "";
       setTopics(studyInput.topics);
       upsertSavedInput({
         study_input_id: studyInput.study_input_id,
         input_type: payload.input_type,
         source_kind: studyInput.source_kind ?? (route.params.mode === "photo" ? "photo" : "manual"),
-        source_preview_text: studyInput.source_preview_text ?? normalizedSourcePreview ?? null,
-        title: studyInput.source_preview_text ?? normalizedSourcePreview ?? usablePoints[0].text.trim(),
+        source_preview_text: sourcePreview || null,
+        title: firstSavedPointText,
         preview:
-          usablePoints.find((point) => point.text.trim() !== (studyInput.source_preview_text ?? normalizedSourcePreview ?? "").trim())?.text.trim() ?? "",
+          sourcePreview ||
+          usablePoints.find((point) => point.text.trim() && point.text.trim() !== firstSavedPointText)?.text.trim() ||
+          "",
         bookmarked_count: starredIndices.length,
         topic_id: studyInput.topics.find((topic) => topic.is_starred)?.id ?? studyInput.topics[0]?.id ?? "",
       });
@@ -221,8 +228,8 @@ export function EditPointsScreen({ route, navigation }: Props) {
     }
 
     Alert.alert(
-      "Save bookmarked points for later?",
-      "Your photo read is already counted. Save the bookmarked points now, or close without saving.",
+      "Save selected points for later?",
+      "Your photo read is already counted. Save the selected points now, or close without saving.",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Close without saving", style: "destructive", onPress: () => navigation.goBack() },
@@ -346,8 +353,8 @@ export function EditPointsScreen({ route, navigation }: Props) {
             ))
           ) : (
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Saved points</Text>
-              <Text style={styles.sectionHelper}>Choose the saved points AI should use for tonight's question.</Text>
+              <Text style={styles.sectionLabel}>Extracted points</Text>
+              <Text style={styles.sectionHelper}>Choose the points AI should use for tonight's question.</Text>
               <ScrollView contentContainerStyle={styles.topicList} showsVerticalScrollIndicator={false}>
                 {savedTopics.map((topic, index) => {
                   const selected = selectedTopicIds.includes(topic.id);

@@ -36,6 +36,11 @@ type Props = NativeStackScreenProps<RootStackParamList, "Library">;
 
 const PAGE_SIZE = 20;
 
+const resolveTopicText = (topic: Topic) =>
+  (typeof topic.text === "string" && topic.text.trim()) ||
+  (typeof topic.topic_text === "string" && topic.topic_text.trim()) ||
+  "";
+
 export function LibraryScreen({ navigation }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [savedInputs, setSavedInputs] = useState<SavedStudyInputSummary[]>([]);
@@ -65,7 +70,7 @@ export function LibraryScreen({ navigation }: Props) {
       input_type: "keywords",
       source_kind: null,
       source_preview_text: null,
-      title: typeof topic.text === "string" && topic.text.trim() ? topic.text.trim() : "Saved learning",
+      title: resolveTopicText(topic) || "Saved learning",
       preview: "Open to review the saved points from this learning.",
       bookmarked_count: 1,
       topic_id: topic.id,

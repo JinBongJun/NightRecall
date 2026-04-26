@@ -178,8 +178,8 @@ class ReviewService:
                 continue
 
             title = (
-                (study_input.source_preview_text or "").strip()
-                or next((topic.topic_text.strip() for topic in starred_topics if topic.topic_text.strip()), "")
+                next((topic.topic_text.strip() for topic in starred_topics if topic.topic_text.strip()), "")
+                or (study_input.source_preview_text or "").strip()
                 or self._raw_preview(study_input.raw_content)
                 or "Saved learning"
             )
@@ -190,7 +190,7 @@ class ReviewService:
                     if topic.topic_text.strip() and topic.topic_text.strip() != title
                 ),
                 "",
-            ) or self._raw_preview(study_input.raw_content)
+            ) or (study_input.source_preview_text or "").strip() or self._raw_preview(study_input.raw_content)
 
             items.append(
                 SavedStudyInputSummaryResponse(
