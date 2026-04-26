@@ -13,6 +13,9 @@ function resetStore() {
     accessToken: null,
     refreshToken: null,
     provider: null,
+    email: null,
+    displayName: null,
+    avatarUrl: null,
   });
 }
 
@@ -29,6 +32,9 @@ describe("authStore", () => {
       accessToken: "access",
       refreshToken: "refresh",
       provider: "google",
+      email: "user@example.com",
+      displayName: "Test User",
+      avatarUrl: "https://example.com/avatar.jpg",
     });
 
     expect(useAuthStore.getState()).toMatchObject({
@@ -65,6 +71,9 @@ describe("authStore", () => {
       accessToken: null,
       refreshToken: null,
       provider: null,
+      email: null,
+      displayName: null,
+      avatarUrl: null,
     });
   });
 });

@@ -12,6 +12,8 @@ class GoogleIdentity:
     subject: str
     email: str | None
     email_verified: bool
+    display_name: str | None = None
+    avatar_url: str | None = None
 
 
 class GoogleAuthService:
@@ -45,6 +47,8 @@ class GoogleAuthService:
                     subject=str(payload["sub"]),
                     email=payload.get("email"),
                     email_verified=bool(payload.get("email_verified", False)),
+                    display_name=payload.get("name"),
+                    avatar_url=payload.get("picture"),
                 )
             except Exception as exc:  # pragma: no cover - network/provider validation path
                 last_error = exc

@@ -9,6 +9,9 @@ export type StoredSession = {
   accessToken: string;
   refreshToken: string;
   provider: "guest" | "google";
+  email?: string | null;
+  displayName?: string | null;
+  avatarUrl?: string | null;
 };
 
 export async function saveSession(session: StoredSession) {

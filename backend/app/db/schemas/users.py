@@ -15,6 +15,8 @@ class UserResponse(APIModel):
     id: str
     auth_provider: str
     email_nullable: str | None
+    display_name: str | None = None
+    avatar_url: str | None = None
     timezone: str
     locale: str
     reminder_time: time | None

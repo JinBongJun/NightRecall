@@ -6,6 +6,9 @@ type BootstrapSessionDependencies = {
     accessToken: string;
     refreshToken: string;
     provider: "guest" | "google";
+    email?: string | null;
+    displayName?: string | null;
+    avatarUrl?: string | null;
   } | null>;
   fetchPlan: () => Promise<{ plan: "free" | "plus" }>;
   setPlan: (plan: "free" | "plus") => void;

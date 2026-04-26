@@ -61,18 +61,7 @@ export function OnboardingScreen({ navigation }: Props) {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
     const reminderTime = "22:30";
 
-    let session:
-      | {
-          user: {
-            id: string;
-            timezone: string;
-          };
-          tokens: {
-            access_token: string;
-            refresh_token: string;
-          };
-        }
-      | null = null;
+    let session: Awaited<ReturnType<typeof createGuestSession>> | null = null;
 
     try {
       setLoading(true);
@@ -110,6 +99,9 @@ export function OnboardingScreen({ navigation }: Props) {
       accessToken: session.tokens.access_token,
       refreshToken: session.tokens.refresh_token,
       provider: "guest" as const,
+      email: session.user.email_nullable ?? null,
+      displayName: session.user.display_name ?? null,
+      avatarUrl: session.user.avatar_url ?? null,
     };
 
     let notificationsEnabled = false;
@@ -153,6 +145,9 @@ export function OnboardingScreen({ navigation }: Props) {
         accessToken: session.tokens.access_token,
         refreshToken: session.tokens.refresh_token,
         provider: "google" as const,
+        email: session.user.email_nullable ?? null,
+        displayName: session.user.display_name ?? null,
+        avatarUrl: session.user.avatar_url ?? null,
       };
       try {
         await persistSession(payload);

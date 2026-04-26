@@ -23,6 +23,9 @@ const sampleSession = {
   accessToken: "access",
   refreshToken: "refresh",
   provider: "google" as const,
+  email: "user@example.com",
+  displayName: "Test User",
+  avatarUrl: "https://example.com/avatar.jpg",
 };
 
 function resetStore() {
@@ -36,6 +39,9 @@ function resetStore() {
     accessToken: null,
     refreshToken: null,
     provider: null,
+    email: null,
+    displayName: null,
+    avatarUrl: null,
   });
 }
 

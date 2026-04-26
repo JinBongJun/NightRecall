@@ -70,6 +70,9 @@ apiClient.interceptors.response.use(
         accessToken: refreshed.access_token,
         refreshToken: refreshed.refresh_token,
         provider: auth.provider,
+        email: auth.email,
+        displayName: auth.displayName,
+        avatarUrl: auth.avatarUrl,
       } as const;
       await persistSession(nextSession);
       originalRequest.headers = originalRequest.headers ?? {};

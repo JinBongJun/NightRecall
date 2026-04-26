@@ -31,17 +31,24 @@ from app.middleware.ops_middleware import ops_middleware
 
 def ensure_runtime_schema() -> None:
     inspector = inspect(engine)
-    if "study_inputs" not in inspector.get_table_names():
-        return
-
-    columns = {column["name"] for column in inspector.get_columns("study_inputs")}
+    table_names = inspector.get_table_names()
     statements: list[str] = []
-    if "source_kind" not in columns:
-        statements.append("ALTER TABLE study_inputs ADD COLUMN source_kind VARCHAR(24)")
-    if "source_preview_text" not in columns:
-        statements.append("ALTER TABLE study_inputs ADD COLUMN source_preview_text TEXT")
-    if "source_image_ref" not in columns:
-        statements.append("ALTER TABLE study_inputs ADD COLUMN source_image_ref VARCHAR(128)")
+
+    if "study_inputs" in table_names:
+        columns = {column["name"] for column in inspector.get_columns("study_inputs")}
+        if "source_kind" not in columns:
+            statements.append("ALTER TABLE study_inputs ADD COLUMN source_kind VARCHAR(24)")
+        if "source_preview_text" not in columns:
+            statements.append("ALTER TABLE study_inputs ADD COLUMN source_preview_text TEXT")
+        if "source_image_ref" not in columns:
+            statements.append("ALTER TABLE study_inputs ADD COLUMN source_image_ref VARCHAR(128)")
+
+    if "users" in table_names:
+        user_columns = {column["name"] for column in inspector.get_columns("users")}
+        if "display_name" not in user_columns:
+            statements.append("ALTER TABLE users ADD COLUMN display_name VARCHAR(255)")
+        if "avatar_url" not in user_columns:
+            statements.append("ALTER TABLE users ADD COLUMN avatar_url VARCHAR(1024)")
 
     if not statements:
         return

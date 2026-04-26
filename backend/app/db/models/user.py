@@ -12,6 +12,8 @@ class User(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True)
     auth_provider: Mapped[str] = mapped_column(String(24), default="guest")
     email_nullable: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     timezone: Mapped[str] = mapped_column(String(64), default="UTC")
     locale: Mapped[str] = mapped_column(String(12), default="en")
     reminder_time: Mapped[time | None] = mapped_column(Time, nullable=True)

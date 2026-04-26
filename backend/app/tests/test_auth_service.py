@@ -52,6 +52,8 @@ def test_sign_in_with_google_uses_client_timezone_for_new_user() -> None:
                     subject="google-subject-123",
                     email="test@example.com",
                     email_verified=True,
+                    display_name="Test User",
+                    avatar_url="https://example.com/avatar.jpg",
                 )
             )
         },
@@ -63,3 +65,5 @@ def test_sign_in_with_google_uses_client_timezone_for_new_user() -> None:
     assert stored_user is not None
     assert stored_user.timezone == "Asia/Seoul"
     assert stored_user.locale == "ko"
+    assert stored_user.display_name == "Test User"
+    assert stored_user.avatar_url == "https://example.com/avatar.jpg"

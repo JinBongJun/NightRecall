@@ -28,8 +28,10 @@ export function SettingsScreen({ navigation }: Props) {
   const userId = useAuthStore((state) => state.userId);
   const timezone = useAuthStore((state) => state.timezone);
   const provider = useAuthStore((state) => state.provider);
+  const email = useAuthStore((state) => state.email);
   const accessToken = useAuthStore((state) => state.accessToken);
   const refreshToken = useAuthStore((state) => state.refreshToken);
+  const setProfile = useAuthStore((state) => state.setProfile);
   const setOnboardingReminderTime = useOnboardingStore((state) => state.setReminderTime);
   const reminderTime = useReminderStore((state) => state.reminderTime);
   const notificationsEnabled = useReminderStore((state) => state.notificationsEnabled);
@@ -85,6 +87,11 @@ export function SettingsScreen({ navigation }: Props) {
 
           const nextReminderTime = response.user.reminder_time ? response.user.reminder_time.slice(0, 5) : "22:30";
           const nextNotificationsEnabled = response.user.notifications_enabled;
+          setProfile({
+            email: response.user.email_nullable,
+            displayName: response.user.display_name ?? null,
+            avatarUrl: response.user.avatar_url ?? null,
+          });
 
           setReminder(nextReminderTime, nextNotificationsEnabled);
           setTimeValue(nextReminderTime);
@@ -105,7 +112,7 @@ export function SettingsScreen({ navigation }: Props) {
       return () => {
         active = false;
       };
-    }, [accessToken, setReminder]),
+    }, [accessToken, setProfile, setReminder]),
   );
 
   const parseReminderTime = (value: string) => {
@@ -240,6 +247,9 @@ export function SettingsScreen({ navigation }: Props) {
         accessToken: linked.tokens.access_token,
         refreshToken: linked.tokens.refresh_token,
         provider: "google" as const,
+        email: linked.user.email_nullable ?? null,
+        displayName: linked.user.display_name ?? null,
+        avatarUrl: linked.user.avatar_url ?? null,
       };
       try {
         await persistSession(payload);
@@ -272,12 +282,23 @@ export function SettingsScreen({ navigation }: Props) {
   };
 
   const deleteAccount = async () => {
-    try {
-      await deleteMyAccount();
-      await clearPersistedSession();
-    } catch {
-      Alert.alert("Delete failed", "Account deletion could not be completed.");
-    }
+    Alert.alert("Delete account?", "This permanently erases your recall history and saved learning.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          void (async () => {
+            try {
+              await deleteMyAccount();
+              await clearPersistedSession();
+            } catch {
+              Alert.alert("Delete failed", "Account deletion could not be completed.");
+            }
+          })();
+        },
+      },
+    ]);
   };
 
   const resetOnboarding = async () => {
@@ -425,15 +446,15 @@ export function SettingsScreen({ navigation }: Props) {
           {provider !== "google" ? (
             <Pressable style={styles.settingRow} onPress={() => void connectGoogle()}>
               <View style={styles.settingCopy}>
-                <Text style={styles.label}>Linked Google Account</Text>
-                <Text style={styles.helper}>Connect Google</Text>
+                <Text style={styles.label}>Google account</Text>
+                <Text style={styles.helper}>Connect Google to keep your learning backed up.</Text>
               </View>
             </Pressable>
           ) : (
             <View style={styles.settingRow}>
               <View style={styles.settingCopy}>
-                <Text style={styles.label}>Linked Google Account</Text>
-                <Text style={styles.helper}>Connected</Text>
+                <Text style={styles.label}>Google account</Text>
+                <Text style={styles.helper}>{email ? `Connected as ${email}` : "Connected with Google"}</Text>
               </View>
             </View>
           )}
@@ -468,21 +489,27 @@ export function SettingsScreen({ navigation }: Props) {
         </View>
       </View>
 
+      {__DEV__ ? (
+        <View style={styles.section}>
+          <SectionRow title="Developer tools" />
+          <Pressable style={({ pressed }) => [styles.secondaryLink, pressed && styles.secondaryLinkPressed]} onPress={() => void resetOnboarding()}>
+            <Text style={styles.secondaryLinkText}>Reset onboarding</Text>
+          </Pressable>
+        </View>
+      ) : null}
       {accessToken && refreshToken ? (
         <Pressable style={({ pressed }) => [styles.secondaryLink, pressed && styles.secondaryLinkPressed]} onPress={() => void logout()}>
           <Text style={styles.secondaryLinkText}>Log Out</Text>
         </Pressable>
       ) : null}
-      {__DEV__ ? (
-        <Pressable style={({ pressed }) => [styles.secondaryLink, pressed && styles.secondaryLinkPressed]} onPress={() => void resetOnboarding()}>
-          <Text style={styles.secondaryLinkText}>Reset onboarding</Text>
-        </Pressable>
-      ) : null}
       {accessToken ? (
-        <Pressable style={styles.deleteCard} onPress={() => void deleteAccount()}>
-          <Text style={styles.deleteTitle}>Delete Account</Text>
-          <Text style={styles.deleteBody}>Permanently erase all recall history</Text>
-        </Pressable>
+        <View style={styles.section}>
+          <SectionRow title="Danger zone" />
+          <Pressable style={styles.deleteCard} onPress={() => void deleteAccount()}>
+            <Text style={styles.deleteTitle}>Delete Account</Text>
+            <Text style={styles.deleteBody}>Permanently erase all recall history</Text>
+          </Pressable>
+        </View>
       ) : null}
       {showTimePicker && Platform.OS === "android" ? (
         <DateTimePicker

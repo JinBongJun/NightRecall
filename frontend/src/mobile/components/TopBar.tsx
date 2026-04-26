@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme/colors";
 
 import { BrandWordmark } from "./BrandWordmark";
@@ -18,7 +18,11 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
   const showTitle = Boolean(title);
   const showProfileAction = rightIcon === "account-circle";
   const plan = useAuthStore((state) => state.plan);
+  const avatarUrl = useAuthStore((state) => state.avatarUrl);
+  const displayName = useAuthStore((state) => state.displayName);
+  const email = useAuthStore((state) => state.email);
   const planLabel = plan === "plus" ? "PLUS" : "FREE";
+  const avatarInitial = (displayName || email || "N").trim().charAt(0).toUpperCase();
 
   return (
     <View style={styles.root}>
@@ -51,7 +55,13 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
           showProfileAction ? (
             <Pressable onPress={onRightPress} style={styles.profileButton} hitSlop={8}>
               <View style={styles.profileGlyphWrap}>
-                <MaterialIcons name="person" size={19} color={colors.primary} />
+                {avatarUrl ? (
+                  <Image source={{ uri: avatarUrl }} style={styles.profileImage} />
+                ) : displayName || email ? (
+                  <Text style={styles.profileInitial}>{avatarInitial}</Text>
+                ) : (
+                  <MaterialIcons name="person" size={19} color={colors.primary} />
+                )}
               </View>
               <View style={styles.profileDot} />
             </Pressable>
@@ -168,6 +178,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surface,
+    overflow: "hidden",
+  },
+  profileImage: {
+    width: "100%",
+    height: "100%",
+  },
+  profileInitial: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: "800",
   },
   profileDot: {
     position: "absolute",

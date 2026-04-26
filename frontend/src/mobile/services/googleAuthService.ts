@@ -38,6 +38,20 @@ export async function getGoogleIdToken() {
   return tokens.idToken || null;
 }
 
+export function getCachedGoogleProfile() {
+  configureGoogleSignIn();
+  const currentUser = GoogleSignin.getCurrentUser();
+  if (!currentUser) {
+    return null;
+  }
+
+  return {
+    email: currentUser.user.email,
+    displayName: currentUser.user.name,
+    avatarUrl: currentUser.user.photo,
+  };
+}
+
 export function isGoogleSignInCancelled(error: unknown) {
   return isErrorWithCode(error) && error.code === statusCodes.SIGN_IN_CANCELLED;
 }

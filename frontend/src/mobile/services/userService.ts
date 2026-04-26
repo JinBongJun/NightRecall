@@ -1,5 +1,17 @@
 import { apiClient } from "./api";
 
+export type ApiUser = {
+  id: string;
+  auth_provider: string;
+  email_nullable: string | null;
+  display_name?: string | null;
+  avatar_url?: string | null;
+  timezone: string;
+  locale: string;
+  reminder_time?: string | null;
+  notifications_enabled?: boolean;
+};
+
 export async function createGuestSession(timezone: string, reminderTime?: string) {
   const response = await apiClient.post("/users/guest/session", {
     timezone,
@@ -7,10 +19,7 @@ export async function createGuestSession(timezone: string, reminderTime?: string
     reminder_time: reminderTime,
   });
   return response.data as {
-    user: {
-      id: string;
-      timezone: string;
-    };
+    user: ApiUser;
     tokens: {
       access_token: string;
       refresh_token: string;
@@ -26,10 +35,7 @@ export async function signInWithGoogleIdToken(idToken: string) {
     locale: "en",
   });
   return response.data as {
-    user: {
-      id: string;
-      timezone: string;
-    };
+    user: ApiUser;
     tokens: {
       access_token: string;
       refresh_token: string;
@@ -40,10 +46,7 @@ export async function signInWithGoogleIdToken(idToken: string) {
 export async function linkGoogleIdToken(idToken: string) {
   const response = await apiClient.post("/users/link/google", { id_token: idToken });
   return response.data as {
-    user: {
-      id: string;
-      timezone: string;
-    };
+    user: ApiUser;
     tokens: {
       access_token: string;
       refresh_token: string;
@@ -70,12 +73,7 @@ export async function deleteMyAccount() {
 export async function fetchMe() {
   const response = await apiClient.get("/users/me");
   return response.data as {
-    user: {
-      id: string;
-      auth_provider: string;
-      email_nullable: string | null;
-      timezone: string;
-      locale: string;
+    user: ApiUser & {
       reminder_time: string | null;
       notifications_enabled: boolean;
     };

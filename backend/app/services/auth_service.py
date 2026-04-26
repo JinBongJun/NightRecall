@@ -10,7 +10,7 @@ from app.db.models.user import User
 from app.db.repositories.auth_repository import AuthRepository
 from app.db.schemas.auth import AuthSessionResponse, GuestSessionRequest, LinkGoogleRequest, RefreshTokenRequest, TokenPair
 from app.db.schemas.users import UserResponse
-from app.services.google_auth_service import GoogleAuthService
+from app.services.google_auth_service import GoogleAuthService, GoogleIdentity
 from app.utils.ids import make_id
 
 
@@ -65,11 +65,14 @@ class AuthService:
             if not user:
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Identity is orphaned")
             record.last_login_at = datetime.utcnow()
+            self._apply_google_profile(user, identity)
         else:
             user = User(
                 id=make_id("usr"),
                 auth_provider="google",
                 email_nullable=identity.email,
+                display_name=identity.display_name,
+                avatar_url=identity.avatar_url,
                 timezone=timezone,
                 locale=locale,
             )
@@ -110,8 +113,7 @@ class AuthService:
                 )
             )
         current_user.auth_provider = "google"
-        if identity.email:
-            current_user.email_nullable = identity.email
+        self._apply_google_profile(current_user, identity)
 
         tokens = self._create_session_tokens(current_user.id, None)
         self.db.commit()
@@ -147,6 +149,14 @@ class AuthService:
 
     def get_me(self, current_user: User) -> UserResponse:
         return UserResponse.model_validate(current_user)
+
+    def _apply_google_profile(self, user: User, identity: GoogleIdentity) -> None:
+        if identity.email:
+            user.email_nullable = identity.email
+        if identity.display_name:
+            user.display_name = identity.display_name
+        if identity.avatar_url:
+            user.avatar_url = identity.avatar_url
 
     def _create_session_tokens(self, user_id: str, device_label: str | None) -> TokenPair:
         session_id = make_id("ses")
