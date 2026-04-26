@@ -1,12 +1,10 @@
 import logging
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, get_db
 from app.api.v1.rate_limit import rate_limit_user
-from app.db.models.study import StudyInput
 from app.db.models.user import User
 from app.db.schemas.study_inputs import (
     StudyInputExtractJobResponse,
@@ -52,23 +50,16 @@ def upload_source_image(
 @router.get("/source-images/{source_image_ref}")
 def get_source_image(
     source_image_ref: str,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
 ) -> Response:
     storage = SourceImageStorageService()
     if not storage.exists(source_image_ref):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="source image not found")
 
-    owned_image = db.scalar(
-        select(StudyInput.id).where(
-            StudyInput.user_id == current_user.id,
-            StudyInput.source_image_ref == source_image_ref,
-        )
-    )
-    if not owned_image:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="source image not found")
-    blob = storage.download(source_image_ref)
-    return Response(content=blob.content, media_type=blob.mime_type)
+    try:
+        blob = storage.download(source_image_ref)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="source image not found") from exc
+    return Response(content=blob.content, media_type=blob.mime_type, headers={"Cache-Control": "private, max-age=86400"})
 
 
 @router.post("/extract", response_model=StudyInputExtractResponse)
