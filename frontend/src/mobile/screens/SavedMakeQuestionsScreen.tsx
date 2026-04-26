@@ -14,7 +14,7 @@ import {
   fetchSavedInputDetail,
   fetchSavedTopicSource,
 } from "../services/reviewService";
-import { getSourceImageUrl } from "../services/api";
+import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
 import { Topic } from "../types/api";
@@ -157,7 +157,9 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
 
           <View style={styles.sourceCard}>
             <Text style={styles.sourceLabel}>{sourceImageRef ? "Saved photo" : inputType === "keywords" ? "Saved keywords" : "Saved note"}</Text>
-            {sourceImageRef ? <Image source={{ uri: getSourceImageUrl(sourceImageRef) }} style={styles.sourceImage} /> : null}
+            {sourceImageRef ? (
+              <Image source={{ uri: getSourceImageUrl(sourceImageRef), headers: getSourceImageHeaders() }} style={styles.sourceImage} />
+            ) : null}
             {sourcePreviewText ? <Text style={styles.sourcePreview}>{sourcePreviewText}</Text> : null}
             <Text style={styles.sourceText}>{normalizedSourceText}</Text>
           </View>

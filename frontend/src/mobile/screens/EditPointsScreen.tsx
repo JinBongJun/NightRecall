@@ -13,7 +13,7 @@ import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import { fetchSavedInputDetail, fetchSavedTopicSource } from "../services/reviewService";
 import { createStudyInput, uploadSourceImage } from "../services/studyService";
-import { getSourceImageUrl } from "../services/api";
+import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
@@ -303,7 +303,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
               <Image source={{ uri: route.params.imageUri }} style={styles.sourceImage} />
             ) : null}
             {route.params.variant === "saved" && savedSourceImageRef ? (
-              <Image source={{ uri: getSourceImageUrl(savedSourceImageRef) }} style={styles.sourceImage} />
+              <Image source={{ uri: getSourceImageUrl(savedSourceImageRef), headers: getSourceImageHeaders() }} style={styles.sourceImage} />
             ) : null}
             {route.params.variant === "new" ? (
               <TextInput
