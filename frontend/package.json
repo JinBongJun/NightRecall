@@ -21,6 +21,7 @@
     "expo": "~54.0.10",
     "expo-auth-session": "~7.0.10",
     "expo-crypto": "~15.0.8",
+    "expo-dev-client": "~6.0.20",
     "expo-image-picker": "~17.0.10",
     "expo-notifications": "~0.32.16",
     "expo-secure-store": "~15.0.7",
@@ -34,6 +35,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
+    "@emnapi/core": "^1.10.0",
+    "@emnapi/runtime": "^1.10.0",
     "@types/react": "~19.1.10",
     "babel-preset-expo": "~54.0.6",
     "typescript": "~5.9.2",

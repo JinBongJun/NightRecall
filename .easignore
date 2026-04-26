@@ -12,6 +12,12 @@ __pycache__/
 pytest-cache-files-*/
 backend/.pytest_cache/
 backend/pytest-cache-files-*/
+backend/pytest-cache-files-*/**
+**/pytest-cache-files-*/
+**/pytest-cache-files-*/**
+
+# EAS mobile builds run from frontend; backend is deployed separately on Railway.
+backend/**
 
 .venv/
 backend/.venv/
