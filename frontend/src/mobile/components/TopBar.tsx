@@ -63,7 +63,6 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
                   <MaterialIcons name="person" size={19} color={colors.primary} />
                 )}
               </View>
-              <View style={styles.profileDot} />
             </Pressable>
           ) : (
             <Pressable onPress={onRightPress} style={styles.iconButton} hitSlop={8}>
@@ -188,16 +187,5 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 13,
     fontWeight: "800",
-  },
-  profileDot: {
-    position: "absolute",
-    right: 7,
-    top: 7,
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-    backgroundColor: colors.primary,
-    borderWidth: 2,
-    borderColor: colors.surface,
   },
 });

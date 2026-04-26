@@ -69,37 +69,48 @@ export function AccountScreen({ navigation }: Props) {
       <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} title="Account" />
 
       <View style={styles.heroCard}>
-        <View style={styles.avatarWrap}>
-          {avatarUrl ? (
-            <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
-          ) : provider === "google" ? (
-            <Text style={styles.avatarInitial}>{avatarInitial}</Text>
-          ) : (
-            <MaterialIcons name="person" size={34} color={colors.primary} />
-          )}
-        </View>
-        <Text style={styles.heroTitle}>{profileTitle}</Text>
-        <Text style={styles.heroBody}>{providerLabel}</Text>
-        {email ? <Text style={styles.emailText}>{email}</Text> : null}
-        <View style={styles.metaWrap}>
-          <View style={styles.statusPill}>
-            <MaterialIcons name={provider === "google" ? "verified-user" : "cloud-off"} size={15} color={colors.primary} />
-            <Text style={styles.statusPillText}>
-              {provider === "google" ? "Your learning is saved to this account" : "Connect Google to back up your learning"}
-            </Text>
+        <View style={styles.profileRow}>
+          <View style={styles.profileCopy}>
+            <View style={styles.providerBadge}>
+              <MaterialIcons name={provider === "google" ? "verified-user" : "cloud-off"} size={14} color={colors.primary} />
+              <Text style={styles.providerBadgeText}>{providerLabel}</Text>
+            </View>
+            <Text style={styles.heroTitle}>{profileTitle}</Text>
+            {email ? <Text style={styles.emailText}>{email}</Text> : null}
           </View>
-          <Text style={styles.metaLabel}>Reminder timezone: {timezone}</Text>
+          <View style={styles.avatarWrap}>
+            {avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
+            ) : provider === "google" ? (
+              <Text style={styles.avatarInitial}>{avatarInitial}</Text>
+            ) : (
+              <MaterialIcons name="person" size={34} color={colors.primary} />
+            )}
+          </View>
+        </View>
+        <View style={styles.reassuranceRow}>
+          <MaterialIcons name={provider === "google" ? "cloud-done" : "cloud-off"} size={17} color={colors.primary} />
+          <Text style={styles.reassuranceText}>
+            {provider === "google" ? "Learning saved to this account" : "Connect Google to back up your learning"}
+          </Text>
+        </View>
+        <View style={styles.detailRow}>
+          <Text style={styles.detailLabel}>Timezone</Text>
+          <Text style={styles.detailValue}>{timezone}</Text>
         </View>
       </View>
 
       <View style={styles.section}>
         <SectionRow title="Account" />
-        <Pressable style={styles.actionCard} onPress={() => navigation.navigate("Settings")}>
+        <Pressable style={[styles.actionCard, styles.primaryActionCard]} onPress={() => navigation.navigate("Settings")}>
+          <View style={styles.actionIconWrap}>
+            <MaterialIcons name="tune" size={22} color="#FFFFFF" />
+          </View>
           <View style={styles.actionCopy}>
             <Text style={styles.actionTitle}>Settings</Text>
             <Text style={styles.actionBody}>Manage reminders, notifications, and account preferences.</Text>
           </View>
-          <MaterialIcons name="chevron-right" size={22} color={colors.muted} />
+          <MaterialIcons name="chevron-right" size={22} color={colors.primary} />
         </Pressable>
 
         <Pressable style={styles.actionCard} onPress={() => navigation.navigate("Stats")}>
@@ -126,22 +137,46 @@ const styles = StyleSheet.create({
 
   heroCard: {
     backgroundColor: colors.surface,
-    borderRadius: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 28,
-    alignItems: "center",
+    borderRadius: 28,
+    padding: 20,
     borderWidth: 1,
     borderColor: "rgba(15,76,63,0.08)",
-    gap: 10,
+    gap: 16,
     overflow: "hidden",
     shadowColor: colors.shadow,
     shadowOpacity: 0.04,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
   },
+  profileRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  profileCopy: {
+    flex: 1,
+    minWidth: 0,
+    gap: 8,
+  },
+  providerBadge: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: colors.primarySoft,
+  },
+  providerBadgeText: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: "800",
+  },
   avatarWrap: {
-    width: 72,
-    height: 72,
+    width: 78,
+    height: 78,
     borderRadius: 999,
     backgroundColor: colors.surface,
     alignItems: "center",
@@ -161,49 +196,46 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     color: colors.primary,
-    fontSize: 28,
+    fontSize: 30,
+    lineHeight: 34,
     fontWeight: "800",
     letterSpacing: -0.8,
-  },
-  heroBody: {
-    color: colors.muted,
-    fontSize: 16,
-    lineHeight: 22,
-    textAlign: "center",
   },
   emailText: {
     color: colors.mutedSoft,
     fontSize: 14,
     fontWeight: "700",
   },
-  metaWrap: {
-    width: "100%",
-    marginTop: 8,
-    gap: 4,
+  reassuranceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 18,
+    backgroundColor: colors.surfaceLow,
+  },
+  reassuranceText: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: colors.line,
   },
-  metaLabel: {
+  detailLabel: {
     color: colors.muted,
     fontSize: 13,
-    lineHeight: 18,
+    fontWeight: "700",
   },
-  statusPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    alignSelf: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: colors.surfaceLow,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statusPillText: {
-    color: colors.primary,
-    fontSize: 12,
+  detailValue: {
+    color: colors.text,
+    fontSize: 13,
     fontWeight: "800",
   },
   section: {
@@ -224,6 +256,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.03,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
+  },
+  primaryActionCard: {
+    borderColor: "rgba(15,76,63,0.16)",
+    backgroundColor: "#FFFEFB",
+  },
+  actionIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.primary,
   },
   actionCopy: {
     flex: 1,
