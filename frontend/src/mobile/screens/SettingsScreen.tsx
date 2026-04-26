@@ -10,7 +10,7 @@ import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { clearPersistedSession, persistSession } from "../services/authSessionService";
-import { getGoogleIdTokenFromResult, useGoogleIdTokenRequest } from "../services/googleAuthService";
+import { getGoogleIdToken, isGoogleSignInCancelled } from "../services/googleAuthService";
 import { cancelNightlyReminder, scheduleLocalReminder } from "../services/reminderService";
 import { updateReminderSettings } from "../services/settingsService";
 import { deleteMyAccount, fetchMe, linkGoogleIdToken, logoutSession } from "../services/userService";
@@ -38,15 +38,12 @@ export function SettingsScreen({ navigation }: Props) {
   const [enabled, setEnabled] = useState(notificationsEnabled);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [draftTimeValue, setDraftTimeValue] = useState(reminderTime);
-  const [googleLinkPending, setGoogleLinkPending] = useState(false);
-  const { promptAsync, response } = useGoogleIdTokenRequest();
   const latestTimeValueRef = useRef(timeValue);
   const latestEnabledRef = useRef(enabled);
   const syncedReminderTimeRef = useRef(reminderTime);
   const syncedNotificationsEnabledRef = useRef(notificationsEnabled);
   const saveInFlightRef = useRef(false);
   const lastRequestedSaveRef = useRef<string | null>(null);
-  const googleLinkInFlightRef = useRef(false);
 
   useEffect(() => {
     setTimeValue(reminderTime);
@@ -228,12 +225,13 @@ export function SettingsScreen({ navigation }: Props) {
     }, [saveReminderSettings]),
   );
 
-  const completeGoogleLink = useCallback(async (idToken: string) => {
-    if (googleLinkInFlightRef.current) {
-      return;
-    }
-    googleLinkInFlightRef.current = true;
+  const connectGoogle = async () => {
     try {
+      const idToken = await getGoogleIdToken();
+      if (!idToken) {
+        return;
+      }
+
       const linked = await linkGoogleIdToken(idToken);
       const payload = {
         userId: linked.user.id,
@@ -249,50 +247,15 @@ export function SettingsScreen({ navigation }: Props) {
         useAuthStore.getState().setSession(payload);
       }
     } catch (error) {
+      if (isGoogleSignInCancelled(error)) {
+        return;
+      }
       const detail =
         axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
           ? error.response.data.detail
           : error instanceof Error && error.message
             ? error.message
             : "Google account could not be linked.";
-      Alert.alert("Link failed", detail);
-    } finally {
-      googleLinkInFlightRef.current = false;
-      setGoogleLinkPending(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!googleLinkPending) {
-      return;
-    }
-    const idToken = getGoogleIdTokenFromResult(response);
-    if (idToken) {
-      void completeGoogleLink(idToken);
-      return;
-    }
-    if (response?.type === "error") {
-      setGoogleLinkPending(false);
-      Alert.alert("Link failed", "Google account could not be linked.");
-    }
-  }, [completeGoogleLink, googleLinkPending, response]);
-
-  const connectGoogle = async () => {
-    try {
-      setGoogleLinkPending(true);
-      const authResult = await promptAsync();
-      if (authResult.type !== "success") {
-        setGoogleLinkPending(false);
-        return;
-      }
-      const idToken = getGoogleIdTokenFromResult(authResult);
-      if (idToken) {
-        await completeGoogleLink(idToken);
-      }
-      // Installed app flows may return a code first; response updates with id_token after auto exchange.
-    } catch (error) {
-      setGoogleLinkPending(false);
-      const detail = error instanceof Error && error.message ? error.message : "Google account could not be linked.";
       Alert.alert("Link failed", detail);
     }
   };

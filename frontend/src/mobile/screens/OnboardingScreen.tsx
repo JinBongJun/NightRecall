@@ -1,5 +1,5 @@
 import Constants from "expo-constants";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
@@ -20,7 +20,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { BrandWordmark } from "../components/BrandWordmark";
 import { persistSession } from "../services/authSessionService";
-import { getGoogleIdTokenFromResult, useGoogleIdTokenRequest } from "../services/googleAuthService";
+import { getGoogleIdToken, isGoogleSignInCancelled } from "../services/googleAuthService";
 import { scheduleLocalReminder } from "../services/reminderService";
 import { createGuestSession, signInWithGoogleIdToken } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
@@ -37,12 +37,9 @@ export function OnboardingScreen({ navigation }: Props) {
   const setSession = useAuthStore((state) => state.setSession);
   const setReminder = useReminderStore((state) => state.setReminder);
   const [loading, setLoading] = useState(false);
-  const [googleSignInPending, setGoogleSignInPending] = useState(false);
   const [page, setPage] = useState<0 | 1>(0);
   const pagerRef = useRef<ScrollView>(null);
-  const googleCompletionInFlightRef = useRef(false);
   const scrollX = useRef(new Animated.Value(0)).current;
-  const { response, promptAsync } = useGoogleIdTokenRequest();
   const isExpoGo = Constants.appOwnership === "expo";
   const { height, width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -134,12 +131,20 @@ export function OnboardingScreen({ navigation }: Props) {
     setLoading(false);
   };
 
-  const completeGoogleSignIn = useCallback(async (idToken: string) => {
-    if (googleCompletionInFlightRef.current) {
+  const startGoogleFlow = async () => {
+    if (isExpoGo) {
+      Alert.alert("Google sign-in unavailable here", "Google sign-in should be tested in a development build, not Expo Go.");
       return;
     }
-    googleCompletionInFlightRef.current = true;
+
     try {
+      setLoading(true);
+      const idToken = await getGoogleIdToken();
+      if (!idToken) {
+        setLoading(false);
+        return;
+      }
+
       const session = await signInWithGoogleIdToken(idToken);
       const payload = {
         userId: session.user.id,
@@ -156,62 +161,13 @@ export function OnboardingScreen({ navigation }: Props) {
       }
       navigation.replace("Home");
     } catch (error) {
-      const detail =
-        axios.isAxiosError(error) && typeof error.response?.data?.detail === "string"
-          ? error.response.data.detail
-          : error instanceof Error && error.message
-            ? error.message
-            : "Google account connection could not be completed.";
-      Alert.alert("Google sign-in failed", detail);
-    } finally {
-      googleCompletionInFlightRef.current = false;
-      setGoogleSignInPending(false);
-      setLoading(false);
-    }
-  }, [navigation, setSession]);
-
-  useEffect(() => {
-    if (!googleSignInPending) {
-      return;
-    }
-    const idToken = getGoogleIdTokenFromResult(response);
-    if (idToken) {
-      void completeGoogleSignIn(idToken);
-      return;
-    }
-    if (response?.type === "error") {
-      setGoogleSignInPending(false);
-      setLoading(false);
-      Alert.alert("Google sign-in failed", "Google account connection could not be completed.");
-    }
-  }, [completeGoogleSignIn, googleSignInPending, response]);
-
-  const startGoogleFlow = async () => {
-    if (isExpoGo) {
-      Alert.alert("Google sign-in unavailable here", "Google sign-in should be tested in a development build, not Expo Go.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setGoogleSignInPending(true);
-      const authResult = await promptAsync();
-      if (authResult.type !== "success") {
-        setGoogleSignInPending(false);
-        setLoading(false);
+      if (isGoogleSignInCancelled(error)) {
         return;
       }
-
-      const idToken = getGoogleIdTokenFromResult(authResult);
-      if (idToken) {
-        await completeGoogleSignIn(idToken);
-      }
-      // Installed app flows may return a code first; the hook's response updates with id_token after auto exchange.
-    } catch (error) {
-      setGoogleSignInPending(false);
-      setLoading(false);
       const detail = error instanceof Error && error.message ? error.message : "Google account connection could not be completed.";
       Alert.alert("Google sign-in failed", detail);
+    } finally {
+      setLoading(false);
     }
   };
 

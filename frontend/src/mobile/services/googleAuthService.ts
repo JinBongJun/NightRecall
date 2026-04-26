@@ -1,26 +1,43 @@
 import Constants from "expo-constants";
-import * as Google from "expo-auth-session/providers/google";
-import { AuthSessionResult } from "expo-auth-session";
-import * as WebBrowser from "expo-web-browser";
+import { GoogleSignin, isCancelledResponse, isErrorWithCode, isSuccessResponse, statusCodes } from "@react-native-google-signin/google-signin";
 
-WebBrowser.maybeCompleteAuthSession();
+let configured = false;
 
-export function useGoogleIdTokenRequest() {
+export function configureGoogleSignIn() {
+  if (configured) {
+    return;
+  }
+
   const googleWebClientId = Constants.expoConfig?.extra?.googleWebClientId as string | undefined;
-  const googleAndroidClientId = Constants.expoConfig?.extra?.googleAndroidClientId as string | undefined;
 
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+  GoogleSignin.configure({
     webClientId: googleWebClientId,
-    androidClientId: googleAndroidClientId,
+    offlineAccess: false,
   });
-
-  return {
-    request,
-    response,
-    promptAsync,
-  };
+  configured = true;
 }
 
-export function getGoogleIdTokenFromResult(result: AuthSessionResult | null | undefined) {
-  return result?.type === "success" && "params" in result ? result.params.id_token : undefined;
+export async function getGoogleIdToken() {
+  configureGoogleSignIn();
+  await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+  const response = await GoogleSignin.signIn();
+  if (isCancelledResponse(response)) {
+    return null;
+  }
+
+  if (!isSuccessResponse(response)) {
+    return null;
+  }
+
+  if (response.data.idToken) {
+    return response.data.idToken;
+  }
+
+  const tokens = await GoogleSignin.getTokens();
+  return tokens.idToken || null;
+}
+
+export function isGoogleSignInCancelled(error: unknown) {
+  return isErrorWithCode(error) && error.code === statusCodes.SIGN_IN_CANCELLED;
 }
