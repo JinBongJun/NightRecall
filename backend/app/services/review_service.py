@@ -153,7 +153,21 @@ class ReviewService:
         limit = max(1, min(limit, 50))
         offset = (page - 1) * limit
         items: list[SavedStudyInputSummaryResponse] = []
-        study_inputs = self.study_repository.get_inputs_for_user(user_id, limit=limit + 1, offset=offset)
+        study_inputs = list(
+            self.db.scalars(
+                select(StudyInput)
+                .join(StudyTopic, StudyTopic.study_input_id == StudyInput.id)
+                .where(
+                    StudyInput.user_id == user_id,
+                    StudyTopic.user_id == user_id,
+                    StudyTopic.is_starred.is_(True),
+                )
+                .distinct()
+                .order_by(StudyInput.created_at.desc())
+                .limit(limit + 1)
+                .offset(offset)
+            )
+        )
         topics_by_input = self.study_repository.get_topics_for_inputs([study_input.id for study_input in study_inputs])
         total_count = int(
             self.db.scalar(
@@ -217,7 +231,7 @@ class ReviewService:
         if not study_input or study_input.user_id != user_id:
             raise ValueError("study input not found")
 
-        topics = self.study_repository.get_topics_for_input(study_input.id)
+        topics = self._saved_topics_for_input(user_id, study_input.id)
         return SavedTopicSourceResponse(
             topic_id=topic.id,
             study_input_id=study_input.id,
@@ -233,7 +247,7 @@ class ReviewService:
         if not study_input or study_input.user_id != user_id:
             raise ValueError("study input not found")
 
-        topics = self.study_repository.get_topics_for_input(study_input.id)
+        topics = self._saved_topics_for_input(user_id, study_input.id)
         return SavedStudyInputDetailResponse(
             study_input_id=study_input.id,
             input_type=study_input.input_type,
@@ -412,3 +426,10 @@ class ReviewService:
         if lines:
             return lines[0][:120]
         return ""
+
+    def _saved_topics_for_input(self, user_id: str, study_input_id: str) -> list[StudyTopic]:
+        return [
+            topic
+            for topic in self.study_repository.get_topics_for_input(study_input_id)
+            if topic.user_id == user_id and topic.is_starred
+        ]

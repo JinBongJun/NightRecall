@@ -46,6 +46,36 @@ def test_from_topic_requires_question_owner_scope(client) -> None:
     assert response.status_code == 404
 
 
+def test_saved_input_detail_returns_only_saved_points(client) -> None:
+    test_client, db = client
+    db.add(
+        StudyInput(
+            id="si_saved_subset",
+            user_id="usr_test",
+            input_type="keywords",
+            raw_content='["one", "two", "three", "four", "five"]',
+        )
+    )
+    for index in range(5):
+        db.add(
+            StudyTopic(
+                id=f"tp_saved_subset_{index}",
+                study_input_id="si_saved_subset",
+                user_id="usr_test",
+                topic_text=f"Point {index + 1}",
+                is_starred=index in {0, 2, 4},
+            )
+        )
+    db.commit()
+
+    response = test_client.get("/v1/review/saved-input/si_saved_subset")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert [topic["text"] for topic in payload["topics"]] == ["Point 1", "Point 3", "Point 5"]
+    assert all(topic["is_starred"] is True for topic in payload["topics"])
+
+
 def test_submit_answer_keeps_working_after_timezone_stats_refactor(client) -> None:
     test_client, db = client
     db.add(

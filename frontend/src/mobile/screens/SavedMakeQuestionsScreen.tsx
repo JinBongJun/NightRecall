@@ -142,7 +142,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
             <View style={styles.summaryRow}>
               <View style={styles.summaryPill}>
                 <Text style={styles.summaryValue}>{topics.length}</Text>
-                <Text style={styles.summaryLabel}>Extracted points</Text>
+                <Text style={styles.summaryLabel}>Saved points</Text>
               </View>
               <View style={styles.summaryPill}>
                 <Text style={styles.summaryValue}>{remainingQuestionsTonight}</Text>
@@ -165,8 +165,8 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Extracted points</Text>
-            <Text style={styles.sectionHelper}>These are the extracted points from this card.</Text>
+            <Text style={styles.sectionLabel}>Saved points</Text>
+            <Text style={styles.sectionHelper}>These are the points you chose to keep from this card.</Text>
             <ScrollView contentContainerStyle={styles.topicList} showsVerticalScrollIndicator={false}>
               {topics.map((topic, index) => {
                 return (
@@ -174,9 +174,9 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
                     <View style={styles.pointHeader}>
                       <Text style={styles.pointLabel}>{index === 0 ? "Main point" : `Point ${index + 1}`}</Text>
                       <View style={styles.pointActions}>
-                        <View style={[styles.savedBadge, !topic.is_starred && styles.extractedBadge]}>
-                          <MaterialIcons name={topic.is_starred ? "bookmark" : "auto-awesome"} size={14} color={colors.primary} />
-                          <Text style={styles.savedBadgeText}>{topic.is_starred ? "Saved" : "Extracted"}</Text>
+                        <View style={styles.savedBadge}>
+                          <MaterialIcons name="bookmark" size={14} color={colors.primary} />
+                          <Text style={styles.savedBadgeText}>Saved</Text>
                         </View>
                       </View>
                     </View>
@@ -352,9 +352,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
-  },
-  extractedBadge: {
-    backgroundColor: "rgba(213,230,220,0.35)",
   },
   savedBadgeText: {
     color: colors.primary,
