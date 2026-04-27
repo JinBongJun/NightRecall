@@ -119,6 +119,7 @@ export function CaptureScreen({ navigation }: Props) {
       <TopBar leftIcon="settings" onLeftPress={() => navigation.navigate("Settings")} rightIcon="account-circle" onRightPress={() => navigation.navigate("Account")} />
 
       <ScreenHeader
+        iconName="add-photo-alternate"
         title="Capture today's learning"
         subtitle="Import notes, slides, photos, or quick ideas to prepare tonight's question."
       />
@@ -135,7 +136,7 @@ export function CaptureScreen({ navigation }: Props) {
         </View>
       </View>
 
-      <SectionRow title="Quick capture" />
+      <SectionRow title="Quick capture" iconName="photo-camera" />
       {photoLimitCopy ? <Text style={[styles.limitNote, photoReadsLocked && styles.limitNoteLocked]}>{photoLimitCopy}</Text> : null}
       <View style={styles.actions}>
         <Pressable
@@ -177,7 +178,7 @@ export function CaptureScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
-      <SectionRow title="Write instead" />
+      <SectionRow title="Write instead" iconName="edit-note" />
       <Pressable style={({ pressed }) => [styles.writeEntryCard, pressed && styles.actionPressed]} onPress={() => navigation.navigate("CaptureNote")}>
         <View style={styles.writeEntryIconTile}>
           <MaterialIcons name="edit-note" size={34} color={colors.primary} />
@@ -192,7 +193,7 @@ export function CaptureScreen({ navigation }: Props) {
 
       {selectedImage ? (
         <View style={styles.previewSection}>
-          <SectionRow title="Preview" />
+          <SectionRow title="Preview" iconName="image-search" />
           <View style={styles.previewCard}>
             <View style={styles.previewHeader}>
               <Text style={styles.previewLabel}>{selectedImage.kind === "camera" ? "Photo selected" : "Gallery image selected"}</Text>

@@ -416,7 +416,7 @@ export function SettingsScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.section}>
-        <SectionRow title="Preferences" />
+        <SectionRow title="Preferences" iconName="tune" />
         <View style={styles.card}>
           <Pressable
             style={styles.settingRow}
@@ -490,7 +490,7 @@ export function SettingsScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.section}>
-        <SectionRow title="Account & data" />
+        <SectionRow title="Account & data" iconName="account-circle" />
         <View style={styles.card}>
           {provider !== "google" ? (
             <Pressable style={styles.settingRow} onPress={() => void connectGoogle()}>
@@ -535,7 +535,7 @@ export function SettingsScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.section}>
-        <SectionRow title="Support" />
+        <SectionRow title="Support" iconName="support-agent" />
         <View style={styles.card}>
           <Pressable style={styles.settingRow} onPress={() => void contactSupport()}>
             <View style={styles.settingCopy}>
@@ -548,7 +548,7 @@ export function SettingsScreen({ navigation }: Props) {
 
       {__DEV__ ? (
         <View style={styles.section}>
-          <SectionRow title="Developer tools" />
+          <SectionRow title="Developer tools" iconName="developer-mode" />
           <Pressable style={({ pressed }) => [styles.secondaryLink, pressed && styles.secondaryLinkPressed]} onPress={() => void resetOnboarding()}>
             <Text style={styles.secondaryLinkText}>Reset onboarding</Text>
           </Pressable>
@@ -561,7 +561,7 @@ export function SettingsScreen({ navigation }: Props) {
       ) : null}
       {accessToken ? (
         <View style={styles.section}>
-          <SectionRow title="Danger zone" />
+          <SectionRow title="Danger zone" iconName="warning" />
           <Pressable style={styles.deleteCard} onPress={() => void deleteAccount()}>
             <Text style={styles.deleteTitle}>Delete Account</Text>
             <Text style={styles.deleteBody}>Permanently erase all recall history</Text>

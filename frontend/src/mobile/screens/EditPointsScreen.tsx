@@ -282,6 +282,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
       <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} title="Edit Points" />
 
       <ScreenHeader
+        iconName="fact-check"
         title="Shape tonight's question"
         subtitle={
           route.params.variant === "new"

@@ -50,7 +50,7 @@ export function ReviewScreen({ navigation }: Props) {
           onLeftPress={() => navigation.goBack()} 
         />
         <View style={{ flex: 1, justifyContent: "center", paddingBottom: 60 }}>
-          <EmptyState title="No question loaded" body="Make a question first to review it here tonight." />
+          <EmptyState iconName="quiz" title="No question loaded" body="Make a question first to review it here tonight." />
           <View style={{ paddingHorizontal: 24, marginTop: 24 }}>
             <PrimaryButton label="Go to Home" onPress={() => navigation.navigate("Home")} />
           </View>
@@ -137,7 +137,7 @@ export function ReviewScreen({ navigation }: Props) {
         ) : null}
       </View>
 
-      <SectionRow title="Question" />
+      <SectionRow title="Question" iconName="quiz" />
       <View style={styles.questionCard}>
         <View style={styles.questionMeta}>
           <Text style={styles.questionMetaText}>

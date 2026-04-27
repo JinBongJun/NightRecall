@@ -290,6 +290,7 @@ export function LibraryScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
+        iconName="collections-bookmark"
         title="Saved learning"
         subtitle="Only the photos or notes where you saved points appear here. Open one card to review those saved points."
       />
@@ -319,7 +320,7 @@ export function LibraryScreen({ navigation }: Props) {
       ) : null}
 
       <View style={styles.section}>
-        <SectionRow title="Saved cards" actionLabel={`${totalCount} total`} />
+        <SectionRow title="Saved cards" iconName="bookmark" actionLabel={`${totalCount} total`} />
         {syncing ? <Text style={styles.syncingText}>Syncing...</Text> : null}
 
         <SearchField
@@ -356,6 +357,7 @@ export function LibraryScreen({ navigation }: Props) {
           ))
         ) : (
           <EmptyState
+            iconName={savedInputs.length ? "search-off" : "collections-bookmark"}
             title={savedInputs.length ? "No matches found" : "Nothing saved yet"}
             body={
               savedInputs.length

@@ -1,15 +1,20 @@
 import { StyleSheet, Text, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 import { colors } from "../theme/colors";
 
 type Props = {
   title: string;
   body: string;
+  iconName?: keyof typeof MaterialIcons.glyphMap;
 };
 
-export function EmptyState({ title, body }: Props) {
+export function EmptyState({ title, body, iconName = "auto-stories" }: Props) {
   return (
     <View style={styles.container}>
+      <View style={styles.iconBadge}>
+        <MaterialIcons name={iconName} size={24} color={colors.primary} />
+      </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.body}>{body}</Text>
     </View>
@@ -24,6 +29,15 @@ const styles = StyleSheet.create({
     gap: 10,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  iconBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 18,
+    backgroundColor: colors.primarySoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
   },
   title: {
     color: colors.text,

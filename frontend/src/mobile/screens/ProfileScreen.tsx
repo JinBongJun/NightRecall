@@ -101,7 +101,7 @@ export function AccountScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.section}>
-        <SectionRow title="Account" />
+        <SectionRow title="Account" iconName="account-circle" />
         <Pressable style={[styles.actionCard, styles.primaryActionCard]} onPress={() => navigation.navigate("Settings")}>
           <View style={styles.actionIconWrap}>
             <MaterialIcons name="tune" size={22} color="#FFFFFF" />

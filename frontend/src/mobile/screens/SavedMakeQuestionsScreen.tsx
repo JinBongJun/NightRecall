@@ -119,6 +119,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
       </View>
 
       <ScreenHeader
+        iconName="collections-bookmark"
         title="Review saved learning"
         subtitle="Open the saved source, review the saved parts, then make a question from them."
       />

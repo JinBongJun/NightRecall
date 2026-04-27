@@ -208,7 +208,7 @@ export function HomeScreen({ navigation }: Props) {
           },
         ]}
       >
-        <SectionRow title="Tonight" />
+        <SectionRow title="Tonight" iconName="bedtime" />
 
         <View style={styles.tonightCard}>
           <View style={styles.tonightCardHeader}>

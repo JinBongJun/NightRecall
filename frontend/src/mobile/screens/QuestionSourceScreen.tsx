@@ -27,6 +27,7 @@ export function CreateScreen({ navigation }: Props) {
       />
 
       <ScreenHeader
+        iconName="route"
         title="Create tonight's question"
         subtitle="Start with something new, or use saved learning from your library."
       />

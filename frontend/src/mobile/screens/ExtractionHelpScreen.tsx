@@ -37,6 +37,7 @@ export function ExtractionHelpScreen({ route, navigation }: Props) {
       </View>
 
       <ScreenHeader
+        iconName="image-search"
         title="Extraction needs help"
         subtitle="NightRecall could not pull out useful points from this image yet. You can describe the key idea yourself or try another photo."
       />

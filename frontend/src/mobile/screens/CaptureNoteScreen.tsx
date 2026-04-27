@@ -39,6 +39,7 @@ export function CaptureNoteScreen({ navigation }: Props) {
       </View>
 
       <ScreenHeader
+        iconName="edit-note"
         title="Write it down"
         subtitle="Type one short learning point now. NightRecall will extract the useful part on the next step."
       />

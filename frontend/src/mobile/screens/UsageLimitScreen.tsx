@@ -57,7 +57,7 @@ export function UsageLimitScreen({ route, navigation }: Props) {
         <View style={styles.iconSpacer} />
       </View>
 
-      <ScreenHeader title={title} subtitle={subtitle} />
+      <ScreenHeader iconName={iconName} title={title} subtitle={subtitle} />
 
       <View style={styles.card}>
         <View style={styles.messageRow}>
