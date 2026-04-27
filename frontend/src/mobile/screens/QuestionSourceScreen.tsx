@@ -19,7 +19,12 @@ export function CreateScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer>
-      <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} />
+      <TopBar
+        leftIcon="arrow-back"
+        onLeftPress={() => navigation.goBack()}
+        rightIcon="account-circle"
+        onRightPress={() => navigation.navigate("Account")}
+      />
 
       <ScreenHeader
         title="Create tonight's question"
