@@ -15,16 +15,19 @@ type BootstrapSessionDependencies = {
   finishBootstrap: () => void;
 };
 
+type RestoredSession = Awaited<ReturnType<BootstrapSessionDependencies["restoreSession"]>>;
+
 export async function bootstrapSession({
   restoreSession,
   fetchPlan,
   setPlan,
   finishBootstrap,
-}: BootstrapSessionDependencies) {
+}: BootstrapSessionDependencies): Promise<RestoredSession> {
+  let session: RestoredSession = null;
   try {
-    const session = await restoreSession();
+    session = await restoreSession();
     if (!session) {
-      return;
+      return null;
     }
 
     try {
@@ -36,4 +39,6 @@ export async function bootstrapSession({
   } finally {
     finishBootstrap();
   }
+
+  return session;
 }

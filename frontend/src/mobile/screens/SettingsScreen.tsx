@@ -11,7 +11,7 @@ import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { clearPersistedSession, persistSession } from "../services/authSessionService";
 import { getGoogleIdToken, isGoogleSignInCancelled } from "../services/googleAuthService";
-import { cancelNightlyReminder, scheduleLocalReminder } from "../services/reminderService";
+import { cancelNightlyReminder, scheduleLocalReminder, syncNightlyReminder } from "../services/reminderService";
 import { updateReminderSettings } from "../services/settingsService";
 import { deleteMyAccount, fetchMe, linkGoogleIdToken, logoutSession } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
@@ -80,7 +80,7 @@ export function SettingsScreen({ navigation }: Props) {
       let active = true;
 
       void fetchMe()
-        .then((response) => {
+        .then(async (response) => {
           if (!active) {
             return;
           }
@@ -89,7 +89,11 @@ export function SettingsScreen({ navigation }: Props) {
           }
 
           const nextReminderTime = response.user.reminder_time ? response.user.reminder_time.slice(0, 5) : "22:30";
-          const nextNotificationsEnabled = response.user.notifications_enabled;
+          const nextNotificationsEnabled = await syncNightlyReminder(
+            nextReminderTime,
+            response.user.notifications_enabled,
+            { requestPermission: false },
+          );
           setProfile({
             email: response.user.email_nullable,
             displayName: response.user.display_name ?? null,

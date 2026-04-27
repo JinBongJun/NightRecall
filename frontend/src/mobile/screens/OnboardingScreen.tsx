@@ -22,6 +22,7 @@ import { BrandWordmark } from "../components/BrandWordmark";
 import { persistSession } from "../services/authSessionService";
 import { getGoogleIdToken, isGoogleSignInCancelled } from "../services/googleAuthService";
 import { scheduleLocalReminder } from "../services/reminderService";
+import { updateReminderSettings } from "../services/settingsService";
 import { createGuestSession, signInWithGoogleIdToken } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
 import { useReminderStore } from "../store/reminderStore";
@@ -116,6 +117,14 @@ export function OnboardingScreen({ navigation }: Props) {
     } catch {
       setSession(payload);
       // Keep the user moving even if secure storage fails on this device.
+    }
+
+    if (!notificationsEnabled) {
+      await updateReminderSettings({
+        reminder_time: reminderTime,
+        notifications_enabled: false,
+        timezone,
+      }).catch(() => undefined);
     }
 
     setReminder(reminderTime, notificationsEnabled);
