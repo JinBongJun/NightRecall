@@ -11,6 +11,7 @@ import { AccountScreen } from "../screens/ProfileScreen";
 import { OnboardingScreen } from "../screens/OnboardingScreen";
 import { ProcessingScreen } from "../screens/ProcessingScreen";
 import { PrivacyPolicyScreen } from "../screens/PrivacyPolicyScreen";
+import { RefundPolicyScreen } from "../screens/RefundPolicyScreen";
 import { QuestionGeneratingScreen } from "../screens/QuestionGeneratingScreen";
 import { CreateScreen } from "../screens/QuestionSourceScreen";
 import { ResultScreen } from "../screens/ResultScreen";
@@ -48,6 +49,7 @@ export function RootNavigator() {
           <Stack.Screen name="Stats" component={StatsScreen} options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="Settings" component={SettingsScreen} options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} options={{ animation: "slide_from_right" }} />
+          <Stack.Screen name="RefundPolicy" component={RefundPolicyScreen} options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="Account" component={AccountScreen} options={{ animation: "slide_from_right" }} />
         </>
       )}

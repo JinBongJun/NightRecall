@@ -52,6 +52,15 @@ export function getCachedGoogleProfile() {
   };
 }
 
+export async function signOutGoogle() {
+  configureGoogleSignIn();
+  try {
+    await GoogleSignin.signOut();
+  } catch {
+    // Local app logout should not depend on the provider SDK state.
+  }
+}
+
 export function isGoogleSignInCancelled(error: unknown) {
   return isErrorWithCode(error) && error.code === statusCodes.SIGN_IN_CANCELLED;
 }

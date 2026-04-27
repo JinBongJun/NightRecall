@@ -7,13 +7,12 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 
-type Props = NativeStackScreenProps<RootStackParamList, "PrivacyPolicy">;
+type Props = NativeStackScreenProps<RootStackParamList, "RefundPolicy">;
 
-const PRIVACY_POLICY_URL = "https://night-recall.vercel.app/privacy-policy/";
-const ACCOUNT_DELETION_URL = "https://night-recall.vercel.app/account-deletion/";
+const REFUND_POLICY_URL = "https://night-recall.vercel.app/refund-policy/";
 const SUPPORT_EMAIL = "bongjun0289@gmail.com";
 
-export function PrivacyPolicyScreen({ navigation }: Props) {
+export function RefundPolicyScreen({ navigation }: Props) {
   const openExternalUrl = async (url: string, failureTitle: string, failureBody: string) => {
     try {
       const supported = await Linking.canOpenURL(url);
@@ -38,34 +37,30 @@ export function PrivacyPolicyScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.header}>
-        <Text style={styles.title}>Privacy Policy</Text>
-        <Text style={styles.subtitle}>How NightRecall handles your account, study content, and reminders.</Text>
+        <Text style={styles.title}>Refund Policy</Text>
+        <Text style={styles.subtitle}>How NightRecall handles billing questions and refund requests.</Text>
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>What NightRecall collects</Text>
-        <Text style={styles.body}>Account identifiers, timezone and reminder settings, study inputs, generated questions, answers, and streak history.</Text>
+        <Text style={styles.sectionTitle}>Current plan</Text>
+        <Text style={styles.body}>NightRecall is currently shown as a free plan in the app. If paid plans are added, refund terms will be shown before purchase.</Text>
 
-        <Text style={styles.sectionTitle}>How it is used</Text>
-        <Text style={styles.body}>To create nightly recall questions, keep your progress and reminders in sync, and protect the service from abuse.</Text>
+        <Text style={styles.sectionTitle}>Refund requests</Text>
+        <Text style={styles.body}>If you believe you were charged incorrectly, contact support with the account email and purchase details.</Text>
 
-        <Text style={styles.sectionTitle}>What happens to your data</Text>
-        <Text style={styles.body}>You can delete your account in Settings. If you cannot access the app, you can use the web deletion request instead.</Text>
+        <Text style={styles.sectionTitle}>App store purchases</Text>
+        <Text style={styles.body}>Purchases made through an app store may need to be refunded through that store's refund process.</Text>
 
         <Text style={styles.sectionTitle}>Contact</Text>
         <Text style={styles.body}>{SUPPORT_EMAIL}</Text>
       </View>
 
-      <Pressable style={styles.primaryButton} onPress={() => void openExternalUrl(PRIVACY_POLICY_URL, "Could not open policy", "NightRecall could not open the full privacy policy right now.")}>
-        <Text style={styles.primaryButtonText}>Open full privacy policy</Text>
+      <Pressable style={styles.primaryButton} onPress={() => void openExternalUrl(REFUND_POLICY_URL, "Could not open policy", "NightRecall could not open the refund policy right now.")}>
+        <Text style={styles.primaryButtonText}>Open full refund policy</Text>
       </Pressable>
 
-      <Pressable style={styles.secondaryButton} onPress={() => void openExternalUrl(`mailto:${SUPPORT_EMAIL}?subject=NightRecall%20Privacy%20Question`, "Could not open email", `Use ${SUPPORT_EMAIL} to contact support.`)}>
+      <Pressable style={styles.secondaryButton} onPress={() => void openExternalUrl(`mailto:${SUPPORT_EMAIL}?subject=NightRecall%20Refund%20Question`, "Could not open email", `Use ${SUPPORT_EMAIL} to contact support.`)}>
         <Text style={styles.secondaryButtonText}>Email support</Text>
-      </Pressable>
-
-      <Pressable style={styles.secondaryButton} onPress={() => void openExternalUrl(ACCOUNT_DELETION_URL, "Could not open deletion page", "NightRecall could not open the account deletion page right now.")}>
-        <Text style={styles.secondaryButtonText}>Open deletion request</Text>
       </Pressable>
     </ScreenContainer>
   );

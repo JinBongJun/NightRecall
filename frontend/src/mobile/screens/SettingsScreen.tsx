@@ -10,7 +10,7 @@ import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { clearPersistedSession, persistSession } from "../services/authSessionService";
-import { getGoogleIdToken, isGoogleSignInCancelled } from "../services/googleAuthService";
+import { getGoogleIdToken, isGoogleSignInCancelled, signOutGoogle } from "../services/googleAuthService";
 import { cancelNightlyReminder, scheduleLocalReminder, syncNightlyReminder } from "../services/reminderService";
 import { updateReminderSettings } from "../services/settingsService";
 import { deleteMyAccount, fetchMe, linkGoogleIdToken, logoutSession } from "../services/userService";
@@ -285,20 +285,39 @@ export function SettingsScreen({ navigation }: Props) {
         // Best-effort revoke. Local logout should still complete.
       }
     }
+    if (provider === "google") {
+      await signOutGoogle();
+    }
     await clearPersistedSession();
   };
 
   const deleteAccount = async () => {
-    Alert.alert("Delete account?", "This permanently erases your recall history and saved learning.", [
+    Alert.alert("Delete account?", "This permanently erases your saved learning, questions, answers, and account history. This cannot be undone.", [
       { text: "Cancel", style: "cancel" },
       {
-        text: "Delete",
+        text: "Yes, delete",
         style: "destructive",
         onPress: () => {
           void (async () => {
             try {
               await deleteMyAccount();
-              await clearPersistedSession();
+              await cancelNightlyReminder();
+              if (provider === "google") {
+                await signOutGoogle();
+              }
+              Alert.alert(
+                "Account deleted",
+                "Your NightRecall account was deleted. To use Google again, sign in as a new session.",
+                [
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      void clearPersistedSession();
+                    },
+                  },
+                ],
+                { cancelable: false },
+              );
             } catch {
               Alert.alert("Delete failed", "Account deletion could not be completed.");
             }
@@ -496,11 +515,19 @@ export function SettingsScreen({ navigation }: Props) {
               </Text>
             </View>
           </Pressable>
+          <Pressable style={styles.settingRow} onPress={() => navigation.navigate("RefundPolicy")}>
+            <View style={styles.settingCopy}>
+              <Text style={styles.label}>Refund Policy</Text>
+              <Text style={styles.helper} numberOfLines={2}>
+                Read how billing questions and refund requests are handled
+              </Text>
+            </View>
+          </Pressable>
           <Pressable style={styles.settingRow} onPress={() => void openDeletionPage()}>
             <View style={styles.settingCopy}>
-              <Text style={styles.label}>Deletion Request Page</Text>
+              <Text style={styles.label}>Deletion Request</Text>
               <Text style={styles.helper} numberOfLines={2}>
-                Use the web page if you cannot access the app
+                Use the web form if you cannot access the app
               </Text>
             </View>
           </Pressable>
