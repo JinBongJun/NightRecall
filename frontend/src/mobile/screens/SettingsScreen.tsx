@@ -4,6 +4,7 @@ import axios from "axios";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
 import { Alert, Image, Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 import { SectionRow } from "../components/SectionRow";
@@ -346,11 +347,28 @@ export function SettingsScreen({ navigation }: Props) {
   };
 
   const contactSupport = async () => {
-    await openExternalUrl(
-      `mailto:${SUPPORT_EMAIL}?subject=NightRecall%20Support`,
-      "Could not open email",
-      `Use ${SUPPORT_EMAIL} to contact support.`,
-    );
+    const mailUrl = `mailto:${SUPPORT_EMAIL}?subject=NightRecall%20Support`;
+    try {
+      const supported = await Linking.canOpenURL(mailUrl);
+      if (supported) {
+        await Linking.openURL(mailUrl);
+        return;
+      }
+    } catch {
+      // Fall through to the copy fallback below.
+    }
+
+    Alert.alert("Email app unavailable", `Use ${SUPPORT_EMAIL} to contact support.`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Copy email",
+        onPress: () => {
+          void Clipboard.setStringAsync(SUPPORT_EMAIL).then(() => {
+            Alert.alert("Email copied", SUPPORT_EMAIL);
+          });
+        },
+      },
+    ]);
   };
 
   const openDeletionPage = async () => {
