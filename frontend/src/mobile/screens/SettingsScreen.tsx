@@ -292,10 +292,13 @@ export function SettingsScreen({ navigation }: Props) {
   };
 
   const deleteAccount = async () => {
-    Alert.alert("Delete account?", "This permanently erases your saved learning, questions, answers, and account history. This cannot be undone.", [
+    Alert.alert(
+      "Delete account?",
+      "This permanently erases your saved learning, questions, answers, images, and account history. This cannot be undone.\n\nYou can sign in again with Google, but your NightRecall data will not be restored.",
+      [
       { text: "Cancel", style: "cancel" },
       {
-        text: "Yes, delete",
+        text: "Delete permanently",
         style: "destructive",
         onPress: () => {
           void (async () => {
@@ -307,7 +310,7 @@ export function SettingsScreen({ navigation }: Props) {
               }
               Alert.alert(
                 "Account deleted",
-                "Your NightRecall account was deleted. To use Google again, sign in as a new session.",
+                "Your account and NightRecall data were permanently deleted. If you sign in again with Google, NightRecall will create a new account.",
                 [
                   {
                     text: "OK",
@@ -324,7 +327,8 @@ export function SettingsScreen({ navigation }: Props) {
           })();
         },
       },
-    ]);
+      ],
+    );
   };
 
   const resetOnboarding = async () => {
