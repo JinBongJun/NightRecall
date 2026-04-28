@@ -13,6 +13,7 @@ type TopicsState = {
   setSavedInputsCache: (items: SavedStudyInputSummary[]) => void;
   removeSavedInput: (studyInputId: string) => void;
   removeTopic: (topicId: string) => void;
+  resetTopics: () => void;
 };
 
 const mergeTopics = (existing: Topic[], incoming: Topic[]) => {
@@ -65,5 +66,12 @@ export const useTopicsStore = create<TopicsState>((set) => ({
       recentTopics: state.recentTopics.filter((topic) => topic.id !== topicId),
       starredTopics: state.starredTopics.filter((topic) => topic.id !== topicId),
       pickableTopics: state.pickableTopics.filter((topic) => topic.id !== topicId),
+    })),
+  resetTopics: () =>
+    set(() => ({
+      recentTopics: [],
+      starredTopics: [],
+      pickableTopics: [],
+      savedInputsCache: [],
     })),
 }));

@@ -6,7 +6,7 @@ from app.db.models.study import StudyInput, StudyTopic
 from app.db.repositories.study_repository import StudyRepository
 from app.db.schemas.study_inputs import StudyInputCreateRequest, StudyInputCreateResponse, TopicResponse
 from app.services.topic_service import TopicService
-from app.services.source_image_storage_service import SourceImageStorageService
+from app.services.source_image_storage_service import SourceImageStorageService, StoredSourceImageBlob
 from app.utils.ids import make_id
 
 
@@ -67,3 +67,15 @@ class StudyInputService:
             topic.is_starred = False
 
         self.db.commit()
+
+    def get_source_image_blob(self, user_id: str, source_image_ref: str) -> StoredSourceImageBlob:
+        study_input = self.repository.get_input_for_source_image_ref(source_image_ref)
+        if not study_input or study_input.user_id != user_id:
+            raise ValueError("source image not found")
+        return SourceImageStorageService().download(source_image_ref)
+
+    def delete_unattached_source_image(self, source_image_ref: str) -> None:
+        study_input = self.repository.get_input_for_source_image_ref(source_image_ref)
+        if study_input:
+            raise ValueError("source image is already attached")
+        SourceImageStorageService().delete(source_image_ref)

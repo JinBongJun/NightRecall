@@ -21,6 +21,9 @@ class StudyRepository:
     def get_input(self, study_input_id: str) -> StudyInput | None:
         return self.db.scalar(select(StudyInput).where(StudyInput.id == study_input_id))
 
+    def get_input_for_source_image_ref(self, source_image_ref: str) -> StudyInput | None:
+        return self.db.scalar(select(StudyInput).where(StudyInput.source_image_ref == source_image_ref))
+
     def get_inputs_for_user(self, user_id: str, limit: int | None = None, offset: int | None = None) -> list[StudyInput]:
         stmt = select(StudyInput).where(StudyInput.user_id == user_id).order_by(StudyInput.created_at.desc())
         if limit is not None:

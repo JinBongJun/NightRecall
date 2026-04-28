@@ -12,7 +12,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import { fetchSavedInputDetail, fetchSavedTopicSource } from "../services/reviewService";
-import { createStudyInput, uploadSourceImage } from "../services/studyService";
+import { createStudyInput, deleteSourceImage, uploadSourceImage } from "../services/studyService";
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
@@ -152,6 +152,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
       return;
     }
 
+    let uploadedSourceImageRef: string | undefined;
     try {
       setSubmitting(true);
       const { usablePoints, payload } = toStudyInputPayload(newPoints);
@@ -166,23 +167,24 @@ export function EditPointsScreen({ route, navigation }: Props) {
         return;
       }
 
-      const sourceImageRef =
-        route.params.mode === "photo" && route.params.imageBase64
-          ? (await uploadSourceImage({
+      if (route.params.mode === "photo" && route.params.imageBase64) {
+        uploadedSourceImageRef = (
+          await uploadSourceImage({
               image_base64: route.params.imageBase64,
               image_mime_type:
                 route.params.imageMimeType && route.params.imageMimeType.startsWith("image/")
                   ? route.params.imageMimeType
                   : "image/jpeg",
-            })).source_image_ref
-          : undefined;
+          })
+        ).source_image_ref;
+      }
 
       const studyInput = await createStudyInput({
         ...payload,
         starred_indices: starredIndices,
         source_kind: route.params.mode === "photo" ? "photo" : "manual",
         source_preview_text: normalizedSourcePreview,
-        source_image_ref: sourceImageRef,
+        source_image_ref: uploadedSourceImageRef,
       });
       const firstSavedPointText =
         usablePoints.find((point) => point.isStarred)?.text.trim() || usablePoints[0]?.text.trim() || "Saved learning";
@@ -207,6 +209,13 @@ export function EditPointsScreen({ route, navigation }: Props) {
         navigation.goBack();
       }
     } catch {
+      if (uploadedSourceImageRef) {
+        try {
+          await deleteSourceImage(uploadedSourceImageRef);
+        } catch {
+          // Best-effort cleanup for an image that was uploaded before save failed.
+        }
+      }
       Alert.alert("Could not save", "NightRecall could not save this learning to your library.");
     } finally {
       setSubmitting(false);

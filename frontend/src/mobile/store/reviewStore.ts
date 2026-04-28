@@ -31,9 +31,10 @@ type ReviewState = {
   setResult: (result: AnswerResponse | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  resetReview: () => void;
 };
 
-export const useReviewStore = create<ReviewState>((set) => ({
+const defaultReviewState = {
   sessionQuestions: [],
   sessionIndex: 0,
   sessionSource: null,
@@ -41,13 +42,17 @@ export const useReviewStore = create<ReviewState>((set) => ({
   currentQuestion: null,
   retryQuestion: null,
   retryUsed: false,
-  currentQuestionMode: "normal",
+  currentQuestionMode: "normal" as const,
   pickableTopics: [],
   selectedChoice: null,
   fillBlankAnswer: "",
   result: null,
   loading: false,
   error: null,
+};
+
+export const useReviewStore = create<ReviewState>((set) => ({
+  ...defaultReviewState,
   setSessionQuestions: (questions) =>
     set(() => {
       const sanitized = questions.filter(Boolean).slice(0, 3);
@@ -140,19 +145,12 @@ export const useReviewStore = create<ReviewState>((set) => ({
   },
   resetSession: () =>
     set(() => ({
-      sessionQuestions: [],
-      sessionIndex: 0,
-      sessionSource: null,
-      tonightQuestion: null,
-      currentQuestion: null,
-      retryQuestion: null,
-      retryUsed: false,
-      currentQuestionMode: "normal",
-      selectedChoice: null,
-      fillBlankAnswer: "",
-      result: null,
-      loading: false,
-      error: null,
+      ...defaultReviewState,
+      pickableTopics: useReviewStore.getState().pickableTopics,
+    })),
+  resetReview: () =>
+    set(() => ({
+      ...defaultReviewState,
     })),
   setTonightQuestion: (question) =>
     set(() => ({

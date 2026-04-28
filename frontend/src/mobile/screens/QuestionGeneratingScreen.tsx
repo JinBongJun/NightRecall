@@ -7,6 +7,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { deleteSavedInput, generateQuestionsFromSavedInput, generateQuestionsFromSavedTopic } from "../services/reviewService";
 import {
   createStudyInput,
+  deleteSourceImage,
   redactStudyInputSource,
   startQuestionGenerationJob,
   uploadSourceImage,
@@ -157,6 +158,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
 
     const run = async () => {
       let transientStudyInputId: string | null = null;
+      let uploadedSourceImageRef: string | null = null;
       let shouldRedactSource = false;
       let pendingSavedInput:
         | {
@@ -179,22 +181,23 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             route.params.sourceText.trim() ||
             route.params.points.find((point) => point.text.trim())?.text.trim() ||
             undefined;
-          const sourceImageRef =
-            route.params.mode === "photo" && route.params.imageBase64 && bookmarkedCount > 0
-              ? (await uploadSourceImage({
+          if (route.params.mode === "photo" && route.params.imageBase64 && bookmarkedCount > 0) {
+            uploadedSourceImageRef = (
+              await uploadSourceImage({
                   image_base64: route.params.imageBase64,
                   image_mime_type:
                     route.params.imageMimeType && route.params.imageMimeType.startsWith("image/")
                       ? route.params.imageMimeType
                       : "image/jpeg",
-                })).source_image_ref
-              : null;
+              })
+            ).source_image_ref;
+          }
 
           const studyInput = await createStudyInput({
             ...payload,
             source_kind: route.params.mode === "photo" ? "photo" : "manual",
             source_preview_text: normalizedSourcePreview,
-            source_image_ref: sourceImageRef ?? undefined,
+            source_image_ref: uploadedSourceImageRef ?? undefined,
           });
 
           if (cancelled) {
@@ -302,6 +305,12 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             }
           } catch {
             // Do not hide the original generation failure behind cleanup errors.
+          }
+        } else if (uploadedSourceImageRef) {
+          try {
+            await deleteSourceImage(uploadedSourceImageRef);
+          } catch {
+            // Best-effort cleanup for an image that was uploaded before save failed.
           }
         }
         if (cancelled) {

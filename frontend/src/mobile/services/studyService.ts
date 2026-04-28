@@ -35,6 +35,10 @@ export async function uploadSourceImage(payload: { image_base64: string; image_m
   return response.data as StudyInputSourceImageUploadResponse;
 }
 
+export async function deleteSourceImage(sourceImageRef: string) {
+  await apiClient.delete(`/study-inputs/source-images/${sourceImageRef}`);
+}
+
 export async function redactStudyInputSource(studyInputId: string) {
   await apiClient.post(`/study-inputs/${studyInputId}/redact-source`);
 }

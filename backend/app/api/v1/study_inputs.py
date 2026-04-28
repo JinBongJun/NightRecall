@@ -50,16 +50,26 @@ def upload_source_image(
 @router.get("/source-images/{source_image_ref}")
 def get_source_image(
     source_image_ref: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> Response:
-    storage = SourceImageStorageService()
-    if not storage.exists(source_image_ref):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="source image not found")
-
     try:
-        blob = storage.download(source_image_ref)
+        blob = StudyInputService(db).get_source_image_blob(current_user.id, source_image_ref)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="source image not found") from exc
     return Response(content=blob.content, media_type=blob.mime_type, headers={"Cache-Control": "private, max-age=86400"})
+
+
+@router.delete("/source-images/{source_image_ref}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_unattached_source_image(
+    source_image_ref: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    try:
+        StudyInputService(db).delete_unattached_source_image(source_image_ref)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
 
 @router.post("/extract", response_model=StudyInputExtractResponse)
