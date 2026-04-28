@@ -308,17 +308,11 @@ export function SettingsScreen({ navigation }: Props) {
               if (provider === "google") {
                 await signOutGoogle();
               }
+              await clearPersistedSession();
               Alert.alert(
                 "Account deleted",
                 "Your account and NightRecall data were permanently deleted. If you sign in again with Google, NightRecall will create a new account.",
-                [
-                  {
-                    text: "OK",
-                    onPress: () => {
-                      void clearPersistedSession();
-                    },
-                  },
-                ],
+                [{ text: "OK" }],
                 { cancelable: false },
               );
             } catch {
