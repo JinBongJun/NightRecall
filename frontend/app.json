@@ -38,7 +38,7 @@
     "extra": {
       "apiBaseUrl": "https://nightrecall-production.up.railway.app/v1",
       "googleWebClientId": "792853648615-h3lk0e00n1ck0rlfmtc0n7l53j3drj7u.apps.googleusercontent.com",
-      "googleAndroidClientId": "792853648615-126rd1iebot70v9vt98pgsubp7dt35d8.apps.googleusercontent.com",
+      "googleAndroidClientId": "792853648615-j41u3d30g62qhhahuqife5at5mrou5kc.apps.googleusercontent.com",
       "eas": {
         "projectId": "3c8303ee-c6bf-4ab3-858f-5b16a96675a5"
       }
