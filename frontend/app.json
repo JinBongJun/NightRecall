@@ -24,6 +24,7 @@
       }
     },
     "plugins": [
+      "./plugins/with-phone-only-android",
       "expo-notifications",
       [
         "expo-image-picker",
