@@ -1,38 +1,79 @@
 import { apiClient } from "./api";
-import {
+import type {
+  Question,
   QuestionGenerationJobResponse,
   StudyInputExtractResponse,
   StudyInputExtractJobResponse,
   StudyInputSourceImageUploadResponse,
   Topic,
 } from "../types/api";
+import type { components } from "../types/generated-api";
+
+type QuestionGenerateRequest = components["schemas"]["QuestionGenerateRequest"];
+type RawQuestionGenerateResponse = components["schemas"]["QuestionGenerateResponse"];
+type RawQuestionGenerationJobResponse = components["schemas"]["QuestionGenerationJobResponse"];
+type StudyInputCreateRequest = components["schemas"]["StudyInputCreateRequest"];
+type RawStudyInputCreateResponse = components["schemas"]["StudyInputCreateResponse"];
+type StudyInputExtractRequest = components["schemas"]["StudyInputExtractRequest"];
+type RawStudyInputExtractResponse = components["schemas"]["StudyInputExtractResponse"];
+type RawStudyInputExtractJobResponse = components["schemas"]["StudyInputExtractJobResponse"];
+type StudyInputSourceImageUploadRequest = components["schemas"]["StudyInputSourceImageUploadRequest"];
+type RawStudyInputSourceImageUploadResponse = components["schemas"]["StudyInputSourceImageUploadResponse"];
+
+type StudyInputSourceImageUploadPayload = Omit<StudyInputSourceImageUploadRequest, "image_mime_type"> & {
+  image_mime_type?: string;
+};
+type StudyInputCreateResult = {
+  study_input_id: string;
+  topics: Topic[];
+  source_kind?: "photo" | "manual" | null;
+  source_preview_text?: string | null;
+  source_image_ref?: string | null;
+};
 
 const QUESTION_GENERATION_POLL_INTERVAL_MS = 1500;
 const QUESTION_GENERATION_JOB_TIMEOUT_MS = 180000;
 const STUDY_INPUT_EXTRACT_JOB_POLL_INTERVAL_MS = 1500;
 const STUDY_INPUT_EXTRACT_JOB_TIMEOUT_MS = 180000;
 
-export async function createStudyInput(payload: {
-  input_type: "keywords" | "notes";
-  content: string[] | string;
-  starred_indices: number[];
-  source_kind?: "photo" | "manual";
-  source_preview_text?: string;
-  source_image_ref?: string;
-}) {
-  const response = await apiClient.post("/study-inputs", payload);
-  return response.data as {
-    study_input_id: string;
-    topics: Topic[];
-    source_kind?: "photo" | "manual" | null;
-    source_preview_text?: string | null;
-    source_image_ref?: string | null;
+function normalizeQuestion(question: components["schemas"]["QuestionOutput"]): Question {
+  return {
+    ...question,
+    choices: question.choices ?? null,
+    answer_index: question.answer_index ?? null,
+    answer_text: question.answer_text ?? null,
   };
 }
 
-export async function uploadSourceImage(payload: { image_base64: string; image_mime_type?: string }) {
-  const response = await apiClient.post("/study-inputs/source-images", payload);
-  return response.data as StudyInputSourceImageUploadResponse;
+function normalizeSourceKind(value: string | null | undefined): "photo" | "manual" | null | undefined {
+  if (value === "photo" || value === "manual" || value == null) {
+    return value;
+  }
+  return undefined;
+}
+
+function normalizeQuestionGenerationJob(job: RawQuestionGenerationJobResponse): QuestionGenerationJobResponse {
+  return {
+    ...job,
+    questions: job.questions?.map(normalizeQuestion),
+  };
+}
+
+function normalizeStudyInputCreate(response: RawStudyInputCreateResponse): StudyInputCreateResult {
+  return {
+    ...response,
+    source_kind: normalizeSourceKind(response.source_kind),
+  };
+}
+
+export async function createStudyInput(payload: StudyInputCreateRequest) {
+  const response = await apiClient.post<RawStudyInputCreateResponse>("/study-inputs", payload);
+  return normalizeStudyInputCreate(response.data);
+}
+
+export async function uploadSourceImage(payload: StudyInputSourceImageUploadPayload) {
+  const response = await apiClient.post<RawStudyInputSourceImageUploadResponse>("/study-inputs/source-images", payload);
+  return response.data;
 }
 
 export async function deleteSourceImage(sourceImageRef: string) {
@@ -43,21 +84,21 @@ export async function redactStudyInputSource(studyInputId: string) {
   await apiClient.post(`/study-inputs/${studyInputId}/redact-source`);
 }
 
-export async function generateQuestions(payload: { study_input_id: string; count: number }) {
-  const response = await apiClient.post("/questions/generate", payload, {
+export async function generateQuestions(payload: QuestionGenerateRequest) {
+  const response = await apiClient.post<RawQuestionGenerateResponse>("/questions/generate", payload, {
     timeout: 60000,
   });
-  return response.data;
+  return { questions: response.data.questions.map(normalizeQuestion) };
 }
 
-export async function startQuestionGenerationJob(payload: { study_input_id: string; count: number }) {
-  const response = await apiClient.post("/questions/jobs", payload);
-  return response.data as QuestionGenerationJobResponse;
+export async function startQuestionGenerationJob(payload: QuestionGenerateRequest) {
+  const response = await apiClient.post<RawQuestionGenerationJobResponse>("/questions/jobs", payload);
+  return normalizeQuestionGenerationJob(response.data);
 }
 
 export async function fetchQuestionGenerationJob(jobId: string) {
-  const response = await apiClient.get(`/questions/jobs/${jobId}`);
-  return response.data as QuestionGenerationJobResponse;
+  const response = await apiClient.get<RawQuestionGenerationJobResponse>(`/questions/jobs/${jobId}`);
+  return normalizeQuestionGenerationJob(response.data);
 }
 
 export async function waitForQuestionGenerationJob(
@@ -89,29 +130,19 @@ export async function waitForQuestionGenerationJob(
   }
 }
 
-export async function extractStudyInput(payload: {
-  source_type: "text" | "image";
-  source_text?: string;
-  image_base64?: string;
-  image_mime_type?: string;
-}) {
-  const response = await apiClient.post("/study-inputs/extract", payload);
-  return response.data as StudyInputExtractResponse;
+export async function extractStudyInput(payload: StudyInputExtractRequest) {
+  const response = await apiClient.post<RawStudyInputExtractResponse>("/study-inputs/extract", payload);
+  return response.data;
 }
 
-export async function startStudyInputExtractJob(payload: {
-  source_type: "text" | "image";
-  source_text?: string;
-  image_base64?: string;
-  image_mime_type?: string;
-}) {
-  const response = await apiClient.post("/study-inputs/extract/jobs", payload);
-  return response.data as StudyInputExtractJobResponse;
+export async function startStudyInputExtractJob(payload: StudyInputExtractRequest) {
+  const response = await apiClient.post<RawStudyInputExtractJobResponse>("/study-inputs/extract/jobs", payload);
+  return response.data;
 }
 
 export async function fetchStudyInputExtractJob(jobId: string) {
-  const response = await apiClient.get(`/study-inputs/extract/jobs/${jobId}`);
-  return response.data as StudyInputExtractJobResponse;
+  const response = await apiClient.get<RawStudyInputExtractJobResponse>(`/study-inputs/extract/jobs/${jobId}`);
+  return response.data;
 }
 
 export async function waitForStudyInputExtractJob(
