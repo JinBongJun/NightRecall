@@ -1,7 +1,9 @@
 import { apiClient } from "./api";
-import { StatsResponse } from "../types/api";
+import type { components } from "../types/generated-api";
+
+type StatsResponse = components["schemas"]["StatsResponse"];
 
 export async function fetchStats() {
-  const response = await apiClient.get("/stats");
-  return response.data as StatsResponse;
+  const response = await apiClient.get<StatsResponse>("/stats");
+  return response.data;
 }

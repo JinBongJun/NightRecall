@@ -1,8 +1,9 @@
 import { apiClient } from "./api";
-import { EntitlementsResponse } from "../types/api";
+import type { components } from "../types/generated-api";
+
+type EntitlementsResponse = components["schemas"]["EntitlementsResponse"];
 
 export async function fetchEntitlements() {
-  const response = await apiClient.get("/entitlements");
-  return response.data as EntitlementsResponse;
+  const response = await apiClient.get<EntitlementsResponse>("/entitlements");
+  return response.data;
 }
-
