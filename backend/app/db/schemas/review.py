@@ -1,12 +1,17 @@
+from typing import Literal
+
 from pydantic import Field, model_validator
 
 from app.db.schemas.common import APIModel
 from app.db.schemas.questions import QuestionGenerateResponse, QuestionOutput
-from app.db.schemas.study_inputs import TopicResponse
+from app.db.schemas.study_inputs import SourceKind, StudyInputType, TopicResponse
+
+
+ReviewMode = Literal["auto", "picked"]
 
 
 class ReviewQuestionResponse(APIModel):
-    mode: str
+    mode: ReviewMode
     question: QuestionOutput
 
 
@@ -21,8 +26,8 @@ class PickTopicQuestionRequest(APIModel):
 class SavedTopicSourceResponse(APIModel):
     topic_id: str
     study_input_id: str
-    input_type: str
-    source_kind: str | None = None
+    input_type: StudyInputType
+    source_kind: SourceKind | None = None
     source_preview_text: str | None = None
     source_image_ref: str | None = None
     topics: list[TopicResponse]
@@ -30,8 +35,8 @@ class SavedTopicSourceResponse(APIModel):
 
 class SavedStudyInputSummaryResponse(APIModel):
     study_input_id: str
-    input_type: str
-    source_kind: str | None = None
+    input_type: StudyInputType
+    source_kind: SourceKind | None = None
     source_preview_text: str | None = None
     source_image_ref: str | None = None
     title: str
@@ -50,8 +55,8 @@ class SavedStudyInputsResponse(APIModel):
 
 class SavedStudyInputDetailResponse(APIModel):
     study_input_id: str
-    input_type: str
-    source_kind: str | None = None
+    input_type: StudyInputType
+    source_kind: SourceKind | None = None
     source_preview_text: str | None = None
     source_image_ref: str | None = None
     topics: list[TopicResponse]

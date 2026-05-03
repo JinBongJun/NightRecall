@@ -7,19 +7,38 @@ import type {
   StudyInputSourceImageUploadResponse,
   Topic,
 } from "../types/api";
+import {
+  StudyInputCreateRequestInput_type,
+  StudyInputCreateRequestSource_kindAnyOf0,
+  StudyInputExtractRequestSource_type,
+} from "../types/generated-api";
 import type { components } from "../types/generated-api";
 
 type QuestionGenerateRequest = components["schemas"]["QuestionGenerateRequest"];
 type RawQuestionGenerateResponse = components["schemas"]["QuestionGenerateResponse"];
 type RawQuestionGenerationJobResponse = components["schemas"]["QuestionGenerationJobResponse"];
-type StudyInputCreateRequest = components["schemas"]["StudyInputCreateRequest"];
+type RawStudyInputCreateRequest = components["schemas"]["StudyInputCreateRequest"];
 type RawStudyInputCreateResponse = components["schemas"]["StudyInputCreateResponse"];
-type StudyInputExtractRequest = components["schemas"]["StudyInputExtractRequest"];
+type RawStudyInputExtractRequest = components["schemas"]["StudyInputExtractRequest"];
 type RawStudyInputExtractResponse = components["schemas"]["StudyInputExtractResponse"];
 type RawStudyInputExtractJobResponse = components["schemas"]["StudyInputExtractJobResponse"];
 type StudyInputSourceImageUploadRequest = components["schemas"]["StudyInputSourceImageUploadRequest"];
 type RawStudyInputSourceImageUploadResponse = components["schemas"]["StudyInputSourceImageUploadResponse"];
 
+type StudyInputCreateRequest = {
+  input_type: "keywords" | "notes";
+  content: string[] | string;
+  starred_indices?: number[];
+  source_kind?: "photo" | "manual" | null;
+  source_preview_text?: string | null;
+  source_image_ref?: string | null;
+};
+type StudyInputExtractRequest = {
+  source_type: "text" | "image";
+  source_text?: string;
+  image_base64?: string;
+  image_mime_type?: string;
+};
 type StudyInputSourceImageUploadPayload = Omit<StudyInputSourceImageUploadRequest, "image_mime_type"> & {
   image_mime_type?: string;
 };
@@ -45,13 +64,6 @@ function normalizeQuestion(question: components["schemas"]["QuestionOutput"]): Q
   };
 }
 
-function normalizeSourceKind(value: string | null | undefined): "photo" | "manual" | null | undefined {
-  if (value === "photo" || value === "manual" || value == null) {
-    return value;
-  }
-  return undefined;
-}
-
 function normalizeQuestionGenerationJob(job: RawQuestionGenerationJobResponse): QuestionGenerationJobResponse {
   return {
     ...job,
@@ -62,12 +74,38 @@ function normalizeQuestionGenerationJob(job: RawQuestionGenerationJobResponse): 
 function normalizeStudyInputCreate(response: RawStudyInputCreateResponse): StudyInputCreateResult {
   return {
     ...response,
-    source_kind: normalizeSourceKind(response.source_kind),
+    source_kind: response.source_kind as StudyInputCreateResult["source_kind"],
+  };
+}
+
+function toStudyInputCreateRequest(payload: StudyInputCreateRequest): RawStudyInputCreateRequest {
+  return {
+    ...payload,
+    input_type:
+      payload.input_type === "keywords"
+        ? StudyInputCreateRequestInput_type.keywords
+        : StudyInputCreateRequestInput_type.notes,
+    source_kind:
+      payload.source_kind == null
+        ? payload.source_kind
+        : payload.source_kind === "photo"
+          ? StudyInputCreateRequestSource_kindAnyOf0.photo
+          : StudyInputCreateRequestSource_kindAnyOf0.manual,
+  };
+}
+
+function toStudyInputExtractRequest(payload: StudyInputExtractRequest): RawStudyInputExtractRequest {
+  return {
+    ...payload,
+    source_type:
+      payload.source_type === "text"
+        ? StudyInputExtractRequestSource_type.text
+        : StudyInputExtractRequestSource_type.image,
   };
 }
 
 export async function createStudyInput(payload: StudyInputCreateRequest) {
-  const response = await apiClient.post<RawStudyInputCreateResponse>("/study-inputs", payload);
+  const response = await apiClient.post<RawStudyInputCreateResponse>("/study-inputs", toStudyInputCreateRequest(payload));
   return normalizeStudyInputCreate(response.data);
 }
 
@@ -131,12 +169,15 @@ export async function waitForQuestionGenerationJob(
 }
 
 export async function extractStudyInput(payload: StudyInputExtractRequest) {
-  const response = await apiClient.post<RawStudyInputExtractResponse>("/study-inputs/extract", payload);
+  const response = await apiClient.post<RawStudyInputExtractResponse>("/study-inputs/extract", toStudyInputExtractRequest(payload));
   return response.data;
 }
 
 export async function startStudyInputExtractJob(payload: StudyInputExtractRequest) {
-  const response = await apiClient.post<RawStudyInputExtractJobResponse>("/study-inputs/extract/jobs", payload);
+  const response = await apiClient.post<RawStudyInputExtractJobResponse>(
+    "/study-inputs/extract/jobs",
+    toStudyInputExtractRequest(payload),
+  );
   return response.data;
 }
 

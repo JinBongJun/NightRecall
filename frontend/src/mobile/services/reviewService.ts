@@ -35,20 +35,9 @@ function normalizeQuestion(question: components["schemas"]["QuestionOutput"]): Q
   };
 }
 
-function normalizeInputType(value: string): "keywords" | "notes" {
-  return value === "keywords" ? "keywords" : "notes";
-}
-
-function normalizeSourceKind(value: string | null | undefined): "photo" | "manual" | null | undefined {
-  if (value === "photo" || value === "manual" || value == null) {
-    return value;
-  }
-  return undefined;
-}
-
 function normalizeReviewQuestion(response: RawReviewQuestionResponse): TonightQuestionResponse {
   return {
-    mode: response.mode === "picked" ? "picked" : "auto",
+    mode: response.mode as TonightQuestionResponse["mode"],
     question: normalizeQuestion(response.question),
   };
 }
@@ -56,8 +45,8 @@ function normalizeReviewQuestion(response: RawReviewQuestionResponse): TonightQu
 function normalizeSavedTopicSource(response: RawSavedTopicSourceResponse): SavedTopicSource {
   return {
     ...response,
-    input_type: normalizeInputType(response.input_type),
-    source_kind: normalizeSourceKind(response.source_kind),
+    input_type: response.input_type as SavedTopicSource["input_type"],
+    source_kind: response.source_kind as SavedTopicSource["source_kind"],
     topics: response.topics as Topic[],
   };
 }
@@ -65,8 +54,8 @@ function normalizeSavedTopicSource(response: RawSavedTopicSourceResponse): Saved
 function normalizeSavedInputDetail(response: RawSavedStudyInputDetailResponse): SavedStudyInputDetail {
   return {
     ...response,
-    input_type: normalizeInputType(response.input_type),
-    source_kind: normalizeSourceKind(response.source_kind),
+    input_type: response.input_type as SavedStudyInputDetail["input_type"],
+    source_kind: response.source_kind as SavedStudyInputDetail["source_kind"],
     topics: response.topics as Topic[],
   };
 }
@@ -76,8 +65,8 @@ function normalizeSavedInputs(response: RawSavedStudyInputsResponse): SavedStudy
     ...response,
     items: response.items.map((item) => ({
       ...item,
-      input_type: normalizeInputType(item.input_type),
-      source_kind: normalizeSourceKind(item.source_kind),
+      input_type: item.input_type as SavedStudyInputsResponse["items"][number]["input_type"],
+      source_kind: item.source_kind as SavedStudyInputsResponse["items"][number]["source_kind"],
     })),
   };
 }

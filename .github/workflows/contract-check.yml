@@ -1,0 +1,46 @@
+name: Contract Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - monorepo
+  workflow_dispatch: {}
+
+jobs:
+  contract-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: python -m pip install -r backend/requirements.txt
+
+      - name: Export OpenAPI
+        run: python scripts/export_openapi.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Regenerate frontend API types
+        run: npm run api:types
+        working-directory: frontend
+
+      - name: Verify generated artifacts are committed
+        run: git diff --exit-code -- api/openapi.json frontend/src/mobile/types/generated-api.ts

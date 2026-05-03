@@ -6,6 +6,8 @@ from pydantic import Field, field_validator, model_validator
 from app.db.schemas.common import APIModel
 
 MAX_SOURCE_IMAGE_DATA_LENGTH = 4_000_000
+StudyInputType = Literal["keywords", "notes"]
+SourceKind = Literal["photo", "manual"]
 
 
 class TopicResponse(APIModel):
@@ -15,10 +17,10 @@ class TopicResponse(APIModel):
 
 
 class StudyInputCreateRequest(APIModel):
-    input_type: Literal["keywords", "notes"]
+    input_type: StudyInputType
     content: list[str] | str
     starred_indices: list[int] = Field(default_factory=list)
-    source_kind: Literal["photo", "manual"] | None = None
+    source_kind: SourceKind | None = None
     source_preview_text: str | None = None
     source_image_ref: str | None = None
 
@@ -51,7 +53,7 @@ class StudyInputCreateRequest(APIModel):
 class StudyInputCreateResponse(APIModel):
     study_input_id: str
     topics: list[TopicResponse]
-    source_kind: str | None = None
+    source_kind: SourceKind | None = None
     source_preview_text: str | None = None
     source_image_ref: str | None = None
 

@@ -2188,6 +2188,10 @@
         "properties": {
           "mode": {
             "type": "string",
+            "enum": [
+              "auto",
+              "picked"
+            ],
             "title": "Mode"
           },
           "question": {
@@ -2209,12 +2213,20 @@
           },
           "input_type": {
             "type": "string",
+            "enum": [
+              "keywords",
+              "notes"
+            ],
             "title": "Input Type"
           },
           "source_kind": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "photo",
+                  "manual"
+                ]
               },
               {
                 "type": "null"
@@ -2268,12 +2280,20 @@
           },
           "input_type": {
             "type": "string",
+            "enum": [
+              "keywords",
+              "notes"
+            ],
             "title": "Input Type"
           },
           "source_kind": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "photo",
+                  "manual"
+                ]
               },
               {
                 "type": "null"
@@ -2379,12 +2399,20 @@
           },
           "input_type": {
             "type": "string",
+            "enum": [
+              "keywords",
+              "notes"
+            ],
             "title": "Input Type"
           },
           "source_kind": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "photo",
+                  "manual"
+                ]
               },
               {
                 "type": "null"
@@ -2572,7 +2600,11 @@
           "source_kind": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "photo",
+                  "manual"
+                ]
               },
               {
                 "type": "null"

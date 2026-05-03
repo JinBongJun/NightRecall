@@ -649,7 +649,7 @@ export interface components {
              * Plan
              * @enum {string}
              */
-            plan: "free" | "plus";
+            plan: EntitlementsResponsePlan;
             /** Billing Enabled */
             billing_enabled: boolean;
         };
@@ -773,7 +773,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "queued" | "running" | "succeeded" | "failed";
+            status: QuestionGenerationJobResponseStatus;
             /** Questions */
             questions?: components["schemas"]["QuestionOutput"][] | null;
             /** Error Message */
@@ -797,7 +797,7 @@ export interface components {
              * Question Type
              * @enum {string}
              */
-            question_type: "mcq" | "true_false" | "fill_blank";
+            question_type: QuestionOutputQuestion_type;
             /** Question Text */
             question_text: string;
             /** Choices */
@@ -847,18 +847,24 @@ export interface components {
         };
         /** ReviewQuestionResponse */
         ReviewQuestionResponse: {
-            /** Mode */
-            mode: string;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: ReviewQuestionResponseMode;
             question: components["schemas"]["QuestionOutput"];
         };
         /** SavedStudyInputDetailResponse */
         SavedStudyInputDetailResponse: {
             /** Study Input Id */
             study_input_id: string;
-            /** Input Type */
-            input_type: string;
+            /**
+             * Input Type
+             * @enum {string}
+             */
+            input_type: SavedStudyInputDetailResponseInput_type;
             /** Source Kind */
-            source_kind?: string | null;
+            source_kind?: SavedStudyInputDetailResponseSource_kindAnyOf0 | null;
             /** Source Preview Text */
             source_preview_text?: string | null;
             /** Source Image Ref */
@@ -870,10 +876,13 @@ export interface components {
         SavedStudyInputSummaryResponse: {
             /** Study Input Id */
             study_input_id: string;
-            /** Input Type */
-            input_type: string;
+            /**
+             * Input Type
+             * @enum {string}
+             */
+            input_type: SavedStudyInputSummaryResponseInput_type;
             /** Source Kind */
-            source_kind?: string | null;
+            source_kind?: SavedStudyInputSummaryResponseSource_kindAnyOf0 | null;
             /** Source Preview Text */
             source_preview_text?: string | null;
             /** Source Image Ref */
@@ -906,10 +915,13 @@ export interface components {
             topic_id: string;
             /** Study Input Id */
             study_input_id: string;
-            /** Input Type */
-            input_type: string;
+            /**
+             * Input Type
+             * @enum {string}
+             */
+            input_type: SavedTopicSourceResponseInput_type;
             /** Source Kind */
-            source_kind?: string | null;
+            source_kind?: SavedTopicSourceResponseSource_kindAnyOf0 | null;
             /** Source Preview Text */
             source_preview_text?: string | null;
             /** Source Image Ref */
@@ -940,13 +952,13 @@ export interface components {
              * Input Type
              * @enum {string}
              */
-            input_type: "keywords" | "notes";
+            input_type: StudyInputCreateRequestInput_type;
             /** Content */
             content: string[] | string;
             /** Starred Indices */
             starred_indices?: number[];
             /** Source Kind */
-            source_kind?: ("photo" | "manual") | null;
+            source_kind?: StudyInputCreateRequestSource_kindAnyOf0 | null;
             /** Source Preview Text */
             source_preview_text?: string | null;
             /** Source Image Ref */
@@ -959,7 +971,7 @@ export interface components {
             /** Topics */
             topics: components["schemas"]["TopicResponse"][];
             /** Source Kind */
-            source_kind?: string | null;
+            source_kind?: StudyInputCreateResponseSource_kindAnyOf0 | null;
             /** Source Preview Text */
             source_preview_text?: string | null;
             /** Source Image Ref */
@@ -973,7 +985,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "queued" | "running" | "succeeded" | "failed";
+            status: StudyInputExtractJobResponseStatus;
             /** Source Preview */
             source_preview?: string | null;
             /** Points */
@@ -997,7 +1009,7 @@ export interface components {
              * Source Type
              * @enum {string}
              */
-            source_type: "text" | "image";
+            source_type: StudyInputExtractRequestSource_type;
             /** Source Text */
             source_text?: string | null;
             /** Image Base64 */
@@ -2264,4 +2276,69 @@ export interface operations {
             };
         };
     };
+}
+export enum EntitlementsResponsePlan {
+    free = "free",
+    plus = "plus"
+}
+export enum QuestionGenerationJobResponseStatus {
+    queued = "queued",
+    running = "running",
+    succeeded = "succeeded",
+    failed = "failed"
+}
+export enum QuestionOutputQuestion_type {
+    mcq = "mcq",
+    true_false = "true_false",
+    fill_blank = "fill_blank"
+}
+export enum ReviewQuestionResponseMode {
+    auto = "auto",
+    picked = "picked"
+}
+export enum SavedStudyInputDetailResponseInput_type {
+    keywords = "keywords",
+    notes = "notes"
+}
+export enum SavedStudyInputDetailResponseSource_kindAnyOf0 {
+    photo = "photo",
+    manual = "manual"
+}
+export enum SavedStudyInputSummaryResponseInput_type {
+    keywords = "keywords",
+    notes = "notes"
+}
+export enum SavedStudyInputSummaryResponseSource_kindAnyOf0 {
+    photo = "photo",
+    manual = "manual"
+}
+export enum SavedTopicSourceResponseInput_type {
+    keywords = "keywords",
+    notes = "notes"
+}
+export enum SavedTopicSourceResponseSource_kindAnyOf0 {
+    photo = "photo",
+    manual = "manual"
+}
+export enum StudyInputCreateRequestInput_type {
+    keywords = "keywords",
+    notes = "notes"
+}
+export enum StudyInputCreateRequestSource_kindAnyOf0 {
+    photo = "photo",
+    manual = "manual"
+}
+export enum StudyInputCreateResponseSource_kindAnyOf0 {
+    photo = "photo",
+    manual = "manual"
+}
+export enum StudyInputExtractJobResponseStatus {
+    queued = "queued",
+    running = "running",
+    succeeded = "succeeded",
+    failed = "failed"
+}
+export enum StudyInputExtractRequestSource_type {
+    text = "text",
+    image = "image"
 }
