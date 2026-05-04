@@ -27,6 +27,9 @@ jobs:
       - name: Export OpenAPI
         run: python scripts/export_openapi.py
 
+      - name: Run backend contract tests
+        run: python -m pytest backend/app/tests/test_review_routes.py backend/app/tests/test_review_logic.py backend/app/tests/test_auth_routes.py
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -40,6 +43,10 @@ jobs:
 
       - name: Regenerate frontend API types
         run: npm run api:types
+        working-directory: frontend
+
+      - name: Run frontend typecheck
+        run: npm run typecheck
         working-directory: frontend
 
       - name: Verify generated artifacts are committed
