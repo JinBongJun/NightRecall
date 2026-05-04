@@ -1,31 +1,20 @@
 import * as SecureStore from "expo-secure-store";
+import type { PersistedSession } from "../types/authModels";
 
 const SESSION_KEY = "nightrecall.session";
 
-export type StoredSession = {
-  userId: string;
-  timezone: string;
-  authMode: "guest" | "signed_in";
-  accessToken: string;
-  refreshToken: string;
-  provider: "guest" | "google";
-  email?: string | null;
-  displayName?: string | null;
-  avatarUrl?: string | null;
-};
-
-export async function saveSession(session: StoredSession) {
+export async function saveSession(session: PersistedSession) {
   await SecureStore.setItemAsync(SESSION_KEY, JSON.stringify(session));
 }
 
-export async function loadSession(): Promise<StoredSession | null> {
+export async function loadSession(): Promise<PersistedSession | null> {
   const raw = await SecureStore.getItemAsync(SESSION_KEY);
   if (!raw) {
     return null;
   }
 
   try {
-    return JSON.parse(raw) as StoredSession;
+    return JSON.parse(raw) as PersistedSession;
   } catch {
     await SecureStore.deleteItemAsync(SESSION_KEY);
     return null;

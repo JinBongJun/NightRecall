@@ -1,17 +1,9 @@
+import type { PersistedSession, PlanName } from "../types/authModels";
+
 type BootstrapSessionDependencies = {
-  restoreSession: () => Promise<{
-    userId: string;
-    timezone: string;
-    authMode: "guest" | "signed_in";
-    accessToken: string;
-    refreshToken: string;
-    provider: "guest" | "google";
-    email?: string | null;
-    displayName?: string | null;
-    avatarUrl?: string | null;
-  } | null>;
-  fetchPlan: () => Promise<{ plan: "free" | "plus" }>;
-  setPlan: (plan: "free" | "plus") => void;
+  restoreSession: () => Promise<PersistedSession | null>;
+  fetchPlan: () => Promise<{ plan: PlanName }>;
+  setPlan: (plan: PlanName) => void;
   finishBootstrap: () => void;
 };
 

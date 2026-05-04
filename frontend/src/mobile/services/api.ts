@@ -3,6 +3,10 @@ import Constants from "expo-constants";
 
 import { clearPersistedSession, persistSession } from "./authSessionService";
 import { useAuthStore } from "../store/authStore";
+import type { PersistedSession } from "../types/authModels";
+import type { components } from "../types/generated-api";
+
+type RefreshTokenResponse = Pick<components["schemas"]["TokenPair"], "access_token" | "refresh_token">;
 
 const publishSafeFallbackBaseURL = "https://example.invalid/v1";
 const defaultBaseURL = (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ?? publishSafeFallbackBaseURL;
@@ -58,12 +62,9 @@ apiClient.interceptors.response.use(
     originalRequest._retry = true;
 
     try {
-      const refreshResponse = await refreshClient.post("/users/refresh", { refresh_token: auth.refreshToken });
-      const refreshed = refreshResponse.data as {
-        access_token: string;
-        refresh_token: string;
-      };
-      const nextSession = {
+      const refreshResponse = await refreshClient.post<RefreshTokenResponse>("/users/refresh", { refresh_token: auth.refreshToken });
+      const refreshed = refreshResponse.data;
+      const nextSession: PersistedSession = {
         userId: auth.userId,
         timezone: auth.timezone,
         authMode: auth.authMode,
@@ -73,7 +74,7 @@ apiClient.interceptors.response.use(
         email: auth.email,
         displayName: auth.displayName,
         avatarUrl: auth.avatarUrl,
-      } as const;
+      };
       await persistSession(nextSession);
       originalRequest.headers = originalRequest.headers ?? {};
       originalRequest.headers.Authorization = `Bearer ${refreshed.access_token}`;

@@ -1,8 +1,5 @@
 import { create } from "zustand";
-
-type AuthMode = "guest" | "signed_in";
-type PlanName = "free" | "plus";
-type BootstrapStatus = "bootstrapping" | "ready";
+import type { AuthMode, AuthProvider, AuthSession, BootstrapStatus, PlanName, UserProfile } from "../types/authModels";
 
 const defaultAuthState = {
   userId: null,
@@ -12,7 +9,7 @@ const defaultAuthState = {
   timezone: "UTC",
   accessToken: null,
   refreshToken: null,
-  provider: null as "guest" | "google" | null,
+  provider: null as AuthProvider | null,
   email: null,
   displayName: null,
   avatarUrl: null,
@@ -27,24 +24,14 @@ type AuthState = {
   timezone: string;
   accessToken: string | null;
   refreshToken: string | null;
-  provider: "guest" | "google" | null;
+  provider: AuthProvider | null;
   email: string | null;
   displayName: string | null;
   avatarUrl: string | null;
   setPlan: (plan: PlanName) => void;
-  setProfile: (profile: { email?: string | null; displayName?: string | null; avatarUrl?: string | null }) => void;
+  setProfile: (profile: UserProfile) => void;
   finishBootstrap: () => void;
-  setSession: (input: {
-    userId: string;
-    timezone: string;
-    authMode: AuthMode;
-    accessToken: string;
-    refreshToken: string;
-    provider: "guest" | "google";
-    email?: string | null;
-    displayName?: string | null;
-    avatarUrl?: string | null;
-  }) => void;
+  setSession: (input: AuthSession) => void;
   clearSession: () => void;
 };
 

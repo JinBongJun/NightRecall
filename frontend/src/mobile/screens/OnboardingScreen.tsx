@@ -93,17 +93,7 @@ export function OnboardingScreen({ navigation }: Props) {
       return;
     }
 
-    const payload = {
-      userId: session.user.id,
-      timezone,
-      authMode: "guest" as const,
-      accessToken: session.tokens.access_token,
-      refreshToken: session.tokens.refresh_token,
-      provider: "guest" as const,
-      email: session.user.email_nullable ?? null,
-      displayName: session.user.display_name ?? null,
-      avatarUrl: session.user.avatar_url ?? null,
-    };
+    const payload = session;
 
     let notificationsEnabled = false;
     try {
@@ -147,17 +137,7 @@ export function OnboardingScreen({ navigation }: Props) {
       }
 
       const session = await signInWithGoogleIdToken(idToken);
-      const payload = {
-        userId: session.user.id,
-        timezone: session.user.timezone,
-        authMode: "signed_in" as const,
-        accessToken: session.tokens.access_token,
-        refreshToken: session.tokens.refresh_token,
-        provider: "google" as const,
-        email: session.user.email_nullable ?? null,
-        displayName: session.user.display_name ?? null,
-        avatarUrl: session.user.avatar_url ?? null,
-      };
+      const payload = session;
       try {
         await persistSession(payload);
       } catch {

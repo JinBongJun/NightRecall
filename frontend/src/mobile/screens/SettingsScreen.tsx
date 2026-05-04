@@ -248,17 +248,7 @@ export function SettingsScreen({ navigation }: Props) {
       }
 
       const linked = await linkGoogleIdToken(idToken);
-      const payload = {
-        userId: linked.user.id,
-        timezone: linked.user.timezone,
-        authMode: "signed_in" as const,
-        accessToken: linked.tokens.access_token,
-        refreshToken: linked.tokens.refresh_token,
-        provider: "google" as const,
-        email: linked.user.email_nullable ?? null,
-        displayName: linked.user.display_name ?? null,
-        avatarUrl: linked.user.avatar_url ?? null,
-      };
+      const payload = linked;
       try {
         await persistSession(payload);
       } catch {

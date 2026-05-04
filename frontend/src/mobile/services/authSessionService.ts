@@ -3,9 +3,10 @@ import { useReminderStore } from "../store/reminderStore";
 import { useReviewStore } from "../store/reviewStore";
 import { useStatsStore } from "../store/statsStore";
 import { useTopicsStore } from "../store/topicsStore";
-import { clearSessionStorage, loadSession, saveSession, StoredSession } from "./sessionStorage";
+import type { PersistedSession } from "../types/authModels";
+import { clearSessionStorage, loadSession, saveSession } from "./sessionStorage";
 
-export async function persistSession(session: StoredSession) {
+export async function persistSession(session: PersistedSession) {
   useAuthStore.getState().setSession(session);
   await saveSession(session);
 }
