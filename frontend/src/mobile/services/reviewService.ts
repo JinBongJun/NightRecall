@@ -1,13 +1,11 @@
 import { apiClient } from "./api";
 import type {
   AnswerResponse,
-  GeneratedQuestionsResponse,
   Question,
   SavedStudyInputDetail,
   SavedStudyInputsResponse,
   SavedTopicSource,
   Topic,
-  TonightQuestionResponse,
 } from "../types/api";
 import type { components } from "../types/generated-api";
 
@@ -23,6 +21,13 @@ type RawSavedStudyInputDetailResponse = components["schemas"]["SavedStudyInputDe
 type RawSavedStudyInputsResponse = components["schemas"]["SavedStudyInputsResponse"];
 type RawSavedTopicSourceResponse = components["schemas"]["SavedTopicSourceResponse"];
 type RawTonightTopicsResponse = components["schemas"]["TonightTopicsResponse"];
+type TonightQuestionResponse = {
+  mode: "auto" | "picked";
+  question: Question;
+};
+type GeneratedQuestionsResponse = {
+  questions: Question[];
+};
 
 const QUESTION_GENERATION_TIMEOUT_MS = 60000;
 

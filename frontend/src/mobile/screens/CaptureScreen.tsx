@@ -12,10 +12,11 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { fetchUsageLimits } from "../services/usageService";
 import { colors } from "../theme/colors";
-import { UsageLimitsResponse } from "../types/api";
+import type { components } from "../types/generated-api";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Capture">;
+type UsageLimitsResponse = components["schemas"]["UsageLimitsResponse"];
 
 export function CaptureScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);

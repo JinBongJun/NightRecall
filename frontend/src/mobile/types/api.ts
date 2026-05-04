@@ -1,3 +1,5 @@
+// App-facing models used by screens, stores, and service normalization.
+
 export type Topic = {
   id: string;
   text: string;
@@ -48,18 +50,6 @@ export type ExtractedPoint = {
   text: string;
 };
 
-export type StudyInputExtractJobStatus = "queued" | "running" | "succeeded" | "failed";
-
-export type StudyInputExtractJobResponse = {
-  job_id: string;
-  status: StudyInputExtractJobStatus;
-  source_preview?: string | null;
-  points?: ExtractedPoint[] | null;
-  error_message?: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
 export type Question = {
   id: string;
   question_type: "mcq" | "true_false" | "fill_blank";
@@ -71,68 +61,10 @@ export type Question = {
   resurface_reason?: "missed_before" | null;
 };
 
-export type TonightQuestionResponse = {
-  mode: "auto" | "picked";
-  question: Question;
-};
-
-export type GeneratedQuestionsResponse = {
-  questions: Question[];
-};
-
-export type QuestionGenerationJobStatus = "queued" | "running" | "succeeded" | "failed";
-
-export type QuestionGenerationJobResponse = {
-  job_id: string;
-  status: QuestionGenerationJobStatus;
-  questions?: Question[];
-  error_message?: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
 export type AnswerResponse = {
   is_correct: boolean;
   correct_index: number | null;
   correct_text: string | null;
   explanation: string;
   current_streak: number;
-};
-
-export type StatsResponse = {
-  current_streak: number;
-  total_answered: number;
-  correct_count: number;
-  accuracy: number;
-  recent_wrong_topics: string[];
-  answered_today: boolean;
-  answered_dates_this_month: string[];
-};
-
-export type StudyInputExtractResponse = {
-  source_preview: string;
-  points: ExtractedPoint[];
-};
-
-export type StudyInputSourceImageUploadResponse = {
-  source_image_ref: string;
-};
-
-export type UsageLimitInfo = {
-  limit: number;
-  used: number;
-  remaining: number;
-};
-
-export type UsageLimitsResponse = {
-  photo_extract_daily: UsageLimitInfo;
-  question_generation_daily: UsageLimitInfo;
-  question_generation_monthly: UsageLimitInfo;
-};
-
-export type PlanName = "free" | "plus";
-
-export type EntitlementsResponse = {
-  plan: PlanName;
-  billing_enabled: boolean;
 };

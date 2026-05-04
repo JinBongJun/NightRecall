@@ -1,10 +1,7 @@
 import { apiClient } from "./api";
 import type {
+  ExtractedPoint,
   Question,
-  QuestionGenerationJobResponse,
-  StudyInputExtractResponse,
-  StudyInputExtractJobResponse,
-  StudyInputSourceImageUploadResponse,
   Topic,
 } from "../types/api";
 import {
@@ -24,6 +21,32 @@ type RawStudyInputExtractResponse = components["schemas"]["StudyInputExtractResp
 type RawStudyInputExtractJobResponse = components["schemas"]["StudyInputExtractJobResponse"];
 type StudyInputSourceImageUploadRequest = components["schemas"]["StudyInputSourceImageUploadRequest"];
 type RawStudyInputSourceImageUploadResponse = components["schemas"]["StudyInputSourceImageUploadResponse"];
+type StudyInputSourceImageUploadResponse = {
+  source_image_ref: string;
+};
+type StudyInputExtractResponse = {
+  source_preview: string;
+  points: ExtractedPoint[];
+};
+type StudyInputExtractJobStatus = "queued" | "running" | "succeeded" | "failed";
+type StudyInputExtractJobResponse = {
+  job_id: string;
+  status: StudyInputExtractJobStatus;
+  source_preview?: string | null;
+  points?: ExtractedPoint[] | null;
+  error_message?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+type QuestionGenerationJobStatus = "queued" | "running" | "succeeded" | "failed";
+type QuestionGenerationJobResponse = {
+  job_id: string;
+  status: QuestionGenerationJobStatus;
+  questions?: Question[];
+  error_message?: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
 type StudyInputCreateRequest = {
   input_type: "keywords" | "notes";
