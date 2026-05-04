@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { Topic } from "../types/api";
+import { Topic } from "../types/models";
 import { colors } from "../theme/colors";
 
 type Props = {

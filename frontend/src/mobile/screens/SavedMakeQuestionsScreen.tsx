@@ -17,7 +17,7 @@ import {
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
-import { Topic } from "../types/api";
+import { Topic } from "../types/models";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SavedCardDetail">;

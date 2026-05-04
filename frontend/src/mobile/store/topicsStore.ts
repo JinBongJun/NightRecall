@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { SavedStudyInputSummary, Topic } from "../types/api";
+import { SavedStudyInputSummary, Topic } from "../types/models";
 
 type TopicsState = {
   recentTopics: Topic[];

@@ -17,7 +17,7 @@ import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
-import { Topic } from "../types/api";
+import { Topic } from "../types/models";
 import { RootStackParamList } from "../types/navigation";
 import { ReviewDraftPoint } from "../types/reviewDraft";
 import { extractKeyPoints } from "../utils/extractKeyPoints";

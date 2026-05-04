@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { AnswerResponse, Question, Topic } from "../types/api";
+import { AnswerResponse, Question, Topic } from "../types/models";
 
 type ReviewState = {
   sessionQuestions: Question[];

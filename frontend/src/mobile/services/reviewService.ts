@@ -6,7 +6,7 @@ import type {
   SavedStudyInputsResponse,
   SavedTopicSource,
   Topic,
-} from "../types/api";
+} from "../types/models";
 import type { components } from "../types/generated-api";
 
 type AnswerSubmitRequest = components["schemas"]["AnswerSubmitRequest"];

@@ -29,7 +29,7 @@ import { deleteSavedInput, deleteTopic, fetchSavedInputs } from "../services/rev
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
-import { SavedStudyInputSummary, Topic } from "../types/api";
+import { SavedStudyInputSummary, Topic } from "../types/models";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Library">;

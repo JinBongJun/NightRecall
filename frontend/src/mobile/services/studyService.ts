@@ -3,7 +3,7 @@ import type {
   ExtractedPoint,
   Question,
   Topic,
-} from "../types/api";
+} from "../types/models";
 import {
   StudyInputCreateRequestInput_type,
   StudyInputCreateRequestSource_kindAnyOf0,

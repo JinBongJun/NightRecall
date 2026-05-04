@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { Question } from "../types/api";
+import { Question } from "../types/models";
 import { colors } from "../theme/colors";
 
 type Props = {
