@@ -17,6 +17,7 @@ import {
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
+import type { StudyInputType } from "../types/domain";
 import { Topic } from "../types/models";
 import { RootStackParamList } from "../types/navigation";
 
@@ -44,7 +45,7 @@ export function SavedCardDetailScreen({ route, navigation }: Props) {
   const usageLimits = useUsageLimits();
 
   const [loading, setLoading] = useState(true);
-  const [inputType, setInputType] = useState<"keywords" | "notes">("notes");
+  const [inputType, setInputType] = useState<StudyInputType>("notes");
   const [sourcePreviewText, setSourcePreviewText] = useState("");
   const [sourceImageRef, setSourceImageRef] = useState<string | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);

@@ -17,6 +17,7 @@ import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
+import type { StudyInputType } from "../types/domain";
 import { Topic } from "../types/models";
 import { RootStackParamList } from "../types/navigation";
 import { ReviewDraftPoint } from "../types/reviewDraft";
@@ -73,7 +74,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         )
       : toInitialPoints([]),
   );
-  const [savedInputType, setSavedInputType] = useState<"keywords" | "notes">("notes");
+  const [savedInputType, setSavedInputType] = useState<StudyInputType>("notes");
   const [savedSourcePreview, setSavedSourcePreview] = useState("");
   const [savedSourceImageRef, setSavedSourceImageRef] = useState<string | null>(null);
   const [savedTopics, setSavedTopics] = useState<Topic[]>([]);

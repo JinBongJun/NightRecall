@@ -1,6 +1,6 @@
-export type AuthMode = "guest" | "signed_in";
-export type AuthProvider = "guest" | "google";
-export type PlanName = "free" | "plus";
+export type { AuthMode, AuthProvider, PlanName } from "./domain";
+import type { AuthMode, AuthProvider, PlanName } from "./domain";
+
 export type BootstrapStatus = "bootstrapping" | "ready";
 
 export type UserProfile = {

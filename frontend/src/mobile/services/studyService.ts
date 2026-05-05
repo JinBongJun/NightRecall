@@ -4,6 +4,7 @@ import type {
   Question,
   Topic,
 } from "../types/models";
+import type { SourceKind, StudyInputType } from "../types/domain";
 import {
   StudyInputCreateRequestInput_type,
   StudyInputCreateRequestSource_kindAnyOf0,
@@ -49,10 +50,10 @@ type QuestionGenerationJobResponse = {
 };
 
 type StudyInputCreateRequest = {
-  input_type: "keywords" | "notes";
+  input_type: StudyInputType;
   content: string[] | string;
   starred_indices?: number[];
-  source_kind?: "photo" | "manual" | null;
+  source_kind?: SourceKind | null;
   source_preview_text?: string | null;
   source_image_ref?: string | null;
 };
@@ -68,7 +69,7 @@ type StudyInputSourceImageUploadPayload = Omit<StudyInputSourceImageUploadReques
 type StudyInputCreateResult = {
   study_input_id: string;
   topics: Topic[];
-  source_kind?: "photo" | "manual" | null;
+  source_kind?: SourceKind | null;
   source_preview_text?: string | null;
   source_image_ref?: string | null;
 };

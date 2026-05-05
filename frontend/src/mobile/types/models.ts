@@ -1,5 +1,7 @@
 // App-facing models used by screens, stores, and service normalization.
 
+import type { QuestionType, SourceKind, StudyInputType } from "./domain";
+
 export type Topic = {
   id: string;
   text: string;
@@ -10,8 +12,8 @@ export type Topic = {
 export type SavedTopicSource = {
   topic_id: string;
   study_input_id: string;
-  input_type: "keywords" | "notes";
-  source_kind?: "photo" | "manual" | null;
+  input_type: StudyInputType;
+  source_kind?: SourceKind | null;
   source_preview_text?: string | null;
   source_image_ref?: string | null;
   topics: Topic[];
@@ -19,8 +21,8 @@ export type SavedTopicSource = {
 
 export type SavedStudyInputSummary = {
   study_input_id: string;
-  input_type: "keywords" | "notes";
-  source_kind?: "photo" | "manual" | null;
+  input_type: StudyInputType;
+  source_kind?: SourceKind | null;
   source_preview_text?: string | null;
   source_image_ref?: string | null;
   title: string;
@@ -39,8 +41,8 @@ export type SavedStudyInputsResponse = {
 
 export type SavedStudyInputDetail = {
   study_input_id: string;
-  input_type: "keywords" | "notes";
-  source_kind?: "photo" | "manual" | null;
+  input_type: StudyInputType;
+  source_kind?: SourceKind | null;
   source_preview_text?: string | null;
   source_image_ref?: string | null;
   topics: Topic[];
@@ -52,7 +54,7 @@ export type ExtractedPoint = {
 
 export type Question = {
   id: string;
-  question_type: "mcq" | "true_false" | "fill_blank";
+  question_type: QuestionType;
   question_text: string;
   choices: string[] | null;
   answer_index: number | null;

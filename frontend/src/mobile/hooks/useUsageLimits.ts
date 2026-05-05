@@ -2,12 +2,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 
 import { fetchUsageLimits } from "../services/usageService";
-import type { components } from "../types/generated-api";
-
-type UsageLimitsResponse = components["schemas"]["UsageLimitsResponse"];
+import type { UsageLimits } from "../services/usageService";
 
 export function useUsageLimits() {
-  const [usageLimits, setUsageLimits] = useState<UsageLimitsResponse | null>(null);
+  const [usageLimits, setUsageLimits] = useState<UsageLimits | null>(null);
 
   useFocusEffect(
     useCallback(() => {

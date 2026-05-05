@@ -1,3 +1,5 @@
+import type { CaptureMode, ReviewMode } from "./domain";
+
 export type RootStackParamList = {
   Onboarding: undefined;
   Home: undefined;
@@ -5,7 +7,7 @@ export type RootStackParamList = {
   Capture: undefined;
   CaptureNote: undefined;
   Processing: {
-    mode: "photo" | "manual";
+    mode: CaptureMode;
     sourceText: string;
     imageBase64?: string;
     imageUri?: string;
@@ -37,7 +39,7 @@ export type RootStackParamList = {
   EditPoints:
     | {
         variant: "new";
-        mode: "photo" | "manual";
+        mode: CaptureMode;
         sourceText: string;
         extractedPoints?: string[];
         imageUri?: string;
@@ -53,7 +55,7 @@ export type RootStackParamList = {
   QuestionGenerating:
     | {
         variant: "new";
-        mode: "photo" | "manual";
+        mode: CaptureMode;
         sourceText: string;
         points: { id: string; text: string; isStarred: boolean }[];
         selectedQuestionCount: number;
@@ -68,7 +70,7 @@ export type RootStackParamList = {
         selectedQuestionCount: number;
       };
   Library: undefined;
-  Review: { mode?: "auto" | "picked" } | undefined;
+  Review: { mode?: ReviewMode } | undefined;
   Result: undefined;
   Stats: undefined;
   Settings: undefined;

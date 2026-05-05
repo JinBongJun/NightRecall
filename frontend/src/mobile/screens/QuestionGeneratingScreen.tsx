@@ -16,6 +16,8 @@ import {
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
+import type { SourceKind, StudyInputType } from "../types/domain";
+import type { Question } from "../types/models";
 import { RootStackParamList } from "../types/navigation";
 import { asUsageLimitReason } from "../utils/usageLimits";
 import { toStudyInputPayload } from "../utils/reviewDraft";
@@ -130,15 +132,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
     let cancelled = false;
 
     const finishWithQuestions = (
-      questions: Array<{
-        id: string;
-        question_type: "mcq" | "true_false" | "fill_blank";
-        question_text: string;
-        choices: string[] | null;
-        answer_index: number | null;
-        answer_text: string | null;
-        explanation: string;
-      }>,
+      questions: Question[],
     ) => {
       if (!questions.length || cancelled) {
         return;
@@ -160,11 +154,11 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
       let transientStudyInputId: string | null = null;
       let uploadedSourceImageRef: string | null = null;
       let shouldRedactSource = false;
-      let pendingSavedInput:
+        let pendingSavedInput:
         | {
             study_input_id: string;
-            input_type: "keywords" | "notes";
-            source_kind: "photo" | "manual";
+            input_type: StudyInputType;
+            source_kind: SourceKind;
             source_preview_text: string | null;
             title: string;
             preview: string;
@@ -257,15 +251,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             }
           }
           finishWithQuestions(
-            questions as Array<{
-              id: string;
-              question_type: "mcq" | "true_false" | "fill_blank";
-              question_text: string;
-              choices: string[] | null;
-              answer_index: number | null;
-              answer_text: string | null;
-              explanation: string;
-            }>,
+            questions as Question[],
           );
           return;
         }

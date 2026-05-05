@@ -11,16 +11,15 @@ import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { fetchUsageLimits } from "../services/usageService";
+import type { UsageLimits } from "../services/usageService";
 import { colors } from "../theme/colors";
-import type { components } from "../types/generated-api";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Capture">;
-type UsageLimitsResponse = components["schemas"]["UsageLimitsResponse"];
 
 export function CaptureScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
-  const [usageLimits, setUsageLimits] = useState<UsageLimitsResponse | null>(null);
+  const [usageLimits, setUsageLimits] = useState<UsageLimits | null>(null);
   const [selectedImage, setSelectedImage] = useState<{
     label: string;
     base64: string;

@@ -13,12 +13,13 @@ import { useAuthStore } from "../store/authStore";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
+import type { StudyInputType } from "../types/domain";
 import { RootStackParamList } from "../types/navigation";
 import { asUsageLimitReason } from "../utils/usageLimits";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Capture">;
 
-type Tab = "keywords" | "notes";
+type Tab = StudyInputType;
 
 export function AddLearningScreen({ navigation }: Props) {
   const userId = useAuthStore((state) => state.userId);
