@@ -49,5 +49,9 @@ jobs:
         run: npm run typecheck
         working-directory: frontend
 
+      - name: Run frontend tests
+        run: npm test
+        working-directory: frontend
+
       - name: Verify generated artifacts are committed
         run: git diff --exit-code -- api/openapi.json frontend/src/mobile/types/generated-api.ts
