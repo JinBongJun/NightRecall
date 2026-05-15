@@ -28,7 +28,7 @@ export function ScreenHeader({ title, subtitle, iconName }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: 8,
+    gap: 5,
   },
   kickerRow: {
     flexDirection: "row",
@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconBadge: {
-    width: 28,
-    height: 28,
+    width: 22,
+    height: 22,
     borderRadius: 999,
     backgroundColor: colors.primarySoft,
     alignItems: "center",
@@ -47,22 +47,22 @@ const styles = StyleSheet.create({
   },
   kicker: {
     color: colors.mutedSoft,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "800",
-    letterSpacing: 1.2,
+    letterSpacing: 1.05,
     textTransform: "uppercase",
   },
   title: {
     color: colors.primary,
-    fontSize: 32,
-    lineHeight: 38,
+    fontSize: 24,
+    lineHeight: 29,
     fontWeight: "800",
-    letterSpacing: -0.9,
+    letterSpacing: -0.75,
   },
   subtitle: {
     color: colors.muted,
-    fontSize: 16,
-    lineHeight: 24,
-    maxWidth: 320,
+    fontSize: 14,
+    lineHeight: 20,
+    maxWidth: 290,
   },
 });

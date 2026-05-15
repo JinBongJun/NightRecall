@@ -23,17 +23,17 @@ export function EmptyState({ title, body, iconName = "auto-stories" }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    borderRadius: 24,
+    padding: 16,
+    borderRadius: 18,
     backgroundColor: "rgba(255,253,248,0.88)",
-    gap: 10,
+    gap: 7,
     borderWidth: 1,
     borderColor: colors.border,
   },
   iconBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 14,
     backgroundColor: colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
@@ -42,10 +42,11 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text,
     fontWeight: "800",
-    fontSize: 19,
+    fontSize: 16,
   },
   body: {
     color: colors.muted,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
   },
 });

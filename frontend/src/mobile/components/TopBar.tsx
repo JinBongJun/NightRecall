@@ -79,16 +79,16 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
 
 const styles = StyleSheet.create({
   root: {
-    minHeight: 66,
+    minHeight: 58,
   },
   shell: {
-    minHeight: 66,
-    borderRadius: 26,
+    minHeight: 58,
+    borderRadius: 22,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -98,9 +98,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
   },
   iconButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceLow,
@@ -108,12 +108,12 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   iconSpacer: {
-    width: 42,
-    height: 42,
+    width: 38,
+    height: 38,
   },
   centerSection: {
     flex: 1,
-    minHeight: 46,
+    minHeight: 40,
     justifyContent: "center",
     paddingHorizontal: 2,
   },
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.primary,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "800",
     letterSpacing: -0.5,
   },
@@ -161,9 +161,9 @@ const styles = StyleSheet.create({
     letterSpacing: 1.0,
   },
   profileButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceLow,
@@ -171,8 +171,8 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   profileGlyphWrap: {
-    width: 30,
-    height: 30,
+    width: 28,
+    height: 28,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   profileInitial: {
     color: colors.primary,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
   },
 });

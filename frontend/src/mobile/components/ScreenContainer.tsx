@@ -39,7 +39,7 @@ export function ScreenContainer({ children, footer, scrollRef }: Props) {
       >
         <ScrollView
           ref={scrollRef}
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: contentBottomPadding }]}
+          contentContainerStyle={[styles.content, { paddingTop: insets.top + 12, paddingBottom: contentBottomPadding }]}
           style={styles.scroll}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -70,15 +70,15 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   content: {
-    paddingHorizontal: 24,
-    gap: 24,
+    paddingHorizontal: 16,
+    gap: 16,
   },
   footerWrap: {
     position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     backgroundColor: colors.surface,
   },
 });

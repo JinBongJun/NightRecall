@@ -380,44 +380,44 @@ export function LibraryScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   overviewCard: {
     backgroundColor: colors.surface,
-    borderRadius: 28,
-    padding: 20,
-    gap: 14,
+    borderRadius: 20,
+    padding: 14,
+    gap: 10,
     borderWidth: 1,
     borderColor: colors.border,
   },
   summaryRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: 6,
   },
   summaryPill: {
     flex: 1,
     backgroundColor: colors.surfaceLow,
-    borderRadius: 20,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 9,
     gap: 4,
   },
   summaryValue: {
     color: colors.primary,
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "800",
   },
   summaryLabel: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: 0.7,
   },
   heroMeta: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 12,
+    lineHeight: 17,
     fontWeight: "700",
   },
   section: {
-    gap: 14,
+    gap: 10,
   },
   syncingText: {
     color: colors.primary,
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "700",
   },
   loadMoreButton: {
