@@ -120,24 +120,14 @@ export function CaptureScreen({ navigation }: Props) {
 
       <ScreenHeader
         iconName="add-photo-alternate"
-        title="Capture today's learning"
-        subtitle="Import notes, slides, photos, or quick ideas to prepare tonight's question."
+        title="Capture learning"
+        subtitle={`${questionGenerationsRemaining} questions · ${photoReadsRemaining ?? 3} photo reads left tonight`}
       />
 
-      <View style={styles.limitStrip}>
-        <View style={styles.limitStat}>
-          <Text style={styles.limitValue}>{questionGenerationsRemaining}</Text>
-          <Text style={styles.limitLabel}>Questions left</Text>
-        </View>
-        <View style={styles.limitDivider} />
-        <View style={styles.limitStat}>
-          <Text style={styles.limitValue}>{photoReadsRemaining ?? 3}</Text>
-          <Text style={styles.limitLabel}>Photo reads left</Text>
-        </View>
-      </View>
-
       <SectionRow title="Quick capture" iconName="photo-camera" />
-      {photoLimitCopy ? <Text style={[styles.limitNote, photoReadsLocked && styles.limitNoteLocked]}>{photoLimitCopy}</Text> : null}
+      {photoLimitCopy && photoReadsLocked ? (
+        <Text style={[styles.limitNote, styles.limitNoteLocked]}>{photoLimitCopy}</Text>
+      ) : null}
       <View style={styles.actions}>
         <Pressable
           disabled={loading || photoReadsLocked}
@@ -149,13 +139,8 @@ export function CaptureScreen({ navigation }: Props) {
           ]}
           onPress={() => void handlePhoto("camera")}
         >
-          <View style={styles.actionIconTile}>
-            <MaterialIcons name="photo-camera" size={34} color="#FFFFFF" />
-          </View>
-          <View style={styles.actionCopy}>
-            <Text style={styles.actionTitle}>Take photo</Text>
-            <Text style={styles.actionSubtitle}>Capture from camera</Text>
-          </View>
+          <MaterialIcons name="photo-camera" size={28} color="#FFFFFF" />
+          <Text style={styles.actionTitle}>Camera</Text>
         </Pressable>
 
         <Pressable
@@ -168,27 +153,21 @@ export function CaptureScreen({ navigation }: Props) {
           ]}
           onPress={() => void handlePhoto("gallery")}
         >
-          <View style={styles.actionIconTile}>
-            <MaterialIcons name="image" size={34} color="#FFFFFF" />
-          </View>
-          <View style={styles.actionCopy}>
-            <Text style={styles.actionTitle}>Gallery</Text>
-            <Text style={styles.actionSubtitle}>Choose an image</Text>
-          </View>
+          <MaterialIcons name="image" size={28} color="#FFFFFF" />
+          <Text style={styles.actionTitle}>Gallery</Text>
         </Pressable>
       </View>
 
       <SectionRow title="Write instead" iconName="edit-note" />
       <Pressable style={({ pressed }) => [styles.writeEntryCard, pressed && styles.actionPressed]} onPress={() => navigation.navigate("CaptureNote")}>
-        <View style={styles.writeEntryIconTile}>
-          <MaterialIcons name="edit-note" size={34} color={colors.primary} />
-        </View>
+        <MaterialIcons name="edit-note" size={24} color={colors.primary} />
         <View style={styles.writeEntryCopy}>
-          <Text style={styles.writeEntryTitle}>Write it down</Text>
-          <Text style={styles.writeEntrySubtitle} numberOfLines={2}>
-            Open a dedicated note screen, then extract the useful point.
+          <Text style={styles.writeEntryTitle}>Write a note</Text>
+          <Text style={styles.writeEntrySubtitle} numberOfLines={1}>
+            Type instead of a photo
           </Text>
         </View>
+        <MaterialIcons name="chevron-right" size={22} color={colors.mutedSoft} />
       </Pressable>
 
       {selectedImage ? (
@@ -238,43 +217,13 @@ export function CaptureScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
-    gap: 12,
-  },
-  limitStrip: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.surfaceLow,
-    borderRadius: 22,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: "rgba(192,200,199,0.18)",
-  },
-  limitStat: {
-    flex: 1,
-    alignItems: "center",
-    gap: 4,
-  },
-  limitValue: {
-    color: colors.primary,
-    fontSize: 22,
-    fontWeight: "800",
-  },
-  limitLabel: {
-    color: colors.muted,
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  limitDivider: {
-    width: 1,
-    height: 36,
-    backgroundColor: colors.line,
+    gap: 10,
   },
   limitNote: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: -4,
+    marginBottom: 4,
     color: colors.muted,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
   },
   limitNoteLocked: {
@@ -282,18 +231,18 @@ const styles = StyleSheet.create({
   },
   actionHero: {
     flex: 1,
-    minHeight: 146,
-    borderRadius: 30,
-    paddingHorizontal: 18,
-    paddingVertical: 18,
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 14,
+    minHeight: 96,
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
     overflow: "hidden",
     shadowColor: colors.shadow,
-    shadowOpacity: 0.08,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
   },
   actionDisabled: {
     opacity: 0.45,
@@ -304,76 +253,45 @@ const styles = StyleSheet.create({
   actionHeroGallery: {
     backgroundColor: colors.primaryContainer,
   },
-  actionIconTile: {
-    width: 58,
-    height: 58,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.14)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  actionCopy: {
-    gap: 5,
-  },
   actionTitle: {
     color: "#FFFFFF",
-    fontSize: 21,
+    fontSize: 15,
     fontWeight: "800",
   },
-  actionSubtitle: {
-    color: "rgba(255,255,255,0.78)",
-    fontSize: 14,
-    lineHeight: 20,
-    maxWidth: 140,
-  },
   writeEntryCard: {
-    borderRadius: 28,
-    backgroundColor: "rgba(255,253,248,0.94)",
-    paddingHorizontal: 22,
-    paddingVertical: 20,
+    borderRadius: 18,
+    backgroundColor: colors.surface,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     flexDirection: "row",
-    gap: 16,
+    gap: 12,
     alignItems: "center",
-    overflow: "hidden",
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.04,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
   },
   writeEntryCopy: {
     flex: 1,
-    gap: 6,
+    gap: 2,
     minWidth: 0,
   },
-  writeEntryIconTile: {
-    width: 64,
-    height: 64,
-    borderRadius: 22,
-    backgroundColor: colors.surfaceLow,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   writeEntryTitle: {
-    color: colors.primary,
-    fontSize: 21,
+    color: colors.text,
+    fontSize: 15,
     fontWeight: "800",
   },
   writeEntrySubtitle: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 12,
     flexShrink: 1,
   },
   previewSection: {
     gap: 12,
   },
   previewCard: {
-    backgroundColor: "rgba(255,253,248,0.94)",
-    borderRadius: 24,
-    padding: 20,
-    gap: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 14,
+    gap: 12,
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: colors.shadow,
@@ -411,8 +329,8 @@ const styles = StyleSheet.create({
   },
   previewImage: {
     width: "100%",
-    height: 220,
-    borderRadius: 18,
+    height: 160,
+    borderRadius: 14,
     backgroundColor: colors.surfaceLow,
   },
   previewCopy: {
@@ -429,8 +347,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   extractButton: {
-    minHeight: 58,
-    borderRadius: 22,
+    minHeight: 48,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.primaryContainer,
@@ -445,12 +363,12 @@ const styles = StyleSheet.create({
   },
   extractButtonText: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "800",
   },
   ctaPlaceholder: {
-    minHeight: 58,
-    borderRadius: 20,
+    minHeight: 48,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 18,
@@ -460,7 +378,7 @@ const styles = StyleSheet.create({
   },
   ctaPlaceholderText: {
     color: colors.muted,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "700",
     textAlign: "center",
   },

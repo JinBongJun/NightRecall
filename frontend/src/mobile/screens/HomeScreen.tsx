@@ -5,7 +5,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { BottomDock } from "../components/BottomDock";
-import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useTonightQuestion } from "../hooks/useTonightQuestion";
@@ -15,6 +14,7 @@ import { useReminderStore } from "../store/reminderStore";
 import { useReviewStore } from "../store/reviewStore";
 import { useStatsStore } from "../store/statsStore";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
@@ -31,7 +31,6 @@ export function HomeScreen({ navigation }: Props) {
   const setStats = useStatsStore((state) => state.setStats);
 
   const heroAnim = useRef(new Animated.Value(0)).current;
-  const cardsAnim = useRef(new Animated.Value(0)).current;
 
   useFocusEffect(
     useCallback(() => {
@@ -64,21 +63,12 @@ export function HomeScreen({ navigation }: Props) {
 
   useEffect(() => {
     heroAnim.setValue(0);
-    cardsAnim.setValue(0);
-
-    Animated.stagger(90, [
-      Animated.timing(heroAnim, {
-        toValue: 1,
-        duration: 420,
-        useNativeDriver: true,
-      }),
-      Animated.timing(cardsAnim, {
-        toValue: 1,
-        duration: 360,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [cardsAnim, heroAnim]);
+    Animated.timing(heroAnim, {
+      toValue: 1,
+      duration: 360,
+      useNativeDriver: true,
+    }).start();
+  }, [heroAnim]);
 
   const queuedQuestionCount =
     sessionSource === "local"
@@ -95,7 +85,7 @@ export function HomeScreen({ navigation }: Props) {
   const todayLabel = useMemo(
     () =>
       new Intl.DateTimeFormat("en-US", {
-        month: "long",
+        month: "short",
         day: "numeric",
       }).format(new Date()),
     [],
@@ -103,40 +93,40 @@ export function HomeScreen({ navigation }: Props) {
 
   const tonightState = currentQuestion
     ? {
-        eyebrow: "Tonight is ready",
-        title: "Start your recall while it is still fresh",
+        eyebrow: "Ready",
+        title: "Start tonight's recall",
         body:
           queuedQuestionCount > 1
-            ? `${queuedQuestionCount} questions are queued. Start with the first one and keep the streak moving.`
-            : "Take 20 seconds before sleep and pull it back.",
+            ? `${queuedQuestionCount} questions queued.`
+            : "Pull it back before sleep.",
         primaryLabel: "Start recall",
         primaryAction: () => navigation.navigate("Review", { mode: "auto" }),
-        secondaryLabel: remainingQuestionsTonight > 0 ? "Create another question" : null,
-        secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Create") : null,
+        secondaryLabel: remainingQuestionsTonight > 0 ? "Add question" : null,
+        secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Capture") : null,
       }
     : answeredToday
       ? {
-          eyebrow: "Tonight complete",
-          title: "You already finished tonight's recall",
-          body: "Your nightly review is done. You can stop here or make one more prompt for tomorrow.",
+          eyebrow: "Done",
+          title: "Tonight's recall is complete",
+          body: "Come back tomorrow, or add one more question.",
           primaryLabel: null,
           primaryAction: null,
-          secondaryLabel: remainingQuestionsTonight > 0 ? "Create another question" : null,
-          secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Create") : null,
+          secondaryLabel: remainingQuestionsTonight > 0 ? "Add question" : null,
+          secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Capture") : null,
         }
       : {
-          eyebrow: "Prepare tonight",
-          title: "Make your next question before the day fades",
-          body: "Start with a photo, note, or saved learning and turn it into a single focused recall.",
-          primaryLabel: "Create tonight's question",
-          primaryAction: () => navigation.navigate("Create"),
-          secondaryLabel: "Use saved learning",
+          eyebrow: "Tonight",
+          title: "Make a question for tonight",
+          body: "Photo, note, or saved learning — one focused recall.",
+          primaryLabel: "Create question",
+          primaryAction: () => navigation.navigate("Capture"),
+          secondaryLabel: "Saved learning",
           secondaryAction: () => navigation.navigate("Library"),
         };
 
   return (
     <ScreenContainer footer={<BottomDock active="Home" navigation={navigation} />}>
-        <TopBar
+      <TopBar
         leftIcon="settings"
         onLeftPress={() => navigation.navigate("Settings")}
         rightIcon="account-circle"
@@ -145,171 +135,103 @@ export function HomeScreen({ navigation }: Props) {
 
       <Animated.View
         style={[
-          styles.headerSection,
+          styles.tonightCard,
           {
             opacity: heroAnim,
             transform: [
               {
                 translateY: heroAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [24, 0],
+                  outputRange: [16, 0],
                 }),
               },
             ],
           },
         ]}
       >
-        <View style={styles.welcomeCard}>
-          <View style={styles.welcomeCopy}>
-            <Text style={styles.dateLabel}>{todayLabel}</Text>
-            <Text style={styles.welcomeTitle}>Keep tonight clear.</Text>
-            <Text style={styles.welcomeSubtitle}>One prompt, one recall, one steady habit before sleep.</Text>
-          </View>
-
+        <View style={styles.cardTop}>
+          <Text style={styles.dateLabel}>{todayLabel}</Text>
           <View style={styles.reminderRow}>
-            <MaterialIcons name="schedule" size={16} color={colors.primary} />
-            <Text style={styles.reminderText}>Reminder at {reminderTime}</Text>
+            <MaterialIcons name="schedule" size={14} color={colors.primary} />
+            <Text style={styles.reminderText}>{reminderTime}</Text>
           </View>
-
-          <View style={styles.summaryStrip}>
-            <View style={styles.summaryStat}>
-              <Text style={styles.summaryValue}>{remainingQuestionsTonight}</Text>
-              <Text style={styles.summaryText}>Questions left</Text>
-            </View>
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryStat}>
-              <Text style={styles.summaryValue}>{remainingPhotoReadsTonight}</Text>
-              <Text style={styles.summaryText}>Photo reads left</Text>
-            </View>
-            <View style={styles.summaryDivider} />
-            <View style={styles.summaryStat}>
-              <Text style={styles.summaryValue}>{queuedQuestionCount}</Text>
-              <Text style={styles.summaryText}>Ready now</Text>
-            </View>
-          </View>
-
-          <Text style={styles.summarySubtext}>{streak}-day streak still active</Text>
         </View>
-      </Animated.View>
 
-      <Animated.View
-        style={[
-          styles.contentStack,
-          {
-            opacity: cardsAnim,
-            transform: [
-              {
-                translateY: cardsAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [12, 0],
-                }),
-              },
-            ],
-          },
-        ]}
-      >
-        <SectionRow title="Tonight" iconName="bedtime" />
-
-        <View style={styles.tonightCard}>
-          <View style={styles.tonightCardHeader}>
-            <View style={styles.tonightIconWrap}>
-              <MaterialIcons name="psychology" size={24} color={colors.primary} />
-            </View>
-            <View style={styles.tonightCopy}>
-              <Text style={styles.tonightEyebrow}>{tonightState.eyebrow}</Text>
-              <Text style={styles.tonightTitle}>{tonightState.title}</Text>
-              <Text style={styles.tonightBody}>{tonightState.body}</Text>
-            </View>
+        <View style={styles.summaryStrip}>
+          <View style={styles.summaryStat}>
+            <Text style={styles.summaryValue}>{remainingQuestionsTonight}</Text>
+            <Text style={styles.summaryText}>Questions</Text>
           </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryStat}>
+            <Text style={styles.summaryValue}>{remainingPhotoReadsTonight}</Text>
+            <Text style={styles.summaryText}>Photos</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryStat}>
+            <Text style={styles.summaryValue}>{queuedQuestionCount}</Text>
+            <Text style={styles.summaryText}>Ready</Text>
+          </View>
+        </View>
 
-          {tonightState.primaryLabel && tonightState.primaryAction ? (
-            <View style={styles.heroActions}>
-              <Pressable style={styles.heroPrimaryButton} onPress={tonightState.primaryAction}>
-                <Text style={styles.heroPrimaryText}>{tonightState.primaryLabel}</Text>
-                <MaterialIcons name="arrow-forward" size={18} color="#FFFFFF" />
+        <Text style={styles.streakText}>{streak}-day streak</Text>
+
+        <View style={styles.tonightCopy}>
+          <Text style={styles.tonightEyebrow}>{tonightState.eyebrow}</Text>
+          <Text style={styles.tonightTitle}>{tonightState.title}</Text>
+          <Text style={styles.tonightBody}>{tonightState.body}</Text>
+        </View>
+
+        {tonightState.primaryLabel && tonightState.primaryAction ? (
+          <View style={styles.heroActions}>
+            <Pressable style={styles.heroPrimaryButton} onPress={tonightState.primaryAction}>
+              <Text style={styles.heroPrimaryText}>{tonightState.primaryLabel}</Text>
+              <MaterialIcons name="arrow-forward" size={16} color="#FFFFFF" />
+            </Pressable>
+
+            {tonightState.secondaryLabel && tonightState.secondaryAction ? (
+              <Pressable style={styles.heroSecondaryButton} onPress={tonightState.secondaryAction}>
+                <Text style={styles.heroSecondaryText}>{tonightState.secondaryLabel}</Text>
               </Pressable>
-
-              {tonightState.secondaryLabel && tonightState.secondaryAction ? (
-                <Pressable style={styles.heroSecondaryButton} onPress={tonightState.secondaryAction}>
-                  <Text style={styles.heroSecondaryText}>{tonightState.secondaryLabel}</Text>
-                </Pressable>
-              ) : null}
-            </View>
-          ) : null}
-        </View>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.scheduleCard,
-            remainingQuestionsTonight === 0 && styles.scheduleCardDisabled,
-            pressed && remainingQuestionsTonight > 0 && styles.cardPressed,
-          ]}
-          onPress={() => {
-            if (remainingQuestionsTonight === 0) {
-              return;
-            }
-            navigation.navigate("Create");
-          }}
-          disabled={remainingQuestionsTonight === 0}
-        >
-          <View style={styles.scheduleImageStub}>
-            <MaterialIcons name="add-photo-alternate" size={32} color="#FFFFFF" />
+            ) : null}
           </View>
-          <View style={styles.scheduleCopy}>
-            <Text style={styles.scheduleTitle}>Create another prompt for tonight</Text>
-            <Text style={styles.scheduleBody}>Capture a note or photo and turn it into one clean question.</Text>
-            <Text style={styles.scheduleMeta}>
-              {remainingQuestionsTonight === 0
-                ? "Tonight's questions are full"
-                : `${remainingQuestionsTonight} question${remainingQuestionsTonight === 1 ? "" : "s"} left tonight`}
-            </Text>
-          </View>
-        </Pressable>
+        ) : tonightState.secondaryLabel && tonightState.secondaryAction ? (
+          <Pressable style={styles.heroPrimaryButton} onPress={tonightState.secondaryAction}>
+            <Text style={styles.heroPrimaryText}>{tonightState.secondaryLabel}</Text>
+          </Pressable>
+        ) : null}
       </Animated.View>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  headerSection: {
-    marginBottom: 4,
-  },
-  welcomeCard: {
+  tonightCard: {
     backgroundColor: colors.surface,
-    borderRadius: 22,
-    padding: 14,
-    gap: 10,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    gap: theme.spacing.sm,
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: colors.shadow,
     shadowOpacity: 0.04,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
   },
-  welcomeCopy: {
-    gap: 4,
+  cardTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   dateLabel: {
     color: colors.mutedSoft,
     fontSize: 12,
     fontWeight: "700",
   },
-  welcomeTitle: {
-    color: colors.text,
-    fontSize: 23,
-    lineHeight: 28,
-    fontWeight: "800",
-    letterSpacing: -0.65,
-  },
-  welcomeSubtitle: {
-    color: colors.muted,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   reminderRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 4,
   },
   reminderText: {
     color: colors.primary,
@@ -320,75 +242,51 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.surfaceLow,
-    borderRadius: 16,
-    paddingVertical: 9,
-    paddingHorizontal: 7,
+    borderRadius: theme.radius.md,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
   },
   summaryStat: {
     flex: 1,
     alignItems: "center",
-    gap: 4,
+    gap: 2,
   },
   summaryValue: {
     color: colors.primary,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "800",
   },
   summaryText: {
     color: colors.muted,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
   },
   summaryDivider: {
     width: 1,
-    height: 32,
+    height: 26,
     backgroundColor: colors.line,
   },
-  summarySubtext: {
+  streakText: {
     color: colors.mutedSoft,
     fontSize: 11,
     fontWeight: "700",
     textAlign: "center",
   },
-  contentStack: {
-    gap: 12,
-  },
-  tonightCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tonightCardHeader: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "flex-start",
-  },
-  tonightIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: colors.surfaceLow,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   tonightCopy: {
-    flex: 1,
-    gap: 4,
+    gap: 3,
+    paddingTop: 2,
   },
   tonightEyebrow: {
     color: colors.mutedSoft,
     fontSize: 10,
     fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 1,
+    letterSpacing: 0.8,
   },
   tonightTitle: {
     color: colors.text,
     fontSize: 18,
-    lineHeight: 23,
+    lineHeight: 22,
     fontWeight: "800",
   },
   tonightBody: {
@@ -397,29 +295,30 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   heroActions: {
-    gap: 10,
+    gap: 8,
+    paddingTop: 4,
   },
   heroPrimaryButton: {
     minHeight: 44,
     backgroundColor: colors.primary,
-    borderRadius: 16,
+    borderRadius: theme.radius.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    paddingHorizontal: 20,
+    gap: 8,
+    paddingHorizontal: 16,
   },
   heroPrimaryText: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "800",
   },
   heroSecondaryButton: {
-    minHeight: 42,
-    borderRadius: 16,
+    minHeight: 40,
+    borderRadius: theme.radius.md,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     backgroundColor: colors.surfaceLow,
     borderWidth: 1,
     borderColor: colors.border,
@@ -427,51 +326,6 @@ const styles = StyleSheet.create({
   heroSecondaryText: {
     color: colors.primary,
     fontSize: 13,
-    fontWeight: "700",
-  },
-  cardPressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.992 }],
-  },
-  scheduleCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: "hidden",
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.04,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-  },
-  scheduleCardDisabled: {
-    opacity: 0.68,
-  },
-  scheduleImageStub: {
-    height: 96,
-    backgroundColor: colors.primaryContainer,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scheduleCopy: {
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    gap: 4,
-  },
-  scheduleTitle: {
-    color: colors.text,
-    fontSize: 17,
-    lineHeight: 21,
-    fontWeight: "800",
-  },
-  scheduleBody: {
-    color: colors.muted,
-    fontSize: 12,
-    lineHeight: 17,
-  },
-  scheduleMeta: {
-    color: colors.tertiary,
-    fontSize: 12,
     fontWeight: "700",
   },
 });

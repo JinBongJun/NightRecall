@@ -151,11 +151,6 @@ export function ReviewScreen({ navigation }: Props) {
           </Text>
         </View>
         <Text style={styles.questionText}>{currentQuestion.question_text}</Text>
-        <Text style={styles.questionPrompt}>
-          {currentQuestion.question_type === "fill_blank"
-            ? "Type the answer you remember."
-            : "Choose the best answer."}
-        </Text>
 
         {currentQuestion.question_type === "fill_blank" ? (
           <>
@@ -193,9 +188,9 @@ export function ReviewScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   statusCard: {
     backgroundColor: colors.surface,
-    borderRadius: 24,
-    padding: 20,
-    gap: 16,
+    borderRadius: 18,
+    padding: 14,
+    gap: 10,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -217,14 +212,14 @@ const styles = StyleSheet.create({
   },
   statusTitle: {
     color: colors.text,
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 17,
+    lineHeight: 22,
     fontWeight: "800",
   },
   statusIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     backgroundColor: colors.surfaceLow,
     alignItems: "center",
     justifyContent: "center",
@@ -264,16 +259,12 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   questionCard: {
-    backgroundColor: "rgba(255,253,248,0.96)",
-    borderRadius: 28,
-    padding: 24,
-    gap: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 14,
+    gap: 12,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.04,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 8 },
   },
   questionMeta: {
     alignSelf: "flex-start",
@@ -291,23 +282,17 @@ const styles = StyleSheet.create({
   },
   questionText: {
     color: colors.primary,
-    fontSize: 30,
-    lineHeight: 38,
+    fontSize: 22,
+    lineHeight: 28,
     fontWeight: "800",
   },
-  questionPrompt: {
-    color: colors.muted,
-    fontSize: 14,
-    lineHeight: 21,
-    fontWeight: "600",
-  },
   textArea: {
-    minHeight: 160,
+    minHeight: 120,
     paddingHorizontal: 0,
-    paddingTop: 8,
-    paddingBottom: 12,
-    fontSize: 20,
-    lineHeight: 30,
+    paddingTop: 6,
+    paddingBottom: 10,
+    fontSize: 17,
+    lineHeight: 24,
     color: colors.text,
     borderBottomWidth: 2,
     borderBottomColor: colors.surfaceHigh,

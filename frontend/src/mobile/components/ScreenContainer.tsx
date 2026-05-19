@@ -2,6 +2,7 @@ import { PropsWithChildren, ReactNode, RefObject, useEffect, useState } from "re
 import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { BOTTOM_DOCK_HEIGHT, theme } from "../theme";
 import { colors } from "../theme/colors";
 
 type Props = PropsWithChildren<{
@@ -27,9 +28,9 @@ export function ScreenContainer({ children, footer, scrollRef }: Props) {
 
   const contentBottomPadding = footer
     ? keyboardVisible
-      ? insets.bottom + 32
-      : insets.bottom + 156
-    : insets.bottom + 104;
+      ? insets.bottom + theme.spacing.lg
+      : insets.bottom + BOTTOM_DOCK_HEIGHT + theme.spacing.lg
+    : insets.bottom + theme.spacing.xl;
 
   return (
     <View style={styles.container}>
@@ -39,7 +40,7 @@ export function ScreenContainer({ children, footer, scrollRef }: Props) {
       >
         <ScrollView
           ref={scrollRef}
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + 12, paddingBottom: contentBottomPadding }]}
+          contentContainerStyle={[styles.content, { paddingTop: insets.top + theme.spacing.sm, paddingBottom: contentBottomPadding }]}
           style={styles.scroll}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -70,8 +71,8 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   content: {
-    paddingHorizontal: 16,
-    gap: 16,
+    paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.md,
   },
   footerWrap: {
     position: "absolute",

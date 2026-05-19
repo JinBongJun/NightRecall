@@ -2,6 +2,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { theme } from "../theme";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 
@@ -18,6 +19,18 @@ const tabs: Array<{ key: TabKey; label: string; icon: keyof typeof MaterialIcons
   { key: "Library", label: "Library", icon: "auto-stories" },
 ];
 
+function navigateTab(navigation: NavigationProp<RootStackParamList>, key: TabKey) {
+  if (key === "Create") {
+    navigation.navigate("Capture");
+    return;
+  }
+  if (key === "Library") {
+    navigation.navigate("Library");
+    return;
+  }
+  navigation.navigate("Home");
+}
+
 export function BottomDock({ active, navigation }: Props) {
   return (
     <View style={styles.wrap}>
@@ -27,10 +40,10 @@ export function BottomDock({ active, navigation }: Props) {
           <Pressable
             key={tab.key}
             style={styles.itemFrame}
-            onPress={() => navigation.navigate(tab.key)}
+            onPress={() => navigateTab(navigation, tab.key)}
           >
             <View style={[styles.item, selected && styles.itemActive]}>
-              <MaterialIcons name={tab.icon} size={22} color={selected ? "#FFFFFF" : colors.mutedSoft} />
+              <MaterialIcons name={tab.icon} size={20} color={selected ? "#FFFFFF" : colors.mutedSoft} />
               <Text style={[styles.label, selected && styles.labelActive]}>{tab.label}</Text>
             </View>
           </Pressable>
@@ -45,12 +58,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: "rgba(15,76,63,0.08)",
     paddingHorizontal: 8,
-    paddingTop: 10,
+    paddingTop: 8,
     paddingBottom: 4,
   },
   itemFrame: {
@@ -59,26 +72,26 @@ const styles = StyleSheet.create({
   },
   item: {
     width: "100%",
-    maxWidth: 110,
-    borderRadius: 18,
-    minHeight: 56,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    maxWidth: 108,
+    borderRadius: theme.radius.md,
+    minHeight: 48,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     alignItems: "center",
     justifyContent: "center",
-    gap: 5,
+    gap: 4,
   },
   itemActive: {
-    backgroundColor: colors.surfaceLow,
+    backgroundColor: colors.primary,
   },
   label: {
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.9,
+    letterSpacing: 0.8,
   },
   labelActive: {
-    color: colors.primary,
+    color: "#FFFFFF",
   },
 });

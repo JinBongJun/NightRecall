@@ -2,12 +2,12 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { CenteredHeroCard } from "../components/CenteredHeroCard";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Create">;
@@ -15,7 +15,6 @@ type Props = NativeStackScreenProps<RootStackParamList, "Create">;
 export function CreateScreen({ navigation }: Props) {
   const usageLimits = useUsageLimits();
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
-  const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
 
   return (
     <ScreenContainer>
@@ -29,52 +28,57 @@ export function CreateScreen({ navigation }: Props) {
       <ScreenHeader
         iconName="route"
         title="Create tonight's question"
-        subtitle="Start with something new, or use saved learning from your library."
-      />
-
-      <CenteredHeroCard
-        badgeLabel="Tonight"
-        title="Tonight overview"
-        body={`${remainingQuestionsTonight} questions left, ${remainingPhotoReadsTonight} photo reads left tonight.`}
-        tone="neutral"
-        iconName="schedule"
+        subtitle={
+          remainingQuestionsTonight > 0
+            ? `${remainingQuestionsTonight} question${remainingQuestionsTonight === 1 ? "" : "s"} left tonight.`
+            : "Tonight's question limit is full."
+        }
       />
 
       <Pressable
-        style={({ pressed }) => [styles.optionCard, styles.optionCardPrimary, remainingQuestionsTonight === 0 && styles.optionDisabled, pressed && remainingQuestionsTonight > 0 && styles.optionPressed]}
+        style={({ pressed }) => [
+          styles.optionCard,
+          styles.optionCardPrimary,
+          remainingQuestionsTonight === 0 && styles.optionDisabled,
+          pressed && remainingQuestionsTonight > 0 && styles.optionPressed,
+        ]}
         onPress={() => {
           if (remainingQuestionsTonight === 0) return;
           navigation.navigate("Capture");
         }}
         disabled={remainingQuestionsTonight === 0}
       >
-        <View style={styles.optionGlow} />
-        <View style={styles.optionOrbit} />
         <View style={styles.optionIconTile}>
-          <MaterialIcons name="add-photo-alternate" size={28} color="#FFFFFF" />
+          <MaterialIcons name="add-photo-alternate" size={24} color="#FFFFFF" />
         </View>
         <View style={styles.optionCopy}>
-          <Text style={styles.optionTitleLight}>Start from new input</Text>
-          <Text style={styles.optionBodyLight}>Take a photo or write a note, then turn it into tonight&apos;s questions.</Text>
+          <Text style={styles.optionTitleLight}>New input</Text>
+          <Text style={styles.optionBodyLight}>Photo or note</Text>
         </View>
+        <MaterialIcons name="chevron-right" size={22} color="rgba(255,255,255,0.7)" />
       </Pressable>
 
       <Pressable
-        style={({ pressed }) => [styles.optionCard, styles.optionCardSecondary, remainingQuestionsTonight === 0 && styles.optionDisabled, pressed && remainingQuestionsTonight > 0 && styles.optionPressed]}
+        style={({ pressed }) => [
+          styles.optionCard,
+          styles.optionCardSecondary,
+          remainingQuestionsTonight === 0 && styles.optionDisabled,
+          pressed && remainingQuestionsTonight > 0 && styles.optionPressed,
+        ]}
         onPress={() => {
           if (remainingQuestionsTonight === 0) return;
           navigation.navigate("Library");
         }}
         disabled={remainingQuestionsTonight === 0}
       >
-        <View style={styles.optionOrbitSoft} />
         <View style={[styles.optionIconTile, styles.optionIconTileSecondary]}>
-          <MaterialIcons name="auto-stories" size={28} color={colors.primary} />
+          <MaterialIcons name="auto-stories" size={24} color={colors.primary} />
         </View>
         <View style={styles.optionCopy}>
-          <Text style={styles.optionTitleDark}>Use saved learning</Text>
-          <Text style={styles.optionBodyDark}>Pick something you saved before and shape one fresh question from it.</Text>
+          <Text style={styles.optionTitleDark}>Saved learning</Text>
+          <Text style={styles.optionBodyDark}>From your library</Text>
         </View>
+        <MaterialIcons name="chevron-right" size={22} color={colors.mutedSoft} />
       </Pressable>
     </ScreenContainer>
   );
@@ -82,91 +86,53 @@ export function CreateScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   optionCard: {
-    borderRadius: 22,
-    padding: 16,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
-    overflow: "hidden",
-    minHeight: 138,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 12 },
+    minHeight: 72,
   },
   optionCardPrimary: {
     backgroundColor: colors.primary,
   },
   optionCardSecondary: {
-    backgroundColor: "rgba(255,253,248,0.94)",
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  optionGlow: {
-    position: "absolute",
-    top: -60,
-    width: 220,
-    height: 170,
-    borderRadius: 999,
-    backgroundColor: "rgba(255,248,236,0.12)",
-  },
-  optionOrbit: {
-    position: "absolute",
-    right: -52,
-    bottom: -72,
-    width: 180,
-    height: 180,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.14)",
-  },
-  optionOrbitSoft: {
-    position: "absolute",
-    right: -46,
-    top: -34,
-    width: 160,
-    height: 160,
-    borderRadius: 999,
-    backgroundColor: "rgba(213,230,220,0.18)",
-  },
   optionIconTile: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.md,
     backgroundColor: "rgba(255,255,255,0.14)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.18)",
     alignItems: "center",
     justifyContent: "center",
   },
   optionIconTileSecondary: {
     backgroundColor: colors.surfaceLow,
-    borderColor: "rgba(18,67,67,0.08)",
   },
   optionCopy: {
-    gap: 6,
+    flex: 1,
+    gap: 2,
   },
   optionTitleLight: {
     color: "#FFFFFF",
-    fontSize: 19,
-    lineHeight: 24,
+    fontSize: 16,
     fontWeight: "800",
-    letterSpacing: -0.65,
   },
   optionBodyLight: {
-    color: "rgba(255,255,255,0.78)",
-    fontSize: 13,
-    lineHeight: 18,
+    color: "rgba(255,255,255,0.75)",
+    fontSize: 12,
   },
   optionTitleDark: {
     color: colors.text,
-    fontSize: 19,
-    lineHeight: 24,
+    fontSize: 16,
     fontWeight: "800",
-    letterSpacing: -0.65,
   },
   optionBodyDark: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
   },
   optionPressed: {
     opacity: 0.95,

@@ -18,12 +18,12 @@ export function ChoiceButton({ label, selected, onPress }: Props) {
 
 const styles = StyleSheet.create({
   button: {
-    paddingHorizontal: 18,
-    paddingVertical: 18,
-    backgroundColor: "rgba(255,253,248,0.92)",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 22,
+    borderRadius: 14,
     shadowColor: colors.shadow,
     shadowOpacity: 0.03,
     shadowRadius: 10,
@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.text,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
     fontWeight: "700",
   },
   selectedText: {

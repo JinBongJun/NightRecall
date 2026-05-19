@@ -50,8 +50,8 @@ export function ActionButton({ label, onPress, disabled = false, variant = "prim
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 56,
-    borderRadius: 22,
+    minHeight: 48,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   tertiary: {
     backgroundColor: "rgba(255,253,248,0.46)",
-    minHeight: 52,
+    minHeight: 44,
     borderColor: "transparent",
   },
   disabled: {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     gap: 9,
   },
   text: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "800",
   },
   textPrimary: {
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   textTertiary: {
     color: colors.muted,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
   },
 });

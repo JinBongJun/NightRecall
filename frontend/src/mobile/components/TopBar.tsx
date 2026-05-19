@@ -79,16 +79,16 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
 
 const styles = StyleSheet.create({
   root: {
-    minHeight: 58,
+    minHeight: 50,
   },
   shell: {
-    minHeight: 58,
-    borderRadius: 22,
+    minHeight: 50,
+    borderRadius: 16,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 6,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
