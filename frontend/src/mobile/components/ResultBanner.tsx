@@ -15,7 +15,7 @@ export function ResultBanner({ correct, body, meta }: Props) {
     <View style={[styles.card, correct ? styles.cardCorrect : styles.cardIncorrect]}>
       <View style={styles.row}>
         <View style={[styles.iconWrap, correct ? styles.iconCorrect : styles.iconIncorrect]}>
-          <MaterialIcons name={correct ? "check" : "close"} size={22} color={correct ? colors.primary : colors.accent} />
+          <MaterialIcons name={correct ? "check" : "close"} size={18} color={correct ? colors.primary : colors.accent} />
         </View>
         <View style={styles.copy}>
           <Text style={styles.title}>{correct ? "Correct" : "Not quite"}</Text>
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: theme.spacing.md,
     borderWidth: 1,
-    gap: 4,
+    gap: 3,
   },
   cardCorrect: {
     backgroundColor: colors.primarySoft,
@@ -44,13 +44,13 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
     alignItems: "flex-start",
   },
   iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: theme.radius.md,
+    width: 34,
+    height: 34,
+    borderRadius: theme.radius.sm,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -62,21 +62,22 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
-    gap: 4,
+    gap: 3,
   },
   title: {
     color: colors.text,
-    fontSize: 18,
+    fontSize: theme.typography.title.fontSize,
+    lineHeight: theme.typography.title.lineHeight,
     fontWeight: "800",
   },
   body: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.body.fontSize,
+    lineHeight: theme.typography.body.lineHeight,
   },
   meta: {
     color: colors.primary,
-    fontSize: 12,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: "700",
   },
 });

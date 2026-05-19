@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
   },
   overline: {
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.3,
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
   },
   flowMiniStep: {
     color: colors.mutedSoft,
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 1.2,
@@ -614,16 +614,16 @@ const styles = StyleSheet.create({
   },
   flowMiniTitle: {
     color: colors.text,
-    fontSize: 16,
-    lineHeight: 20,
+    fontSize: 14,
+    lineHeight: 18,
     fontWeight: "700",
   },
   flowMiniTitleActive: {
     color: "#FFFFFF",
   },
   flowMiniTitleCompact: {
-    fontSize: 15,
-    lineHeight: 18,
+    fontSize: 13,
+    lineHeight: 16,
   },
   footer: {
     paddingHorizontal: theme.spacing.md,
@@ -662,7 +662,7 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
   },
   googleButton: {
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
   },
   googleText: {
     color: "#1F1F1F",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
   },
 });

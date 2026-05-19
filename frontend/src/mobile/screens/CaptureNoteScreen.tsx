@@ -64,13 +64,13 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 160,
     color: colors.text,
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 24,
     padding: 0,
   },
   hint: {
     color: colors.muted,
-    fontSize: 12,
-    lineHeight: 18,
+    fontSize: 11,
+    lineHeight: 16,
   },
 });

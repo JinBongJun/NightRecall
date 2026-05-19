@@ -193,15 +193,15 @@ const styles = StyleSheet.create({
   },
   statusEyebrow: {
     color: colors.mutedSoft,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.1,
   },
   statusTitle: {
     color: colors.text,
-    fontSize: 17,
-    lineHeight: 22,
+    fontSize: 15,
+    lineHeight: 18,
     fontWeight: "800",
   },
   statusIconWrap: {
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   heroFooterText: {
     color: colors.muted,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
   },
   questionCard: {
@@ -250,15 +250,15 @@ const styles = StyleSheet.create({
   },
   questionMetaText: {
     color: colors.secondary,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1,
   },
   questionText: {
     color: colors.primary,
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 18,
+    lineHeight: 22,
     fontWeight: "800",
   },
   textArea: {
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: 6,
     paddingBottom: 10,
-    fontSize: 17,
+    fontSize: 15,
     lineHeight: 24,
     color: colors.text,
     borderBottomWidth: 2,
@@ -279,8 +279,8 @@ const styles = StyleSheet.create({
   },
   hintText: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
     opacity: 0.72,
   },
   choices: {

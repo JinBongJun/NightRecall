@@ -111,13 +111,13 @@ const styles = StyleSheet.create({
     color: colors.mutedSoft,
     textTransform: "uppercase",
     letterSpacing: 0.8,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "800",
   },
   body: {
     color: colors.text,
-    lineHeight: 22,
-    fontSize: 15,
+    lineHeight: 18,
+    fontSize: 13,
   },
   streakRow: {
     gap: 4,
@@ -125,12 +125,12 @@ const styles = StyleSheet.create({
   },
   streakValue: {
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
   },
   streakHelper: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
   },
 });

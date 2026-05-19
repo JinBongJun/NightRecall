@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 18,
+    borderRadius: 14,
+    padding: 12,
     gap: 12,
     borderWidth: 1,
     borderColor: colors.border,
@@ -173,10 +173,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    minHeight: 64,
+    minHeight: 52,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 14,
     textAlignVertical: "top",
   },
   noteInput: {

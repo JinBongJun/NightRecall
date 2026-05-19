@@ -43,7 +43,7 @@ export function BottomDock({ active, navigation }: Props) {
             onPress={() => navigateTab(navigation, tab.key)}
           >
             <View style={[styles.item, selected && styles.itemActive]}>
-              <MaterialIcons name={tab.icon} size={20} color={selected ? "#FFFFFF" : colors.mutedSoft} />
+              <MaterialIcons name={tab.icon} size={18} color={selected ? "#FFFFFF" : colors.mutedSoft} />
               <Text style={[styles.label, selected && styles.labelActive]}>{tab.label}</Text>
             </View>
           </Pressable>
@@ -58,13 +58,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: "rgba(15,76,63,0.08)",
-    paddingHorizontal: 8,
-    paddingTop: 8,
-    paddingBottom: 4,
+    paddingHorizontal: 6,
+    paddingTop: 6,
+    paddingBottom: 2,
   },
   itemFrame: {
     flex: 1,
@@ -72,24 +72,24 @@ const styles = StyleSheet.create({
   },
   item: {
     width: "100%",
-    maxWidth: 108,
+    maxWidth: 100,
     borderRadius: theme.radius.md,
-    minHeight: 48,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    minHeight: theme.control.touchTarget,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
+    gap: 2,
   },
   itemActive: {
     backgroundColor: colors.primary,
   },
   label: {
     color: colors.mutedSoft,
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: "700",
     textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: 0.7,
   },
   labelActive: {
     color: "#FFFFFF",

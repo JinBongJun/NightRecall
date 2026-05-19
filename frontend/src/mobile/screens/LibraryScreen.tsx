@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   },
   syncingText: {
     color: colors.primary,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
   },
   loadingRow: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: colors.primary,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
   },
   loadMoreButton: {
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   },
   loadMoreText: {
     color: colors.primary,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "800",
   },
 });

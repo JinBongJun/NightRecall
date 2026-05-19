@@ -420,7 +420,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   loadingCard: {
     backgroundColor: colors.surfaceLow,
-    borderRadius: 24,
+    borderRadius: 16,
     paddingVertical: 24,
     paddingHorizontal: 20,
     flexDirection: "row",
@@ -430,20 +430,20 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "700",
   },
   sourceCard: {
     backgroundColor: "rgba(255,253,248,0.94)",
     borderRadius: 26,
-    padding: 20,
+    padding: 14,
     gap: 12,
     borderWidth: 1,
     borderColor: "rgba(15,76,63,0.08)",
   },
   sourceLabel: {
     color: colors.mutedSoft,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.2,
@@ -451,14 +451,14 @@ const styles = StyleSheet.create({
   sourceImage: {
     width: "100%",
     height: 208,
-    borderRadius: 20,
+    borderRadius: 14,
     backgroundColor: colors.surfaceHigh,
   },
   sourceInput: {
-    minHeight: 56,
+    minHeight: 46,
     color: colors.text,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
     padding: 0,
   },
   savedSourceCopy: {
@@ -466,13 +466,13 @@ const styles = StyleSheet.create({
   },
   savedSourcePreview: {
     color: colors.primary,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
     fontWeight: "700",
   },
   savedSourceText: {
     color: colors.text,
-    fontSize: 15,
+    fontSize: 13,
     lineHeight: 23,
   },
   featureCard: {
@@ -485,8 +485,8 @@ const styles = StyleSheet.create({
   },
   secondaryCard: {
     backgroundColor: "rgba(255,253,248,0.88)",
-    borderRadius: 22,
-    padding: 20,
+    borderRadius: 16,
+    padding: 14,
     gap: 14,
     borderWidth: 1,
     borderColor: "rgba(15,76,63,0.08)",
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   },
   pointLabel: {
     color: colors.mutedSoft,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.1,
@@ -520,11 +520,11 @@ const styles = StyleSheet.create({
   },
   pointInput: {
     color: colors.text,
-    fontSize: 20,
+    fontSize: 17,
     lineHeight: 30,
     fontWeight: "700",
     padding: 0,
-    minHeight: 60,
+    minHeight: 50,
   },
   section: {
     gap: 12,
@@ -532,15 +532,15 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.2,
   },
   sectionHelper: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 13,
+    lineHeight: 18,
   },
   topicList: {
     gap: 12,
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
   topicCard: {
     backgroundColor: colors.surfaceLow,
     borderRadius: 18,
-    padding: 20,
+    padding: 14,
     gap: 14,
     borderWidth: 1,
     borderColor: "rgba(192,200,199,0.18)",
@@ -560,8 +560,8 @@ const styles = StyleSheet.create({
   },
   topicText: {
     color: colors.text,
-    fontSize: 18,
-    lineHeight: 28,
+    fontSize: 16,
+    lineHeight: 22,
     fontWeight: "700",
   },
   checkButton: {
@@ -581,33 +581,33 @@ const styles = StyleSheet.create({
   summaryCard: {
     backgroundColor: "rgba(255,253,248,0.92)",
     borderRadius: 26,
-    padding: 20,
+    padding: 14,
     gap: 10,
     borderWidth: 1,
     borderColor: "rgba(15,76,63,0.08)",
   },
   summaryLabel: {
     color: colors.primary,
-    fontSize: 20,
+    fontSize: 17,
     lineHeight: 26,
     fontWeight: "800",
   },
   summaryBody: {
     color: colors.text,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 18,
     fontWeight: "700",
   },
   summaryCapacity: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
     fontWeight: "700",
   },
   summaryHelper: {
     color: colors.mutedSoft,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 12,
+    lineHeight: 17,
   },
   smallActionPressed: {
     opacity: 0.92,

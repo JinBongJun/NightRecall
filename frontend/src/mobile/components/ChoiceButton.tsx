@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 type Props = {
   label: string;
@@ -18,16 +19,18 @@ export function ChoiceButton({ label, selected, onPress }: Props) {
 
 const styles = StyleSheet.create({
   button: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    minHeight: theme.control.buttonMinHeightCompact,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 14,
+    borderRadius: theme.radius.md,
+    justifyContent: "center",
     shadowColor: colors.shadow,
     shadowOpacity: 0.03,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
   selected: {
     backgroundColor: "rgba(213,230,220,0.86)",
@@ -39,8 +42,8 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.text,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: theme.typography.body.fontSize,
+    lineHeight: theme.typography.body.lineHeight,
     fontWeight: "700",
   },
   selectedText: {

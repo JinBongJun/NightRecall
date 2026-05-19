@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.primary,
-    fontSize: 28,
+    fontSize: 22,
     lineHeight: 34,
     fontWeight: "800",
     textAlign: "center",
@@ -391,15 +391,15 @@ const styles = StyleSheet.create({
   },
   body: {
     color: colors.muted,
-    fontSize: 17,
+    fontSize: 15,
     lineHeight: 24,
     textAlign: "center",
     maxWidth: 280,
   },
   phase: {
     color: colors.mutedSoft,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 1.1,

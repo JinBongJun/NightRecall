@@ -23,14 +23,14 @@ const styles = StyleSheet.create({
   bar: {
     backgroundColor: colors.surfaceLow,
     borderRadius: theme.radius.sm,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: colors.line,
   },
   text: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: "700",
     textAlign: "center",
   },

@@ -2,6 +2,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 type Props = {
   title: string;
@@ -21,7 +22,7 @@ export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, i
         <Image source={{ uri: imageUri, headers: imageHeaders }} style={styles.image} />
       ) : (
         <View style={styles.imageFallback}>
-          <MaterialIcons name="auto-stories" size={28} color={colors.primary} />
+          <MaterialIcons name="auto-stories" size={22} color={colors.primary} />
         </View>
       )}
 
@@ -38,7 +39,7 @@ export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, i
             }}
             hitSlop={8}
           >
-            <MaterialIcons name={deleting ? "hourglass-empty" : "delete-outline"} size={18} color={colors.primary} />
+            <MaterialIcons name={deleting ? "hourglass-empty" : "delete-outline"} size={16} color={colors.primary} />
           </Pressable>
         </View>
 
@@ -48,7 +49,7 @@ export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, i
 
         <View style={styles.metaRow}>
           <View style={styles.metaPill}>
-            <MaterialIcons name="bookmark" size={13} color={colors.primary} />
+            <MaterialIcons name="bookmark" size={12} color={colors.primary} />
             <Text style={styles.metaText}>
               {bookmarkedCount} saved point{bookmarkedCount > 1 ? "s" : ""}
             </Text>
@@ -65,94 +66,94 @@ export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, i
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "rgba(255,253,248,0.92)",
-    borderRadius: 20,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 12,
+    padding: 10,
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
     alignItems: "stretch",
     shadowColor: colors.shadow,
     shadowOpacity: 0.04,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
   },
   cardPressed: {
     opacity: 0.96,
     transform: [{ scale: 0.995 }],
   },
   image: {
-    width: 84,
-    height: 84,
-    borderRadius: 16,
+    width: 72,
+    height: 72,
+    borderRadius: theme.radius.md,
     backgroundColor: colors.surfaceHigh,
   },
   imageFallback: {
-    width: 84,
-    height: 84,
-    borderRadius: 16,
+    width: 72,
+    height: 72,
+    borderRadius: theme.radius.md,
     backgroundColor: "rgba(213,230,220,0.7)",
     alignItems: "center",
     justifyContent: "center",
   },
   copy: {
     flex: 1,
-    gap: 8,
+    gap: 6,
     justifyContent: "space-between",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 8,
+    gap: 6,
   },
   title: {
     flex: 1,
     color: colors.text,
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: "800",
+    fontSize: theme.typography.section.fontSize,
+    lineHeight: theme.typography.section.lineHeight,
+    fontWeight: theme.typography.section.fontWeight,
   },
   preview: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: theme.typography.body.fontSize,
+    lineHeight: theme.typography.body.lineHeight,
   },
   metaRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   metaPill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 4,
     backgroundColor: "rgba(213,230,220,0.52)",
     borderRadius: 999,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
+    paddingHorizontal: 7,
+    paddingVertical: 4,
   },
   metaText: {
     color: colors.primary,
-    fontSize: 11,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
   },
   openPill: {
     borderRadius: 999,
     backgroundColor: colors.surfaceLow,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   openText: {
     color: colors.primary,
-    fontSize: 11,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.7,
+    letterSpacing: 0.6,
   },
   deleteButton: {
-    width: 30,
-    height: 30,
+    width: 26,
+    height: 26,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",

@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
   },
   pill: {
     flex: 1,
-    minHeight: 72,
-    borderRadius: 22,
+    minHeight: 58,
+    borderRadius: 16,
     backgroundColor: "rgba(255,253,248,0.94)",
     borderWidth: 1,
     borderColor: colors.border,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   value: {
     color: colors.primary,
-    fontSize: 26,
+    fontSize: 20,
     fontWeight: "800",
   },
   valueActive: {

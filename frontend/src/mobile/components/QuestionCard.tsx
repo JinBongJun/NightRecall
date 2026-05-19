@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Question } from "../types/models";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 type Props = {
   question: Question;
@@ -19,22 +20,22 @@ export function QuestionCard({ question }: Props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 24,
-    padding: 20,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
-    gap: 10,
+    gap: 8,
   },
   kicker: {
     color: colors.muted,
     fontWeight: "700",
     textTransform: "uppercase",
-    fontSize: 12,
+    fontSize: theme.typography.micro.fontSize,
     letterSpacing: 0.5,
   },
   text: {
-    fontSize: 24,
-    lineHeight: 32,
+    fontSize: theme.typography.display.fontSize,
+    lineHeight: theme.typography.display.lineHeight,
     color: colors.text,
     fontWeight: "700",
   },

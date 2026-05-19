@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 20,
+    borderRadius: 16,
+    padding: 14,
     gap: 18,
     borderWidth: 1,
     borderColor: colors.border,
@@ -115,11 +115,11 @@ const styles = StyleSheet.create({
   },
   messageTitle: {
     color: colors.text,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "800",
   },
   messageBody: {
     color: colors.muted,
-    lineHeight: 22,
+    lineHeight: 18,
   },
 });

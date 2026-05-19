@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   },
   sectionEyebrow: {
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "800",
     letterSpacing: 0.8,
     textTransform: "uppercase",
@@ -258,8 +258,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
   },
   heroCard: {
     backgroundColor: colors.primary,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   heroLabel: {
     color: "rgba(255,255,255,0.65)",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "800",
     letterSpacing: 0.6,
     textTransform: "uppercase",
@@ -289,22 +289,22 @@ const styles = StyleSheet.create({
   },
   heroValue: {
     color: "#FFFFFF",
-    fontSize: 44,
+    fontSize: 34,
     lineHeight: 48,
     fontWeight: "800",
     letterSpacing: -1,
   },
   heroUnit: {
     color: "rgba(255,255,255,0.7)",
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 13,
+    lineHeight: 16,
     fontWeight: "600",
     marginBottom: 4,
   },
   heroBody: {
     color: "rgba(255,255,255,0.88)",
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
     fontWeight: "500",
   },
   heroStatusRow: {
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   heroStatusText: {
     color: "rgba(255,255,255,0.72)",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
   },
   heroIconWrap: {
@@ -350,19 +350,19 @@ const styles = StyleSheet.create({
   },
   calendarTitle: {
     color: colors.text,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "800",
   },
   calendarHelper: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 11,
     lineHeight: 16,
     marginTop: 4,
     maxWidth: 200,
   },
   calendarMonth: {
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.6,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     width: 36,
     textAlign: "center",
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "700",
   },
   calendarGrid: {
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   },
   calendarDayText: {
     color: colors.text,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
   },
   calendarDayTextOutside: {
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   statLabel: {
     color: colors.muted,
     fontWeight: "700",
-    fontSize: 11,
+    fontSize: 10,
     flexShrink: 1,
   },
   statRowRight: {
@@ -489,13 +489,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: colors.primary,
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 18,
     fontWeight: "800",
   },
   statHelper: {
     color: colors.mutedSoft,
-    fontSize: 11,
+    fontSize: 10,
     lineHeight: 15,
   },
   footerNoteWrap: {
@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
   },
   footerNote: {
     color: colors.mutedSoft,
-    fontSize: 12,
+    fontSize: 11,
     lineHeight: 17,
     textAlign: "center",
     maxWidth: 280,

@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 type Props = {
   streak: number;
@@ -18,18 +19,19 @@ export function StreakCard({ streak }: Props) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.primary,
-    borderRadius: 20,
-    padding: 18,
-    gap: 6,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    gap: 4,
   },
   label: {
     color: "#D6EEF0",
-    fontSize: 13,
+    fontSize: theme.typography.body.fontSize,
     fontWeight: "700",
   },
   value: {
     color: "#FFFFFF",
-    fontSize: 26,
+    fontSize: theme.typography.display.fontSize,
+    lineHeight: theme.typography.display.lineHeight,
     fontWeight: "800",
   },
 });

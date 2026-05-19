@@ -16,7 +16,7 @@ export function ScreenHeader({ title, subtitle, iconName }: Props) {
       <View style={styles.titleRow}>
         {iconName ? (
           <View style={styles.iconBadge}>
-            <MaterialIcons name={iconName} size={14} color={colors.primary} />
+            <MaterialIcons name={iconName} size={13} color={colors.primary} />
           </View>
         ) : null}
         <Text style={styles.title}>{title}</Text>
@@ -28,16 +28,16 @@ export function ScreenHeader({ title, subtitle, iconName }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: 4,
+    gap: 3,
   },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   iconBadge: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     borderRadius: 999,
     backgroundColor: colors.primarySoft,
     alignItems: "center",
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.title.fontSize,
     lineHeight: theme.typography.title.lineHeight,
     fontWeight: theme.typography.title.fontWeight,
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
   },
   subtitle: {
     color: colors.muted,

@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   libraryLinkText: {
     flex: 1,
     color: colors.primary,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
   },
   actions: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     marginTop: -4,
     marginBottom: 4,
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
   },
   limitNoteLocked: {
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   },
   actionTitle: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
   },
   writeEntryCard: {
@@ -273,12 +273,12 @@ const styles = StyleSheet.create({
   },
   writeEntryTitle: {
     color: colors.text,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
   },
   writeEntrySubtitle: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 11,
     flexShrink: 1,
   },
   previewSection: {
@@ -307,10 +307,10 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.2,
-    fontSize: 12,
+    fontSize: 11,
   },
   previewActionButton: {
-    minHeight: 34,
+    minHeight: 30,
     paddingHorizontal: 12,
     borderRadius: 999,
     justifyContent: "center",
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   previewAction: {
     color: colors.primary,
     fontWeight: "800",
-    fontSize: 13,
+    fontSize: 12,
   },
   previewBody: {
     gap: 16,
@@ -335,16 +335,16 @@ const styles = StyleSheet.create({
   },
   previewTitle: {
     color: colors.text,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "800",
   },
   previewSubtitle: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
   },
   extractButton: {
-    minHeight: 48,
+    minHeight: 40,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -360,11 +360,11 @@ const styles = StyleSheet.create({
   },
   extractButtonText: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
   },
   ctaPlaceholder: {
-    minHeight: 48,
+    minHeight: 40,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   },
   ctaPlaceholderText: {
     color: colors.muted,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
     textAlign: "center",
   },

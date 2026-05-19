@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   providerBadgeText: {
     color: colors.primary,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "800",
   },
   avatarWrap: {
@@ -187,19 +187,19 @@ const styles = StyleSheet.create({
   },
   avatarInitial: {
     color: colors.primary,
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: "800",
   },
   heroTitle: {
     color: colors.primary,
-    fontSize: 22,
+    fontSize: 18,
     lineHeight: 26,
     fontWeight: "800",
     letterSpacing: -0.8,
   },
   emailText: {
     color: colors.mutedSoft,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
   },
   reassuranceRow: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   reassuranceText: {
     color: colors.primary,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
   },
   detailRow: {
@@ -226,12 +226,12 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     color: colors.muted,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
   },
   detailValue: {
     color: colors.text,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
   },
   section: {
@@ -274,12 +274,12 @@ const styles = StyleSheet.create({
   },
   actionTitle: {
     color: colors.text,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
   },
   actionBody: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 18,
   },
 });

@@ -580,8 +580,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
     maxWidth: 320,
   },
   profileLinkRow: {
@@ -609,12 +609,12 @@ const styles = StyleSheet.create({
   },
   profileLinkTitle: {
     color: colors.text,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "800",
   },
   profileLinkHelper: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 11,
     lineHeight: 16,
   },
   section: {
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 24,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: "hidden",
@@ -650,11 +650,11 @@ const styles = StyleSheet.create({
   label: {
     color: colors.text,
     fontWeight: "700",
-    fontSize: 17,
+    fontSize: 15,
   },
   helper: {
     color: colors.muted,
-    lineHeight: 18,
+    lineHeight: 16,
   },
   settingValueWrap: {
     flexDirection: "row",
@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
   timeValue: {
     color: colors.primary,
     fontWeight: "800",
-    fontSize: 17,
+    fontSize: 15,
   },
   timePickerCard: {
     paddingHorizontal: 10,
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   timePickerButton: {
-    minHeight: 40,
+    minHeight: 36,
     borderRadius: 14,
     paddingHorizontal: 14,
     alignItems: "center",
@@ -695,7 +695,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   timePickerPrimaryButton: {
-    minHeight: 40,
+    minHeight: 36,
     borderRadius: 14,
     paddingHorizontal: 16,
     alignItems: "center",
@@ -708,15 +708,15 @@ const styles = StyleSheet.create({
   timePickerButtonText: {
     color: colors.primary,
     fontWeight: "800",
-    fontSize: 14,
+    fontSize: 13,
   },
   timePickerPrimaryText: {
     color: "#FFFFFF",
     fontWeight: "800",
-    fontSize: 14,
+    fontSize: 13,
   },
   secondaryLink: {
-    minHeight: 48,
+    minHeight: 40,
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   logoutLink: {
-    minHeight: 48,
+    minHeight: 40,
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
@@ -738,12 +738,12 @@ const styles = StyleSheet.create({
   logoutLinkText: {
     color: colors.primary,
     fontWeight: "800",
-    fontSize: 15,
+    fontSize: 13,
   },
   secondaryLinkText: {
     color: colors.primary,
     fontWeight: "700",
-    fontSize: 15,
+    fontSize: 13,
   },
   secondaryLinkPressed: {
     opacity: 0.92,
@@ -751,15 +751,15 @@ const styles = StyleSheet.create({
   },
   deleteCard: {
     backgroundColor: "#FFF5F2",
-    borderRadius: 24,
-    padding: 18,
+    borderRadius: 16,
+    padding: 12,
     gap: 6,
     borderWidth: 1,
     borderColor: "#F2C9C2",
   },
   deleteTitle: {
     color: colors.danger,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "800",
   },
   deleteBody: {

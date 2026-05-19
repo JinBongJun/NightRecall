@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 import { BrandWordmark } from "./BrandWordmark";
 import { useAuthStore } from "../store/authStore";
@@ -29,7 +30,7 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
       <View style={styles.shell}>
         {leftIcon ? (
           <Pressable onPress={onLeftPress} style={styles.iconButton} hitSlop={8}>
-            <MaterialIcons name={leftIcon} size={22} color={colors.primary} />
+            <MaterialIcons name={leftIcon} size={20} color={colors.primary} />
           </Pressable>
         ) : (
           <View style={styles.iconSpacer} />
@@ -60,13 +61,13 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
                 ) : displayName || email ? (
                   <Text style={styles.profileInitial}>{avatarInitial}</Text>
                 ) : (
-                  <MaterialIcons name="person" size={19} color={colors.primary} />
+                  <MaterialIcons name="person" size={17} color={colors.primary} />
                 )}
               </View>
             </Pressable>
           ) : (
             <Pressable onPress={onRightPress} style={styles.iconButton} hitSlop={8}>
-              <MaterialIcons name={rightIcon} size={22} color={colors.primary} />
+              <MaterialIcons name={rightIcon} size={20} color={colors.primary} />
             </Pressable>
           )
         ) : (
@@ -79,28 +80,28 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
 
 const styles = StyleSheet.create({
   root: {
-    minHeight: 50,
+    minHeight: theme.control.touchTarget + 2,
   },
   shell: {
-    minHeight: 50,
-    borderRadius: 16,
+    minHeight: theme.control.touchTarget + 2,
+    borderRadius: theme.radius.md,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     shadowColor: colors.shadow,
     shadowOpacity: 0.04,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
   },
   iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceLow,
@@ -108,12 +109,12 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   iconSpacer: {
-    width: 38,
-    height: 38,
+    width: 34,
+    height: 34,
   },
   centerSection: {
     flex: 1,
-    minHeight: 40,
+    minHeight: 34,
     justifyContent: "center",
     paddingHorizontal: 2,
   },
@@ -125,30 +126,31 @@ const styles = StyleSheet.create({
   },
   titleWrap: {
     alignItems: "center",
-    gap: 2,
+    gap: 1,
   },
   metaRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     justifyContent: "center",
   },
   subtitle: {
     color: colors.mutedSoft,
-    fontSize: 11,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
-    letterSpacing: 0.9,
+    letterSpacing: 0.8,
     textTransform: "uppercase",
   },
   title: {
     color: colors.primary,
-    fontSize: 16,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+    fontSize: theme.typography.section.fontSize,
+    lineHeight: theme.typography.section.lineHeight,
+    fontWeight: theme.typography.section.fontWeight,
+    letterSpacing: -0.4,
   },
   planBadge: {
-    paddingHorizontal: 9,
-    paddingVertical: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
     borderRadius: 999,
     backgroundColor: "rgba(18,67,67,0.10)",
     borderWidth: 1,
@@ -156,14 +158,14 @@ const styles = StyleSheet.create({
   },
   planBadgeText: {
     color: colors.primary,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "800",
-    letterSpacing: 1.0,
+    letterSpacing: 0.9,
   },
   profileButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceLow,
@@ -171,8 +173,8 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   profileGlyphWrap: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
@@ -185,7 +187,7 @@ const styles = StyleSheet.create({
   },
   profileInitial: {
     color: colors.primary,
-    fontSize: 12,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: "800",
   },
 });

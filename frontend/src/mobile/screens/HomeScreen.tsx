@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     color: colors.mutedSoft,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
   },
   reminderRow: {
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   },
   reminderText: {
     color: colors.primary,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
   },
   summaryStrip: {
@@ -258,12 +258,12 @@ const styles = StyleSheet.create({
   },
   summaryValue: {
     color: colors.primary,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "800",
   },
   summaryText: {
     color: colors.muted,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "700",
   },
   summaryDivider: {
@@ -279,12 +279,12 @@ const styles = StyleSheet.create({
   },
   streakText: {
     color: colors.mutedSoft,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
   },
   statsLink: {
     color: colors.primary,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "800",
   },
   tonightCopy: {
@@ -293,28 +293,28 @@ const styles = StyleSheet.create({
   },
   tonightEyebrow: {
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.8,
   },
   tonightTitle: {
     color: colors.text,
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: theme.typography.title.fontSize,
+    lineHeight: theme.typography.title.lineHeight,
     fontWeight: "800",
   },
   tonightBody: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
   },
   heroActions: {
     gap: 8,
     paddingTop: 4,
   },
   heroPrimaryButton: {
-    minHeight: 44,
+    minHeight: theme.control.buttonMinHeight,
     backgroundColor: colors.primary,
     borderRadius: theme.radius.md,
     flexDirection: "row",
@@ -325,11 +325,11 @@ const styles = StyleSheet.create({
   },
   heroPrimaryText: {
     color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: theme.typography.button.fontSize,
+    fontWeight: theme.typography.button.fontWeight,
   },
   heroSecondaryButton: {
-    minHeight: 40,
+    minHeight: theme.control.buttonMinHeightCompact,
     borderRadius: theme.radius.md,
     alignItems: "center",
     justifyContent: "center",
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   },
   heroSecondaryText: {
     color: colors.primary,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
   },
 });

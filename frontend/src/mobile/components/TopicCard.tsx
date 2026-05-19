@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "800",
     color: colors.text,
     flexShrink: 1,
@@ -91,12 +91,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     overflow: "hidden",
     fontWeight: "700",
-    fontSize: 12,
+    fontSize: 11,
   },
   subtitle: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 12,
+    lineHeight: 17,
   },
   cta: {
     backgroundColor: colors.surfaceHigh,

@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 type Props = {
   label: string;
@@ -29,7 +30,7 @@ export function ActionButton({ label, onPress, disabled = false, variant = "prim
         {iconName ? (
           <MaterialIcons
             name={iconName}
-            size={18}
+            size={16}
             color={variant === "primary" ? "#FFFFFF" : variant === "secondary" ? colors.primary : colors.muted}
           />
         ) : null}
@@ -50,20 +51,20 @@ export function ActionButton({ label, onPress, disabled = false, variant = "prim
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 48,
-    borderRadius: 16,
+    minHeight: theme.control.buttonMinHeight,
+    borderRadius: theme.radius.md,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     borderWidth: 1,
   },
   primary: {
     backgroundColor: colors.primaryContainer,
     borderColor: "rgba(15,76,63,0.4)",
     shadowColor: colors.shadow,
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
   },
   secondary: {
     backgroundColor: "rgba(255,253,248,0.92)",
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
   },
   tertiary: {
     backgroundColor: "rgba(255,253,248,0.46)",
-    minHeight: 44,
+    minHeight: theme.control.buttonMinHeightCompact,
     borderColor: "transparent",
   },
   disabled: {
@@ -85,11 +86,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 9,
+    gap: 7,
   },
   text: {
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: theme.typography.button.fontSize,
+    lineHeight: theme.typography.button.lineHeight,
+    fontWeight: theme.typography.button.fontWeight,
   },
   textPrimary: {
     color: "#FFFFFF",
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
   },
   textTertiary: {
     color: colors.muted,
-    fontSize: 14,
+    fontSize: theme.typography.body.fontSize,
     fontWeight: "700",
   },
 });

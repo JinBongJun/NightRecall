@@ -88,25 +88,25 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.primary,
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: "800",
   },
   subtitle: {
     color: colors.muted,
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 24,
   },
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 22,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 20,
+    padding: 14,
     gap: 12,
   },
   sectionTitle: {
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -114,11 +114,11 @@ const styles = StyleSheet.create({
   },
   body: {
     color: colors.text,
-    fontSize: 15,
+    fontSize: 13,
     lineHeight: 24,
   },
   primaryButton: {
-    minHeight: 52,
+    minHeight: 44,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -127,11 +127,11 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
   },
   secondaryButton: {
-    minHeight: 52,
+    minHeight: 44,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "800",
   },
 });

@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 type Props = {
   title: string;
@@ -18,15 +19,17 @@ export function SectionHeader({ title, subtitle }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    gap: 4,
+    gap: 3,
   },
   title: {
-    fontSize: 26,
+    fontSize: theme.typography.display.fontSize,
+    lineHeight: theme.typography.display.lineHeight,
     color: colors.text,
     fontWeight: "800",
   },
   subtitle: {
     color: colors.muted,
-    lineHeight: 21,
+    fontSize: theme.typography.body.fontSize,
+    lineHeight: theme.typography.body.lineHeight,
   },
 });

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 
 type Props = {
   label: string;
@@ -17,16 +18,19 @@ export function SecondaryButton({ label, onPress }: Props) {
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 16,
-    borderRadius: 18,
+    minHeight: theme.control.buttonMinHeight,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: theme.radius.md,
     alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surfaceLow,
   },
   text: {
     color: colors.text,
-    fontSize: 17,
+    fontSize: theme.typography.button.fontSize,
     fontWeight: "700",
   },
 });

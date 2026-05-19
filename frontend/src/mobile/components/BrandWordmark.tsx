@@ -53,12 +53,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
   },
   logoFrameSmall: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
   },
   logoFrameMedium: {
-    width: 44,
-    height: 44,
+    width: 38,
+    height: 38,
   },
   logo: {
     borderRadius: 999,
@@ -85,14 +85,14 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   textSmall: {
-    fontSize: 18,
+    fontSize: 15,
   },
   textMedium: {
-    fontSize: 19,
+    fontSize: 16,
   },
   tagline: {
     color: colors.mutedSoft,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
     letterSpacing: 0.4,
   },
