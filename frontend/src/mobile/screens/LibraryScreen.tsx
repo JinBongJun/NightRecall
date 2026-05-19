@@ -358,44 +358,6 @@ export function LibraryScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  overviewCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  summaryRow: {
-    flexDirection: "row",
-    gap: 6,
-  },
-  summaryPill: {
-    flex: 1,
-    backgroundColor: colors.surfaceLow,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 9,
-    gap: 4,
-  },
-  summaryValue: {
-    color: colors.primary,
-    fontSize: 18,
-    fontWeight: "800",
-  },
-  summaryLabel: {
-    color: colors.muted,
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.7,
-  },
-  heroMeta: {
-    color: colors.muted,
-    fontSize: 12,
-    lineHeight: 17,
-    fontWeight: "700",
-  },
   section: {
     gap: 10,
   },

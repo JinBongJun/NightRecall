@@ -5,7 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { Alert, Image, Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { Alert, Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
@@ -30,8 +30,6 @@ export function SettingsScreen({ navigation }: Props) {
   const timezone = useAuthStore((state) => state.timezone);
   const provider = useAuthStore((state) => state.provider);
   const email = useAuthStore((state) => state.email);
-  const displayName = useAuthStore((state) => state.displayName);
-  const avatarUrl = useAuthStore((state) => state.avatarUrl);
   const accessToken = useAuthStore((state) => state.accessToken);
   const refreshToken = useAuthStore((state) => state.refreshToken);
   const setProfile = useAuthStore((state) => state.setProfile);
@@ -49,8 +47,6 @@ export function SettingsScreen({ navigation }: Props) {
   const syncedNotificationsEnabledRef = useRef(notificationsEnabled);
   const saveInFlightRef = useRef(false);
   const lastRequestedSaveRef = useRef<string | null>(null);
-  const avatarInitial = (displayName || email || "N").trim().charAt(0).toUpperCase();
-
   useEffect(() => {
     setTimeValue(reminderTime);
     setDraftTimeValue(reminderTime);
@@ -395,30 +391,21 @@ export function SettingsScreen({ navigation }: Props) {
     <ScreenContainer>
       <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} title="Settings" />
       <View style={styles.header}>
-        <Text style={styles.subtitle}>Adjust your preferences and manage your account.</Text>
+        <Text style={styles.subtitle}>Reminders, notifications, and policies.</Text>
       </View>
 
-      <View style={styles.accountSummary}>
-        <View style={styles.summaryAvatar}>
-          {avatarUrl ? (
-            <Image source={{ uri: avatarUrl }} style={styles.summaryAvatarImage} />
-          ) : provider === "google" ? (
-            <Text style={styles.summaryAvatarInitial}>{avatarInitial}</Text>
-          ) : (
-            <MaterialIcons name="person" size={22} color={colors.primary} />
-          )}
-        </View>
-        <View style={styles.summaryCopy}>
-          <Text style={styles.summaryName} numberOfLines={1}>
-            {provider === "google" ? displayName || "Google account" : "Guest account"}
-          </Text>
-          <Text style={styles.summaryMeta} numberOfLines={1}>
-            {provider === "google" ? email || "Connected with Google" : "Not backed up yet"}
-          </Text>
-        </View>
-        <View style={styles.summaryBadge}>
-          <Text style={styles.summaryBadgeText}>{provider === "google" ? "SYNCED" : "LOCAL"}</Text>
-        </View>
+      <View style={styles.section}>
+        <SectionRow title="Profile" iconName="person" />
+        <Pressable
+          style={({ pressed }) => [styles.profileLinkRow, pressed && styles.profileLinkRowPressed]}
+          onPress={() => navigation.navigate("Account")}
+        >
+          <View style={styles.profileLinkCopy}>
+            <Text style={styles.profileLinkTitle}>Account & backup</Text>
+            <Text style={styles.profileLinkHelper}>Google, guest, and profile details</Text>
+          </View>
+          <MaterialIcons name="chevron-right" size={22} color={colors.mutedSoft} />
+        </Pressable>
       </View>
 
       <View style={styles.section}>
@@ -593,17 +580,18 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.muted,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
     maxWidth: 320,
   },
-  accountSummary: {
+  profileLinkRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     backgroundColor: colors.surface,
-    borderRadius: 24,
-    padding: 14,
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: colors.shadow,
@@ -611,52 +599,23 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
   },
-  summaryAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    backgroundColor: colors.surfaceLow,
-    borderWidth: 1,
-    borderColor: colors.line,
+  profileLinkRowPressed: {
+    opacity: 0.92,
   },
-  summaryAvatarImage: {
-    width: "100%",
-    height: "100%",
-  },
-  summaryAvatarInitial: {
-    color: colors.primary,
-    fontSize: 18,
-    fontWeight: "800",
-  },
-  summaryCopy: {
+  profileLinkCopy: {
     flex: 1,
-    minWidth: 0,
     gap: 2,
+    minWidth: 0,
   },
-  summaryName: {
+  profileLinkTitle: {
     color: colors.text,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "800",
   },
-  summaryMeta: {
+  profileLinkHelper: {
     color: colors.muted,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  summaryBadge: {
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: colors.primarySoft,
-  },
-  summaryBadgeText: {
-    color: colors.primary,
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 16,
   },
   section: {
     gap: 12,

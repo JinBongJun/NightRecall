@@ -27,6 +27,7 @@ import { createGuestSession, signInWithGoogleIdToken } from "../services/userSer
 import { useAuthStore } from "../store/authStore";
 import { useReminderStore } from "../store/reminderStore";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Onboarding">;
@@ -50,10 +51,10 @@ export function OnboardingScreen({ navigation }: Props) {
 
   const typeScale = useMemo(
     () => ({
-      title: small ? 22 : compact ? 26 : 30,
-      titleLine: small ? 27 : compact ? 31 : 35,
-      body: small ? 14 : 16,
-      bodyLine: small ? 21 : 24,
+      title: small ? 20 : compact ? 22 : 24,
+      titleLine: small ? 25 : compact ? 27 : 29,
+      body: small ? 13 : 14,
+      bodyLine: small ? 19 : 21,
     }),
     [compact, small],
   );
@@ -83,7 +84,7 @@ export function OnboardingScreen({ navigation }: Props) {
       }
 
       Alert.alert("Setup failed", detail);
-      } finally {
+    } finally {
       if (!session) {
         setLoading(false);
       }
@@ -241,10 +242,10 @@ export function OnboardingScreen({ navigation }: Props) {
               <View style={styles.copyCenter}>
                 <Text style={styles.overline}>Nightly recall</Text>
                 <Text style={[styles.posterTitle, { fontSize: typeScale.title, lineHeight: typeScale.titleLine }]}>
-                  A calm ritual{"\n"}before sleep
+                  One question{"\n"}before sleep
                 </Text>
                 <Text style={[styles.posterBody, { fontSize: typeScale.body, lineHeight: typeScale.bodyLine }]}>
-                  Capture what mattered today, then return to it at night with one focused recall.
+                  Save one idea from today, then pull it back tonight in a short recall.
                 </Text>
               </View>
             </Animated.View>
@@ -304,10 +305,10 @@ export function OnboardingScreen({ navigation }: Props) {
 
               <View style={styles.copyCenter}>
                 <Text style={[styles.posterTitle, styles.posterTitleDark, { fontSize: typeScale.title, lineHeight: typeScale.titleLine }]}>
-                  Built for a daily loop.{"\n"}Not a cluttered feed.
+                  Capture, then recall.{"\n"}Same time each night.
                 </Text>
                 <Text style={[styles.posterBody, styles.posterBodyDark, { fontSize: typeScale.body, lineHeight: typeScale.bodyLine }]}>
-                  Save key ideas, keep only what matters, and answer one clear question before bed.
+                  Photo or note in, one question out. No feed, no noise.
                 </Text>
               </View>
             </Animated.View>
@@ -373,9 +374,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingTop: 6,
-    paddingBottom: 4,
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: 4,
+    paddingBottom: 2,
   },
   backButton: {
     width: 28,
@@ -394,16 +395,16 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   page: {
-    paddingHorizontal: 24,
+    paddingHorizontal: theme.spacing.md,
     justifyContent: "center",
   },
   posterBlock: {
-    gap: 22,
+    gap: 14,
   },
   heroImage: {
     width: "100%",
-    aspectRatio: 1.18,
-    borderRadius: 34,
+    aspectRatio: 1.4,
+    borderRadius: theme.radius.xl,
     overflow: "hidden",
     backgroundColor: colors.primary,
     shadowColor: colors.shadow,
@@ -414,42 +415,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   heroImageCompact: {
-    aspectRatio: 1.28,
+    aspectRatio: 1.48,
   },
   heroImageSmall: {
-    aspectRatio: 1.36,
+    aspectRatio: 1.55,
   },
   heroOrbLarge: {
     position: "absolute",
-    width: 220,
-    height: 220,
+    width: 160,
+    height: 160,
     borderRadius: 999,
     backgroundColor: "rgba(255,248,236,0.1)",
-    top: -42,
-    right: -22,
+    top: -32,
+    right: -18,
   },
   heroOrbSmall: {
     position: "absolute",
-    width: 130,
-    height: 130,
+    width: 100,
+    height: 100,
     borderRadius: 999,
     backgroundColor: "rgba(255,255,255,0.08)",
-    left: -20,
-    bottom: 18,
+    left: -16,
+    bottom: 12,
   },
   heroRing: {
     position: "absolute",
-    width: 280,
-    height: 280,
+    width: 200,
+    height: 200,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.1)",
-    top: -76,
-    right: -88,
+    top: -56,
+    right: -64,
   },
   heroLogoShell: {
-    width: 176,
-    height: 176,
+    width: 120,
+    height: 120,
     borderRadius: 999,
     backgroundColor: "rgba(255,252,247,0.94)",
     alignItems: "center",
@@ -458,12 +459,12 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.16)",
   },
   heroLogo: {
-    width: 132,
-    height: 132,
+    width: 88,
+    height: 88,
   },
   heroNodeRow: {
     position: "absolute",
-    bottom: 26,
+    bottom: 16,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -484,7 +485,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF8EC",
   },
   copyCenter: {
-    gap: 12,
+    gap: 8,
     alignItems: "center",
   },
   overline: {
@@ -512,23 +513,23 @@ const styles = StyleSheet.create({
     maxWidth: 320,
   },
   flowArtwork: {
-    height: 176,
-    borderRadius: 32,
+    height: 140,
+    borderRadius: theme.radius.xl,
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
     backgroundColor: "rgba(255,253,248,0.42)",
   },
   flowArtworkCompact: {
-    height: 162,
+    height: 128,
   },
   flowArtworkSmall: {
-    height: 150,
+    height: 118,
   },
   flowGlow: {
     position: "absolute",
     inset: 0,
-    borderRadius: 32,
+    borderRadius: theme.radius.xl,
     backgroundColor: "rgba(213,230,220,0.18)",
   },
   flowHalo: {
@@ -564,10 +565,10 @@ const styles = StyleSheet.create({
   flowMiniCard: {
     flex: 1,
     backgroundColor: "rgba(255,253,248,0.96)",
-    borderRadius: 24,
-    minHeight: 112,
-    paddingHorizontal: 14,
-    paddingVertical: 16,
+    borderRadius: theme.radius.lg,
+    minHeight: 88,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     shadowColor: colors.shadow,
     shadowOpacity: 0.05,
     shadowRadius: 16,
@@ -575,13 +576,13 @@ const styles = StyleSheet.create({
   },
   flowMiniCardActive: {
     backgroundColor: colors.primary,
-    minHeight: 140,
-    transform: [{ translateY: -6 }],
+    minHeight: 104,
+    transform: [{ translateY: -4 }],
   },
   flowMiniCardCompact: {
-    minHeight: 96,
-    paddingHorizontal: 12,
-    paddingVertical: 14,
+    minHeight: 80,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   flowMiniIconBubble: {
     width: 44,
@@ -625,20 +626,20 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   footer: {
-    paddingHorizontal: 24,
-    paddingTop: 6,
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: 4,
     backgroundColor: colors.background,
   },
   dots: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 10,
-    marginBottom: 18,
+    gap: 8,
+    marginBottom: 12,
   },
   dot: {
-    width: 12,
-    height: 12,
+    width: 8,
+    height: 8,
     borderRadius: 999,
     backgroundColor: "rgba(192,200,199,0.55)",
   },
@@ -646,10 +647,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   actions: {
-    gap: 12,
+    gap: 10,
   },
   primaryButton: {
-    height: 56,
+    height: 48,
     backgroundColor: colors.primary,
     borderRadius: 999,
     alignItems: "center",
@@ -661,11 +662,11 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "800",
   },
   googleButton: {
-    height: 56,
+    height: 48,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.border,

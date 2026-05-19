@@ -11,6 +11,7 @@ import { getCachedGoogleProfile } from "../services/googleAuthService";
 import { fetchMe } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Account">;
@@ -132,8 +133,8 @@ const styles = StyleSheet.create({
 
   heroCard: {
     backgroundColor: colors.surface,
-    borderRadius: 28,
-    padding: 20,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
     borderWidth: 1,
     borderColor: "rgba(15,76,63,0.08)",
     gap: 16,
@@ -170,8 +171,8 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   avatarWrap: {
-    width: 78,
-    height: 78,
+    width: 64,
+    height: 64,
     borderRadius: 999,
     backgroundColor: colors.surface,
     alignItems: "center",
@@ -186,13 +187,13 @@ const styles = StyleSheet.create({
   },
   avatarInitial: {
     color: colors.primary,
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "800",
   },
   heroTitle: {
     color: colors.primary,
-    fontSize: 30,
-    lineHeight: 34,
+    fontSize: 22,
+    lineHeight: 26,
     fontWeight: "800",
     letterSpacing: -0.8,
   },
@@ -238,9 +239,9 @@ const styles = StyleSheet.create({
   },
   actionCard: {
     backgroundColor: colors.surface,
-    borderRadius: 24,
-    paddingHorizontal: 18,
-    paddingVertical: 18,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 14,
     borderWidth: 1,
     borderColor: "rgba(15,76,63,0.08)",
     flexDirection: "row",
@@ -273,12 +274,12 @@ const styles = StyleSheet.create({
   },
   actionTitle: {
     color: colors.text,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700",
   },
   actionBody: {
     color: colors.muted,
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 20,
   },
 });

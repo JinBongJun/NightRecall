@@ -1,17 +1,17 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useStatsStore } from "../store/statsStore";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Stats">;
 
 const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
-const heroLogo = require("../../../assets/logo.png");
 
 export function StatsScreen({ navigation }: Props) {
   const streak = useStatsStore((state) => state.streak);
@@ -27,40 +27,33 @@ export function StatsScreen({ navigation }: Props) {
   });
   const completedDateKeys = new Set(answeredDatesThisMonth);
   const calendarDays = buildCalendarDays(today, completedDateKeys, answeredToday);
-  const streakStatus = answeredToday ? "Checked in tonight" : "Still time tonight";
   const ritualStatus = answeredToday ? "1/1" : "0/1";
 
   return (
     <ScreenContainer>
-      <TopBar 
-        leftIcon="arrow-back" 
-        onLeftPress={() => navigation.goBack()} 
-      />
+      <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} title="Stats" />
 
       <View style={styles.header}>
-        <Text style={styles.sectionEyebrow}>Recall Ritual</Text>
-        <Text style={styles.title}>Current Streak</Text>
-        <Text style={styles.subtitle}>A quiet summary of your progress.</Text>
+        <Text style={styles.sectionEyebrow}>Progress</Text>
+        <Text style={styles.title}>Streak & recall</Text>
+        <Text style={styles.subtitle}>How your nightly habit is going.</Text>
       </View>
 
       <View style={styles.heroCard}>
-        <Image source={heroLogo} style={styles.heroDecorationPrimary} resizeMode="cover" />
         <View style={styles.heroContent}>
-          <View style={styles.heroLabelRow}>
-            <Text style={styles.heroLabel}>Progress Record</Text>
-            <View style={styles.heroLabelDivider} />
-          </View>
+          <Text style={styles.heroLabel}>Current streak</Text>
           <View style={styles.heroValueRow}>
             <Text style={styles.heroValue}>{streak}</Text>
             <Text style={styles.heroUnit}>nights</Text>
           </View>
-          <Text style={styles.heroBody}>Your memory paths are strengthening.</Text>
+          <Text style={styles.heroBody}>{answeredToday ? "You checked in tonight." : "Still time to recall tonight."}</Text>
           <View style={styles.heroStatusRow}>
-            <View style={styles.heroStatusIndicator}>
-              <View style={[styles.heroStatusDot, answeredToday ? styles.heroStatusDotOn : styles.heroStatusDotOff]} />
-            </View>
-            <Text style={styles.heroStatusText}>{`${ritualStatus} Answered tonight`}</Text>
+            <View style={[styles.heroStatusDot, answeredToday ? styles.heroStatusDotOn : styles.heroStatusDotOff]} />
+            <Text style={styles.heroStatusText}>{`${ritualStatus} tonight`}</Text>
           </View>
+        </View>
+        <View style={styles.heroIconWrap}>
+          <MaterialIcons name="local-fire-department" size={28} color="rgba(255,255,255,0.35)" />
         </View>
       </View>
 
@@ -246,117 +239,79 @@ function formatCount(value: number): string {
 }
 
 const styles = StyleSheet.create({
-
   header: {
-    gap: 10,
+    gap: 4,
   },
   sectionEyebrow: {
-    color: colors.primary,
-    fontSize: 12,
+    color: colors.mutedSoft,
+    fontSize: 10,
     fontWeight: "800",
-    letterSpacing: 0.1,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
   },
   title: {
     color: colors.text,
-    fontSize: 42,
+    fontSize: theme.typography.title.fontSize,
     fontWeight: "800",
-    lineHeight: 52,
-    letterSpacing: -1.2,
+    lineHeight: theme.typography.title.lineHeight,
+    letterSpacing: -0.4,
   },
   subtitle: {
-    color: colors.mutedSoft,
-    fontSize: 18,
-    lineHeight: 28,
-    maxWidth: 300,
+    color: colors.muted,
+    fontSize: 13,
+    lineHeight: 18,
   },
   heroCard: {
     backgroundColor: colors.primary,
-    borderRadius: 32,
-    overflow: "hidden",
-    minHeight: 320,
-    paddingHorizontal: 28,
-    paddingTop: 28,
-    paddingBottom: 24,
-    justifyContent: "space-between",
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.2,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  heroDecorationPrimary: {
-    position: "absolute",
-    right: -18,
-    bottom: -28,
-    width: 330,
-    height: 330,
-    opacity: 0.1,
-    tintColor: "#D8F5F5",
-    transform: [{ rotate: "-12deg" }, { scale: 1.26 }],
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.12)",
   },
   heroContent: {
     flex: 1,
-    justifyContent: "space-between",
-  },
-  heroLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    gap: 6,
   },
   heroLabel: {
-    color: "rgba(255,255,255,0.52)",
+    color: "rgba(255,255,255,0.65)",
     fontSize: 11,
     fontWeight: "800",
-    letterSpacing: 2.8,
+    letterSpacing: 0.6,
     textTransform: "uppercase",
-  },
-  heroLabelDivider: {
-    width: 30,
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.16)",
   },
   heroValueRow: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 8,
-    marginTop: 24,
+    gap: 6,
   },
   heroValue: {
     color: "#FFFFFF",
-    fontSize: 108,
-    lineHeight: 110,
+    fontSize: 44,
+    lineHeight: 48,
     fontWeight: "800",
-    letterSpacing: -4.2,
+    letterSpacing: -1,
   },
   heroUnit: {
-    color: "rgba(255,255,255,0.66)",
-    fontSize: 36,
-    lineHeight: 40,
-    fontWeight: "500",
-    fontStyle: "italic",
-    marginBottom: 16,
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: "600",
+    marginBottom: 4,
   },
   heroBody: {
-    color: "#FFFFFF",
-    fontSize: 22,
-    lineHeight: 28,
+    color: "rgba(255,255,255,0.88)",
+    fontSize: 13,
+    lineHeight: 18,
     fontWeight: "500",
-    maxWidth: 210,
   },
   heroStatusRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    marginTop: 18,
-  },
-  heroStatusIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "rgba(188,235,235,0.3)",
-    alignItems: "center",
-    justifyContent: "center",
+    gap: 8,
+    marginTop: 4,
   },
   heroStatusDot: {
     width: 8,
@@ -367,50 +322,50 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primarySoft,
   },
   heroStatusDotOff: {
-    backgroundColor: "rgba(255,255,255,0.36)",
+    backgroundColor: "rgba(255,255,255,0.35)",
   },
   heroStatusText: {
-    color: "rgba(255,255,255,0.40)",
-    fontSize: 10,
-    fontWeight: "900",
-    letterSpacing: 1.8,
-    textTransform: "uppercase",
+    color: "rgba(255,255,255,0.72)",
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  heroIconWrap: {
+    justifyContent: "center",
+    paddingLeft: 4,
   },
   calendarCard: {
-    backgroundColor: colors.surfaceLow,
-    borderRadius: 40,
-    paddingHorizontal: 26,
-    paddingTop: 24,
-    paddingBottom: 28,
-    gap: 24,
+    backgroundColor: colors.surface,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.md,
+    gap: 12,
     borderWidth: 1,
-    borderColor: "rgba(192,200,199,0.16)",
+    borderColor: colors.border,
   },
   calendarHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 14,
-    alignItems: "baseline",
+    gap: 12,
+    alignItems: "flex-start",
   },
   calendarTitle: {
-    color: colors.primary,
-    fontSize: 26,
+    color: colors.text,
+    fontSize: 16,
     fontWeight: "800",
   },
   calendarHelper: {
-    color: colors.mutedSoft,
+    color: colors.muted,
     fontSize: 12,
-    lineHeight: 17,
-    marginTop: 10,
-    maxWidth: 150,
+    lineHeight: 16,
+    marginTop: 4,
+    maxWidth: 200,
   },
   calendarMonth: {
-    color: colors.primary,
-    fontSize: 11,
-    fontWeight: "900",
-    opacity: 0.4,
+    color: colors.mutedSoft,
+    fontSize: 10,
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 2.2,
+    letterSpacing: 0.6,
   },
   calendarWeekHeader: {
     flexDirection: "row",
@@ -418,27 +373,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   calendarWeekday: {
-    width: 38,
+    width: 36,
     textAlign: "center",
     color: colors.mutedSoft,
     fontSize: 10,
-    fontWeight: "900",
-    opacity: 0.28,
-    letterSpacing: 0.8,
+    fontWeight: "700",
   },
   calendarGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    rowGap: 18,
-    columnGap: 7,
+    rowGap: 10,
+    columnGap: 6,
   },
   calendarCell: {
-    width: 38,
-    height: 40,
-    borderRadius: 19,
+    width: 36,
+    height: 38,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 4,
   },
   calendarCellActiveMonth: {
     backgroundColor: "transparent",
@@ -450,28 +403,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderWidth: 1,
     borderColor: "rgba(18,67,67,0.12)",
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 4,
   },
   calendarCellTodayPending: {
     borderWidth: 1,
-    borderColor: "rgba(18,67,67,0.12)",
-    backgroundColor: "#FFFFFF",
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceLow,
   },
   calendarDayText: {
     color: colors.text,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "800",
   },
   calendarDayTextOutside: {
     color: colors.mutedSoft,
-    opacity: 0.14,
+    opacity: 0.35,
   },
   calendarDayTextCompleted: {
-    color: "rgba(18,67,67,0.8)",
+    color: "rgba(18,67,67,0.85)",
   },
   calendarDayTextTodayComplete: {
     color: "#FFFFFF",
@@ -480,34 +428,34 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   calendarDot: {
-    width: 6,
-    height: 6,
+    width: 5,
+    height: 5,
     borderRadius: 999,
-    backgroundColor: "rgba(18,67,67,0.18)",
+    backgroundColor: "rgba(18,67,67,0.2)",
   },
   calendarDotCompleted: {
     backgroundColor: colors.primary,
-    opacity: 0.36,
+    opacity: 0.4,
   },
   calendarDotTodayComplete: {
-    backgroundColor: colors.primary,
+    backgroundColor: "#FFFFFF",
     opacity: 1,
   },
   calendarDotTodayPending: {
     backgroundColor: colors.primary,
-    opacity: 0.5,
+    opacity: 0.55,
   },
   statsGrid: {
-    gap: 16,
+    gap: 10,
   },
   statCard: {
     width: "100%",
-    backgroundColor: "#FFFEFC",
-    borderRadius: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    backgroundColor: colors.surface,
+    borderRadius: theme.radius.lg,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "rgba(192,200,199,0.10)",
+    borderColor: colors.border,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -518,24 +466,22 @@ const styles = StyleSheet.create({
   statRowLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 10,
   },
   statIconWrap: {
-    width: 32,
-    height: 32,
+    width: 30,
+    height: 30,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "rgba(18,67,67,0.10)",
+    borderColor: colors.line,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.85)",
+    backgroundColor: colors.surfaceLow,
   },
   statLabel: {
     color: colors.muted,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 2,
-    fontSize: 10,
+    fontWeight: "700",
+    fontSize: 11,
     flexShrink: 1,
   },
   statRowRight: {
@@ -543,28 +489,25 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: colors.primary,
-    fontSize: 30,
-    lineHeight: 34,
+    fontSize: 18,
+    lineHeight: 22,
     fontWeight: "800",
-    letterSpacing: -1.2,
   },
   statHelper: {
     color: colors.mutedSoft,
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 11,
+    lineHeight: 15,
   },
   footerNoteWrap: {
     paddingTop: 2,
-    paddingBottom: 12,
+    paddingBottom: 8,
     alignItems: "center",
   },
   footerNote: {
     color: colors.mutedSoft,
-    fontSize: 13,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 17,
     textAlign: "center",
-    fontStyle: "italic",
-    opacity: 0.4,
     maxWidth: 280,
   },
 });
