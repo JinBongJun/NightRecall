@@ -5,16 +5,17 @@ import { MaterialIcons } from "@expo/vector-icons";
 import {
   Alert,
   findNodeHandle,
+  FlatList,
   Keyboard,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TextInputProps,
   View,
 } from "react-native";
+import type { ScrollView } from "react-native";
 import axios from "axios";
 
 import { BottomDock } from "../components/BottomDock";
@@ -29,6 +30,7 @@ import { deleteSavedInput, deleteTopic, fetchSavedInputs } from "../services/rev
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { SavedStudyInputSummary, Topic } from "../types/models";
 import { RootStackParamList } from "../types/navigation";
 
@@ -53,7 +55,7 @@ export function LibraryScreen({ navigation }: Props) {
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const scrollRef = useRef<ScrollView | null>(null);
+  const flatListRef = useRef<FlatList<SavedStudyInputSummary>>(null);
   const searchInputRef = useRef<TextInput | null>(null);
   const savedInputsCacheRef = useRef<SavedStudyInputSummary[]>([]);
   const starredTopicsRef = useRef<Topic[]>([]);
@@ -63,6 +65,14 @@ export function LibraryScreen({ navigation }: Props) {
   const removeSavedInput = useTopicsStore((state) => state.removeSavedInput);
   const setSavedInputsCache = useTopicsStore((state) => state.setSavedInputsCache);
   const trimmedQuery = searchQuery.trim().toLowerCase();
+
+  const scrollInputIntoView = useCallback(() => {
+    const inputHandle = findNodeHandle(searchInputRef.current);
+    const scrollResponder = flatListRef.current?.getScrollResponder?.() as ScrollView | undefined;
+    if (typeof inputHandle === "number" && scrollResponder?.scrollResponderScrollNativeHandleToKeyboard) {
+      scrollResponder.scrollResponderScrollNativeHandleToKeyboard(inputHandle, 132, true);
+    }
+  }, []);
 
   const buildLegacyItems = (topics: Topic[]): SavedStudyInputSummary[] =>
     topics.map((topic) => ({
@@ -168,23 +178,9 @@ export function LibraryScreen({ navigation }: Props) {
   useEffect(() => {
     const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
     const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-    const scrollToSearch = () => {
-      const inputHandle = findNodeHandle(searchInputRef.current);
-      const scrollResponder = scrollRef.current as ScrollView & {
-        scrollResponderScrollNativeHandleToKeyboard?: (
-          nodeHandle: number,
-          additionalOffset?: number,
-          preventNegativeScrollOffset?: boolean,
-        ) => void;
-      };
-      if (typeof inputHandle === "number") {
-        scrollResponder.scrollResponderScrollNativeHandleToKeyboard?.(inputHandle, 132, true);
-      }
-    };
-
     const showSubscription = Keyboard.addListener(showEvent, () => {
       setKeyboardVisible(true);
-      requestAnimationFrame(scrollToSearch);
+      requestAnimationFrame(scrollInputIntoView);
     });
     const hideSubscription = Keyboard.addListener(hideEvent, () => {
       setKeyboardVisible(false);
@@ -194,7 +190,7 @@ export function LibraryScreen({ navigation }: Props) {
       showSubscription.remove();
       hideSubscription.remove();
     };
-  }, []);
+  }, [scrollInputIntoView]);
 
   const filteredInputs = useMemo(
     () =>
@@ -262,102 +258,139 @@ export function LibraryScreen({ navigation }: Props) {
     }
   };
 
-
   const handleSearchFocus: NonNullable<TextInputProps["onFocus"]> = (event) => {
     const target = event.nativeEvent.target;
-    const scrollResponder = scrollRef.current as ScrollView & {
-      scrollResponderScrollNativeHandleToKeyboard?: (
-        nodeHandle: number,
-        additionalOffset?: number,
-        preventNegativeScrollOffset?: boolean,
-      ) => void;
-    };
+    const scrollResponder = flatListRef.current?.getScrollResponder?.() as ScrollView | undefined;
     requestAnimationFrame(() => {
-      if (typeof target === "number") {
-        scrollResponder.scrollResponderScrollNativeHandleToKeyboard?.(target, 132, true);
+      if (typeof target === "number" && scrollResponder?.scrollResponderScrollNativeHandleToKeyboard) {
+        scrollResponder.scrollResponderScrollNativeHandleToKeyboard(target, 132, true);
       }
     });
   };
 
-  return (
-    <ScreenContainer footer={<BottomDock active="Library" navigation={navigation} />} scrollRef={scrollRef}>
-      <TopBar
-        leftIcon="settings"
-        onLeftPress={() => navigation.navigate("Settings")}
-        rightIcon="account-circle"
-        onRightPress={() => navigation.navigate("Account")}
-      />
-
-      <ScreenHeader
-        iconName="collections-bookmark"
-        title="Saved learning"
-        subtitle={
-          keyboardVisible
-            ? undefined
-            : `${totalCount} card${totalCount === 1 ? "" : "s"} · tap one to make tonight's question`
-        }
-      />
-
-      <View style={styles.section}>
-        <SectionRow title="Saved cards" iconName="bookmark" actionLabel={`${totalCount} total`} />
-        {syncing ? <Text style={styles.syncingText}>Syncing...</Text> : null}
-
-        <SearchField
-          ref={searchInputRef}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onFocus={handleSearchFocus}
-          placeholder="Search saved photos or notes"
+  const listHeader = useMemo(
+    () => (
+      <>
+        <TopBar
+          leftIcon="settings"
+          onLeftPress={() => navigation.navigate("Settings")}
+          rightIcon="account-circle"
+          onRightPress={() => navigation.navigate("Account")}
         />
 
-        {loading ? (
-          <View style={styles.loadingRow}>
-            <MaterialIcons name="hourglass-empty" size={18} color={colors.primary} />
-            <Text style={styles.loadingText}>Loading saved learning...</Text>
-          </View>
-        ) : filteredInputs.length ? (
-          filteredInputs.map((item) => (
-            <SavedLearningCard
-              key={item.study_input_id || item.topic_id}
-              title={item.title}
-              preview={item.preview || "Open to review the saved points from this learning."}
-              bookmarkedCount={item.bookmarked_count}
-              imageUri={item.source_image_ref ? getSourceImageUrl(item.source_image_ref) : null}
-              imageHeaders={item.source_image_ref ? getSourceImageHeaders() : undefined}
-              deleting={!usingLegacyFallback && deletingStudyInputId === item.study_input_id}
-              onDelete={() => (usingLegacyFallback ? confirmLegacyDelete(item.topic_id, item.title) : confirmDelete(item))}
-              onPress={() =>
-                navigation.navigate("EditPoints", {
-                  variant: "saved",
-                  ...(item.study_input_id ? { studyInputId: item.study_input_id } : {}),
-                  topicId: item.topic_id,
-                })
-              }
-            />
-          ))
-        ) : (
-          <EmptyState
-            iconName={savedInputs.length ? "search-off" : "collections-bookmark"}
-            title={savedInputs.length ? "No matches found" : "Nothing saved yet"}
-            body={
-              savedInputs.length
-                ? "Try a different word or clear the search."
-                : "Saved cards will appear here after you extract points and save at least one of them."
-            }
-            />
-          )}
+        <ScreenHeader
+          iconName="collections-bookmark"
+          title="Saved learning"
+          subtitle={
+            keyboardVisible ? undefined : `${totalCount} card${totalCount === 1 ? "" : "s"} · tap one to make tonight's question`
+          }
+        />
 
-        {hasMore && !loading ? (
-          <Pressable style={({ pressed }) => [styles.loadMoreButton, pressed && styles.loadMoreButtonPressed]} onPress={() => void loadMore()}>
-            <Text style={styles.loadMoreText}>{loadingMore ? "Loading more..." : "Load more"}</Text>
-          </Pressable>
-        ) : null}
-      </View>
+        <View style={styles.section}>
+          <SectionRow title="Saved cards" iconName="bookmark" actionLabel={`${totalCount} total`} />
+          {syncing ? <Text style={styles.syncingText}>Syncing...</Text> : null}
+
+          <SearchField
+            ref={searchInputRef}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onFocus={handleSearchFocus}
+            placeholder="Search saved photos or notes"
+          />
+        </View>
+      </>
+    ),
+    [handleSearchFocus, keyboardVisible, navigation, searchQuery, syncing, totalCount],
+  );
+
+  const listFooter = useMemo(() => {
+    if (!hasMore || loading) {
+      return null;
+    }
+    return (
+      <Pressable style={({ pressed }) => [styles.loadMoreButton, pressed && styles.loadMoreButtonPressed]} onPress={() => void loadMore()}>
+        <Text style={styles.loadMoreText}>{loadingMore ? "Loading more..." : "Load more"}</Text>
+      </Pressable>
+    );
+  }, [hasMore, loadMore, loading, loadingMore]);
+
+  const listEmpty = useMemo(() => {
+    if (loading) {
+      return (
+        <View style={styles.loadingRow}>
+          <MaterialIcons name="hourglass-empty" size={18} color={colors.primary} />
+          <Text style={styles.loadingText}>Loading saved learning...</Text>
+        </View>
+      );
+    }
+    return (
+      <EmptyState
+        iconName={savedInputs.length ? "search-off" : "collections-bookmark"}
+        title={savedInputs.length ? "No matches found" : "Nothing saved yet"}
+        body={
+          savedInputs.length
+            ? "Try a different word or clear the search."
+            : "Saved cards will appear here after you extract points and save at least one of them."
+        }
+      />
+    );
+  }, [loading, savedInputs.length]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: SavedStudyInputSummary }) => (
+      <SavedLearningCard
+        title={item.title}
+        preview={item.preview || "Open to review the saved points from this learning."}
+        bookmarkedCount={item.bookmarked_count}
+        imageUri={item.source_image_ref ? getSourceImageUrl(item.source_image_ref) : null}
+        imageHeaders={item.source_image_ref ? getSourceImageHeaders() : undefined}
+        deleting={!usingLegacyFallback && deletingStudyInputId === item.study_input_id}
+        onDelete={() => (usingLegacyFallback ? confirmLegacyDelete(item.topic_id, item.title) : confirmDelete(item))}
+        onPress={() =>
+          navigation.navigate("EditPoints", {
+            variant: "saved",
+            ...(item.study_input_id ? { studyInputId: item.study_input_id } : {}),
+            topicId: item.topic_id,
+          })
+        }
+      />
+    ),
+    [deletingStudyInputId, navigation, usingLegacyFallback],
+  );
+
+  return (
+    <ScreenContainer footer={<BottomDock active="Library" navigation={navigation} />} scrollable={false}>
+      <FlatList
+        ref={flatListRef}
+        data={loading ? [] : filteredInputs}
+        keyExtractor={(item) => item.study_input_id || item.topic_id}
+        renderItem={renderItem}
+        ListHeaderComponent={listHeader}
+        ListEmptyComponent={listEmpty}
+        ListFooterComponent={listFooter}
+        ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+        contentContainerStyle={styles.listContent}
+        style={styles.list}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+      />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    flexGrow: 1,
+    paddingBottom: theme.spacing.md,
+    gap: 0,
+  },
+  itemSeparator: {
+    height: theme.spacing.sm,
+  },
   section: {
     gap: 10,
   },
@@ -371,7 +404,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    paddingVertical: 20,
+    paddingVertical: 28,
   },
   loadingText: {
     color: colors.primary,
@@ -380,7 +413,8 @@ const styles = StyleSheet.create({
   },
   loadMoreButton: {
     alignSelf: "center",
-    marginTop: 6,
+    marginTop: 8,
+    marginBottom: 8,
     paddingVertical: 12,
     paddingHorizontal: 18,
     borderRadius: 999,

@@ -67,8 +67,8 @@ export function StatsScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.calendarWeekHeader}>
-          {WEEKDAY_LABELS.map((label) => (
-            <Text key={label} style={styles.calendarWeekday}>
+          {WEEKDAY_LABELS.map((label, index) => (
+            <Text key={`weekday-${index}`} style={styles.calendarWeekday}>
               {label}
             </Text>
           ))}

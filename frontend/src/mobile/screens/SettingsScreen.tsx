@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   section: {
-    gap: 12,
+    gap: 10,
   },
   card: {
     backgroundColor: colors.surface,
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 18,
-    paddingVertical: 18,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
     gap: 12,

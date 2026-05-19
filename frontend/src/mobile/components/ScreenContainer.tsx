@@ -8,9 +8,11 @@ import { colors } from "../theme/colors";
 type Props = PropsWithChildren<{
   footer?: ReactNode;
   scrollRef?: RefObject<ScrollView | null>;
+  /** When false, children manage their own scroll (e.g. FlatList). Outer padding/safe area still applied. */
+  scrollable?: boolean;
 }>;
 
-export function ScreenContainer({ children, footer, scrollRef }: Props) {
+export function ScreenContainer({ children, footer, scrollRef, scrollable = true }: Props) {
   const insets = useSafeAreaInsets();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -38,18 +40,29 @@ export function ScreenContainer({ children, footer, scrollRef }: Props) {
         style={styles.keyboardArea}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView
-          ref={scrollRef}
-          contentContainerStyle={[styles.content, { paddingTop: insets.top + theme.spacing.sm, paddingBottom: contentBottomPadding }]}
-          style={styles.scroll}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          overScrollMode="never"
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-        >
-          {children}
-        </ScrollView>
+        {scrollable ? (
+          <ScrollView
+            ref={scrollRef}
+            contentContainerStyle={[styles.content, { paddingTop: insets.top + theme.spacing.sm, paddingBottom: contentBottomPadding }]}
+            style={styles.scroll}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+            overScrollMode="never"
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+          >
+            {children}
+          </ScrollView>
+        ) : (
+          <View
+            style={[
+              styles.staticOuter,
+              { paddingTop: insets.top + theme.spacing.sm, paddingBottom: contentBottomPadding, paddingHorizontal: theme.spacing.md },
+            ]}
+          >
+            {children}
+          </View>
+        )}
       </KeyboardAvoidingView>
       {footer && !keyboardVisible ? (
         <View style={[styles.footerWrap, { paddingBottom: Math.max(insets.bottom, 10) }]}>{footer}</View>
@@ -79,7 +92,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: theme.spacing.md,
     backgroundColor: colors.surface,
+  },
+  staticOuter: {
+    flex: 1,
+    minHeight: 0,
   },
 });
