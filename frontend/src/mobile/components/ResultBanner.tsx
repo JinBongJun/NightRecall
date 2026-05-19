@@ -1,0 +1,82 @@
+import { StyleSheet, Text, View } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+
+import { colors } from "../theme/colors";
+import { theme } from "../theme";
+
+type Props = {
+  correct: boolean;
+  body: string;
+  meta?: string;
+};
+
+export function ResultBanner({ correct, body, meta }: Props) {
+  return (
+    <View style={[styles.card, correct ? styles.cardCorrect : styles.cardIncorrect]}>
+      <View style={styles.row}>
+        <View style={[styles.iconWrap, correct ? styles.iconCorrect : styles.iconIncorrect]}>
+          <MaterialIcons name={correct ? "check" : "close"} size={22} color={correct ? colors.primary : colors.accent} />
+        </View>
+        <View style={styles.copy}>
+          <Text style={styles.title}>{correct ? "Correct" : "Not quite"}</Text>
+          <Text style={styles.body}>{body}</Text>
+          {meta ? <Text style={styles.meta}>{meta}</Text> : null}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    borderWidth: 1,
+    gap: 4,
+  },
+  cardCorrect: {
+    backgroundColor: colors.primarySoft,
+    borderColor: "rgba(15,76,63,0.15)",
+  },
+  cardIncorrect: {
+    backgroundColor: colors.accentSoft,
+    borderColor: "rgba(199,123,74,0.2)",
+  },
+  row: {
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "flex-start",
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconCorrect: {
+    backgroundColor: colors.surface,
+  },
+  iconIncorrect: {
+    backgroundColor: colors.surface,
+  },
+  copy: {
+    flex: 1,
+    gap: 4,
+  },
+  title: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: "800",
+  },
+  body: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  meta: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: "700",
+  },
+});

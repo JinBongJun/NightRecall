@@ -1,5 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import { useMemo, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
@@ -9,17 +8,18 @@ import { BottomDock } from "../components/BottomDock";
 import { SectionRow } from "../components/SectionRow";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
-import { fetchUsageLimits } from "../services/usageService";
-import type { UsageLimits } from "../services/usageService";
+import { useUsageLimits } from "../hooks/useUsageLimits";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Capture">;
 
 export function CaptureScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
-  const [usageLimits, setUsageLimits] = useState<UsageLimits | null>(null);
+  const usageLimits = useUsageLimits();
   const [selectedImage, setSelectedImage] = useState<{
     label: string;
     base64: string;
@@ -29,28 +29,8 @@ export function CaptureScreen({ navigation }: Props) {
   } | null>(null);
   const canContinue = Boolean(selectedImage?.base64);
 
-  const questionGenerationsRemaining = usageLimits?.question_generation_daily.remaining ?? 3;
   const photoReadsRemaining = usageLimits?.photo_extract_daily.remaining ?? null;
   const photoReadsLocked = photoReadsRemaining === 0;
-
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
-      void fetchUsageLimits()
-        .then((limits) => {
-          if (active) {
-            setUsageLimits(limits);
-          }
-        })
-        .catch(() => {
-          // Keep the flow permissive if we cannot load limits; backend still enforces them.
-        });
-
-      return () => {
-        active = false;
-      };
-    }, []),
-  );
 
   const photoLimitCopy = useMemo(() => {
     if (photoReadsRemaining === null) {
@@ -118,11 +98,15 @@ export function CaptureScreen({ navigation }: Props) {
     <ScreenContainer footer={<BottomDock active="Create" navigation={navigation} />}>
       <TopBar leftIcon="settings" onLeftPress={() => navigation.navigate("Settings")} rightIcon="account-circle" onRightPress={() => navigation.navigate("Account")} />
 
-      <ScreenHeader
-        iconName="add-photo-alternate"
-        title="Capture learning"
-        subtitle={`${questionGenerationsRemaining} questions · ${photoReadsRemaining ?? 3} photo reads left tonight`}
-      />
+      <ScreenHeader iconName="add-photo-alternate" title="Capture learning" subtitle="Photo or note for tonight's question." />
+
+      <TonightLimitsBar />
+
+      <Pressable style={styles.libraryLink} onPress={() => navigation.navigate("Library")}>
+        <MaterialIcons name="auto-stories" size={18} color={colors.primary} />
+        <Text style={styles.libraryLinkText}>Use saved learning instead</Text>
+        <MaterialIcons name="chevron-right" size={18} color={colors.mutedSoft} />
+      </Pressable>
 
       <SectionRow title="Quick capture" iconName="photo-camera" />
       {photoLimitCopy && photoReadsLocked ? (
@@ -215,6 +199,19 @@ export function CaptureScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  libraryLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  libraryLinkText: {
+    flex: 1,
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: "700",
+  },
   actions: {
     flexDirection: "row",
     gap: 10,

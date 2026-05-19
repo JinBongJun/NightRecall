@@ -30,7 +30,14 @@ export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, i
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
-          <Pressable style={({ pressed }) => [styles.deleteButton, pressed && styles.deletePressed]} onPress={onDelete} hitSlop={8}>
+          <Pressable
+            style={({ pressed }) => [styles.deleteButton, pressed && styles.deletePressed]}
+            onPress={(event) => {
+              event.stopPropagation();
+              onDelete();
+            }}
+            hitSlop={8}
+          >
             <MaterialIcons name={deleting ? "hourglass-empty" : "delete-outline"} size={18} color={colors.primary} />
           </Pressable>
         </View>

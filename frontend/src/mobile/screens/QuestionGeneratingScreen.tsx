@@ -463,7 +463,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   wrap: {
     flex: 1,
-    minHeight: 520,
+    minHeight: 280,
     justifyContent: "center",
     alignItems: "center",
     gap: 28,

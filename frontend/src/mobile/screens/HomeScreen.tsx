@@ -174,7 +174,12 @@ export function HomeScreen({ navigation }: Props) {
           </View>
         </View>
 
-        <Text style={styles.streakText}>{streak}-day streak</Text>
+        <View style={styles.metaRow}>
+          <Text style={styles.streakText}>{streak}-day streak</Text>
+          <Pressable onPress={() => navigation.navigate("Stats")} hitSlop={8}>
+            <Text style={styles.statsLink}>See progress</Text>
+          </Pressable>
+        </View>
 
         <View style={styles.tonightCopy}>
           <Text style={styles.tonightEyebrow}>{tonightState.eyebrow}</Text>
@@ -266,11 +271,21 @@ const styles = StyleSheet.create({
     height: 26,
     backgroundColor: colors.line,
   },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 2,
+  },
   streakText: {
     color: colors.mutedSoft,
     fontSize: 11,
     fontWeight: "700",
-    textAlign: "center",
+  },
+  statsLink: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: "800",
   },
   tonightCopy: {
     gap: 3,

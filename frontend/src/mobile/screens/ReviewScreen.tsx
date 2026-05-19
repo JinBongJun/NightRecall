@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -29,12 +29,11 @@ export function ReviewScreen({ navigation }: Props) {
   const setResult = useReviewStore((state) => state.setResult);
   const queueRetryQuestion = useReviewStore((state) => state.queueRetryQuestion);
   const startedAt = useRef(Date.now());
-  const [devResurfacedPreview, setDevResurfacedPreview] = useState(false);
   const totalQuestions = sessionQuestions.length ? sessionQuestions.length : 1;
   const currentNumber = currentQuestionMode === "retry" ? totalQuestions : sessionQuestions.length ? sessionIndex + 1 : 1;
   const progressRatio = currentQuestionMode === "retry" ? 1 : Math.min(1, Math.max(0, currentNumber / totalQuestions));
   const remainingAfterCurrent = currentQuestionMode === "retry" ? 0 : Math.max(0, totalQuestions - currentNumber);
-  const isResurfaced = currentQuestion?.resurface_reason === "missed_before" || (__DEV__ && devResurfacedPreview);
+  const isResurfaced = currentQuestion?.resurface_reason === "missed_before";
 
   const canSubmit = useMemo(() => {
     if (!currentQuestion) return false;
@@ -90,11 +89,7 @@ export function ReviewScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer>
-      <TopBar 
-        leftIcon="arrow-back" 
-        onLeftPress={() => navigation.goBack()} 
-        title="Review"
-      />
+      <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} />
 
       <View style={styles.statusCard}>
         <View style={styles.statusHeader}>
@@ -128,13 +123,6 @@ export function ReviewScreen({ navigation }: Props) {
               : "Last question for tonight"}
           </Text>
         </View>
-        {__DEV__ && currentQuestionMode === "normal" && currentQuestion?.resurface_reason !== "missed_before" ? (
-          <Pressable style={styles.devToggle} onPress={() => setDevResurfacedPreview((current) => !current)}>
-            <Text style={styles.devToggleText}>
-            {devResurfacedPreview ? "Hide one more look preview" : "Preview one more look"}
-            </Text>
-          </Pressable>
-        ) : null}
       </View>
 
       <SectionRow title="Question" iconName="quiz" />
@@ -244,19 +232,6 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 13,
     fontWeight: "700",
-  },
-  devToggle: {
-    alignSelf: "flex-start",
-    marginTop: 8,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: colors.surfaceLow,
-  },
-  devToggleText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: "800",
   },
   questionCard: {
     backgroundColor: colors.surface,

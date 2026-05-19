@@ -3,11 +3,12 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { ActionButton } from "../components/ActionButton";
 import { TopBar } from "../components/TopBar";
-import { HeroCard } from "../components/HeroCard";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { ResultBanner } from "../components/ResultBanner";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Result">;
@@ -24,6 +25,7 @@ export function ResultScreen({ navigation }: Props) {
   const resetSession = useReviewStore((state) => state.resetSession);
   const remaining = sessionQuestions.length ? Math.max(0, sessionQuestions.length - (sessionIndex + 1)) : 0;
   const retryReady = Boolean(retryQuestion) && !retryUsed && currentQuestionMode !== "retry";
+  const isCorrect = Boolean(result?.is_correct);
 
   const done = () => {
     resetSession();
@@ -46,28 +48,25 @@ export function ResultScreen({ navigation }: Props) {
     navigation.navigate("Review", { mode: "auto" });
   };
 
+  const meta =
+    remaining > 0
+      ? `${remaining} more question${remaining > 1 ? "s" : ""} left tonight.`
+      : retryReady
+        ? "One more try is ready."
+        : "This set is done for tonight.";
+
   return (
     <ScreenContainer>
-      <TopBar />
+      <TopBar leftIcon="close" onLeftPress={done} />
 
-      <HeroCard
-        overline="Tonight's result"
-        title={result?.is_correct ? "Correct" : "Not quite"}
-        tone={result?.is_correct ? "primary" : "accent"}
-        iconName={result?.is_correct ? "check" : "close"}
+      <ResultBanner
+        correct={isCorrect}
         body={
-          result?.is_correct
+          isCorrect
             ? "You pulled the right idea back tonight."
             : "That one needs another pass, but the recall still counts."
         }
-        meta={
-          remaining > 0
-            ? `${remaining} more question${remaining > 1 ? "s" : ""} still ready tonight.`
-            : retryReady
-              ? "One more try is ready tonight."
-            : "This set is done for tonight."
-        }
-        titleMaxWidth={220}
+        meta={meta}
       />
 
       <View style={styles.explanationCard}>
@@ -75,13 +74,10 @@ export function ResultScreen({ navigation }: Props) {
         <Text style={styles.body}>{result?.explanation ?? "No explanation available."}</Text>
       </View>
 
-      <View style={styles.streakCard}>
-        <Text style={styles.streakLabel}>Consistency</Text>
+      <View style={styles.streakRow}>
         <Text style={styles.streakValue}>{result?.current_streak ?? 0}-night streak</Text>
         <Text style={styles.streakHelper}>
-          {result?.current_streak
-            ? "Your recall habit is still active."
-            : "Start your streak again tonight."}
+          {result?.current_streak ? "Your recall habit is still active." : "Start your streak again tonight."}
         </Text>
       </View>
 
@@ -103,49 +99,33 @@ export function ResultScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-
   explanationCard: {
-    backgroundColor: "rgba(255,253,248,0.94)",
-    borderRadius: 24,
-    padding: 22,
-    gap: 10,
+    backgroundColor: colors.surface,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    gap: 8,
     borderWidth: 1,
     borderColor: colors.border,
   },
   explanationLabel: {
-    color: colors.muted,
+    color: colors.mutedSoft,
     textTransform: "uppercase",
-    letterSpacing: 1,
-    fontSize: 12,
+    letterSpacing: 0.8,
+    fontSize: 11,
     fontWeight: "800",
-  },
-  streakCard: {
-    backgroundColor: "rgba(255,253,248,0.94)",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 20,
-    gap: 10,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
   },
   body: {
     color: colors.text,
-    lineHeight: 28,
-    fontSize: 18,
+    lineHeight: 22,
+    fontSize: 15,
   },
-  streakLabel: {
-    color: colors.muted,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    fontSize: 12,
-    fontWeight: "800",
+  streakRow: {
+    gap: 4,
+    paddingHorizontal: 4,
   },
   streakValue: {
     color: colors.primary,
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "800",
   },
   streakHelper: {

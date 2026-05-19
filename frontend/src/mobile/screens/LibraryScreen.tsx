@@ -262,7 +262,6 @@ export function LibraryScreen({ navigation }: Props) {
     }
   };
 
-  const totalBookmarkedCount = savedInputs.reduce((sum, item) => sum + item.bookmarked_count, 0);
 
   const handleSearchFocus: NonNullable<TextInputProps["onFocus"]> = (event) => {
     const target = event.nativeEvent.target;
@@ -292,32 +291,12 @@ export function LibraryScreen({ navigation }: Props) {
       <ScreenHeader
         iconName="collections-bookmark"
         title="Saved learning"
-        subtitle="Only the photos or notes where you saved points appear here. Open one card to review those saved points."
+        subtitle={
+          keyboardVisible
+            ? undefined
+            : `${totalCount} card${totalCount === 1 ? "" : "s"} · tap one to make tonight's question`
+        }
       />
-
-      {!keyboardVisible ? (
-        <View style={styles.overviewCard}>
-          <View style={styles.summaryRow}>
-            <View style={styles.summaryPill}>
-              <Text style={styles.summaryValue}>{totalCount}</Text>
-              <Text style={styles.summaryLabel}>Cards</Text>
-            </View>
-            <View style={styles.summaryPill}>
-              <Text style={styles.summaryValue}>{totalBookmarkedCount}</Text>
-              <Text style={styles.summaryLabel}>Loaded points</Text>
-            </View>
-            <View style={styles.summaryPill}>
-              <Text style={styles.summaryValue}>{filteredInputs.length}</Text>
-              <Text style={styles.summaryLabel}>Shown</Text>
-            </View>
-          </View>
-          <Text style={styles.heroMeta}>
-            {usingLegacyFallback
-              ? "Open one bookmarked item to review the saved points and make tonight's question."
-              : "Each card represents one saved photo or note. Open it to review what you kept and make tonight's question."}
-          </Text>
-        </View>
-      ) : null}
 
       <View style={styles.section}>
         <SectionRow title="Saved cards" iconName="bookmark" actionLabel={`${totalCount} total`} />
@@ -348,7 +327,8 @@ export function LibraryScreen({ navigation }: Props) {
               deleting={!usingLegacyFallback && deletingStudyInputId === item.study_input_id}
               onDelete={() => (usingLegacyFallback ? confirmLegacyDelete(item.topic_id, item.title) : confirmDelete(item))}
               onPress={() =>
-                navigation.navigate("SavedCardDetail", {
+                navigation.navigate("EditPoints", {
+                  variant: "saved",
                   ...(item.study_input_id ? { studyInputId: item.study_input_id } : {}),
                   topicId: item.topic_id,
                 })

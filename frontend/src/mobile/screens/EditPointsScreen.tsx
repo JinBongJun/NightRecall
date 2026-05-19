@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
@@ -7,8 +7,8 @@ import axios from "axios";
 import { ActionButton } from "../components/ActionButton";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { QuantitySelector } from "../components/QuantitySelector";
-import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import { fetchSavedInputDetail, fetchSavedTopicSource } from "../services/reviewService";
@@ -126,7 +126,6 @@ export function EditPointsScreen({ route, navigation }: Props) {
   }, [navigation, route.params]);
 
   const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
-  const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
   const tonightIsFull = remainingQuestionsTonight <= 0;
   const usablePointCount = newPoints.filter((point) => point.text.trim()).length;
   const normalizedSourcePreview =
@@ -289,17 +288,13 @@ export function EditPointsScreen({ route, navigation }: Props) {
 
   return (
     <ScreenContainer>
-      <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} title="Edit Points" />
-
-      <ScreenHeader
-        iconName="fact-check"
-        title="Shape tonight's question"
-        subtitle={
-          route.params.variant === "new"
-            ? "Check the source, adjust the points, then generate a clean recall."
-            : "Review the saved source, choose the saved points you want, then generate tonight's recall."
-        }
+      <TopBar
+        leftIcon="arrow-back"
+        onLeftPress={() => navigation.goBack()}
+        title={route.params.variant === "new" ? "Edit points" : "Make question"}
       />
+
+      <TonightLimitsBar />
 
       {loading ? (
         <View style={styles.loadingCard}>
@@ -327,8 +322,9 @@ export function EditPointsScreen({ route, navigation }: Props) {
               />
             ) : (
               <View style={styles.savedSourceCopy}>
-                {savedSourcePreview ? <Text style={styles.savedSourcePreview}>{savedSourcePreview}</Text> : null}
-                <Text style={styles.savedSourceText}>{normalizedSavedSourceText}</Text>
+                <Text style={styles.savedSourceText}>
+                  {savedSourcePreview.trim() || "No saved source text."}
+                </Text>
               </View>
             )}
           </View>
@@ -366,7 +362,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>Extracted points</Text>
               <Text style={styles.sectionHelper}>Choose the points AI should use for tonight's question.</Text>
-              <ScrollView contentContainerStyle={styles.topicList} showsVerticalScrollIndicator={false}>
+              <View style={styles.topicList}>
                 {savedTopics.map((topic, index) => {
                   const selected = selectedTopicIds.includes(topic.id);
                   return (
@@ -389,15 +385,13 @@ export function EditPointsScreen({ route, navigation }: Props) {
                     </Pressable>
                   );
                 })}
-              </ScrollView>
+              </View>
             </View>
           )}
 
           <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Question count</Text>
             <Text style={styles.summaryBody}>Start with 1 question. You can make up to 3 if you want.</Text>
-            <Text style={styles.summaryCapacity}>{`${remainingQuestionsTonight} questions left tonight.`}</Text>
-            <Text style={styles.summaryHelper}>{`${remainingPhotoReadsTonight} photo reads left tonight.`}</Text>
             <QuantitySelector
               values={[1, 2, 3]}
               selectedValue={selectedQuestionCount}

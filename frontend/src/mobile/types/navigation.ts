@@ -3,7 +3,6 @@ import type { CaptureMode, ReviewMode } from "./domain";
 export type RootStackParamList = {
   Onboarding: undefined;
   Home: undefined;
-  Create: undefined;
   Capture: undefined;
   CaptureNote: undefined;
   Processing: {
@@ -32,10 +31,6 @@ export type RootStackParamList = {
     | {
         reason: "question_generation_daily" | "question_generation_monthly";
       };
-  SavedCardDetail: {
-    studyInputId?: string;
-    topicId?: string;
-  };
   EditPoints:
     | {
         variant: "new";

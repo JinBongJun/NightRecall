@@ -119,18 +119,7 @@ export function AccountScreen({ navigation }: Props) {
           </View>
           <View style={styles.actionCopy}>
             <Text style={styles.actionTitle}>Recall stats</Text>
-            <Text style={styles.actionBody}>Check streaks, progress, and recent performance.</Text>
-          </View>
-          <MaterialIcons name="chevron-right" size={22} color={colors.muted} />
-        </Pressable>
-
-        <Pressable style={styles.actionCard} onPress={() => navigation.navigate("PrivacyPolicy")}>
-          <View style={[styles.actionIconWrap, styles.secondaryActionIconWrap]}>
-            <MaterialIcons name="privacy-tip" size={22} color={colors.primary} />
-          </View>
-          <View style={styles.actionCopy}>
-            <Text style={styles.actionTitle}>Privacy policy</Text>
-            <Text style={styles.actionBody}>Read how NightRecall handles your data.</Text>
+            <Text style={styles.actionBody}>Streak, accuracy, and this month at a glance.</Text>
           </View>
           <MaterialIcons name="chevron-right" size={22} color={colors.muted} />
         </Pressable>
