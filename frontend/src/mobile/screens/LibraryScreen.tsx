@@ -51,6 +51,7 @@ export function LibraryScreen({ navigation }: Props) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [deletingStudyInputId, setDeletingStudyInputId] = useState<string | null>(null);
   const [usingLegacyFallback, setUsingLegacyFallback] = useState(false);
+  const [syncFailed, setSyncFailed] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -127,10 +128,12 @@ export function LibraryScreen({ navigation }: Props) {
           setTotalCount(response.total_count);
           setSavedInputsCache(response.items);
           setUsingLegacyFallback(false);
+          setSyncFailed(false);
         }
       } catch {
         if (!cancelled) {
           hydrateImmediateItems();
+          setSyncFailed(true);
         }
       } finally {
         if (!cancelled) {
@@ -289,6 +292,13 @@ export function LibraryScreen({ navigation }: Props) {
         <View style={styles.section}>
           <SectionRow title="Saved cards" iconName="bookmark" actionLabel={`${totalCount} total`} />
           {syncing ? <Text style={styles.syncingText}>Syncing...</Text> : null}
+          {usingLegacyFallback && syncFailed ? (
+            <View style={styles.syncWarning}>
+              <Text style={styles.syncWarningText}>
+                Could not refresh from the server. Showing saved items cached on this device.
+              </Text>
+            </View>
+          ) : null}
 
           <SearchField
             ref={searchInputRef}
@@ -300,7 +310,7 @@ export function LibraryScreen({ navigation }: Props) {
         </View>
       </>
     ),
-    [handleSearchFocus, keyboardVisible, navigation, searchQuery, syncing, totalCount],
+    [handleSearchFocus, keyboardVisible, navigation, searchQuery, syncFailed, syncing, totalCount, usingLegacyFallback],
   );
 
   const listFooter = useMemo(() => {
@@ -398,6 +408,20 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 11,
     fontWeight: "800",
+  },
+  syncWarning: {
+    backgroundColor: "rgba(213,230,220,0.45)",
+    borderRadius: theme.radius.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  syncWarningText: {
+    color: colors.secondary,
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "600",
   },
   loadingRow: {
     flexDirection: "row",

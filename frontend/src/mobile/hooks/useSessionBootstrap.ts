@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { restorePersistedSession } from "../services/authSessionService";
+import { restoreReviewSession } from "../services/restoreReviewSession";
 import { fetchEntitlements } from "../services/entitlementsService";
 import { syncNightlyReminder } from "../services/reminderService";
 import { bootstrapSession } from "../services/bootstrapSession";
@@ -35,6 +36,12 @@ export function useSessionBootstrap() {
 
       if (!active || !session) {
         return;
+      }
+
+      try {
+        await restoreReviewSession();
+      } catch {
+        // Keep the nightly flow moving if local recall state cannot be restored.
       }
 
       try {

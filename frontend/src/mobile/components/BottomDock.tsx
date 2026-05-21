@@ -6,7 +6,7 @@ import { theme } from "../theme";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
 
-type TabKey = "Home" | "Create" | "Library";
+type TabKey = "Home" | "Capture" | "Library";
 
 type Props = {
   active: TabKey;
@@ -14,13 +14,13 @@ type Props = {
 };
 
 const tabs: Array<{ key: TabKey; label: string; icon: keyof typeof MaterialIcons.glyphMap }> = [
-  { key: "Create", label: "Create", icon: "add-circle" },
+  { key: "Capture", label: "Capture", icon: "add-circle" },
   { key: "Home", label: "Home", icon: "home" },
   { key: "Library", label: "Library", icon: "auto-stories" },
 ];
 
 function navigateTab(navigation: NavigationProp<RootStackParamList>, key: TabKey) {
-  if (key === "Create") {
+  if (key === "Capture") {
     navigation.navigate("Capture");
     return;
   }

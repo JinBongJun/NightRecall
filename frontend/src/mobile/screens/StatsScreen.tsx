@@ -1,4 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useStatsRefresh } from "../hooks/useStatsRefresh";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -14,6 +15,8 @@ type Props = NativeStackScreenProps<RootStackParamList, "Stats">;
 const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function StatsScreen({ navigation }: Props) {
+  useStatsRefresh();
+
   const streak = useStatsStore((state) => state.streak);
   const totalAnswered = useStatsStore((state) => state.totalAnswered);
   const accuracy = useStatsStore((state) => state.accuracy);

@@ -11,6 +11,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
+import { isQuestionGenerationFull, remainingQuestionGenerations } from "../utils/usageLimitDisplay";
 import { fetchSavedInputDetail, fetchSavedTopicSource } from "../services/reviewService";
 import { createStudyInput, deleteSourceImage, uploadSourceImage } from "../services/studyService";
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
@@ -125,8 +126,9 @@ export function EditPointsScreen({ route, navigation }: Props) {
     };
   }, [navigation, route.params]);
 
-  const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
-  const tonightIsFull = remainingQuestionsTonight <= 0;
+  const remainingQuestionsTonight = remainingQuestionGenerations(usageLimits);
+  const tonightIsFull = isQuestionGenerationFull(usageLimits);
+  const maxSelectableQuestions = remainingQuestionsTonight ?? 3;
   const usablePointCount = newPoints.filter((point) => point.text.trim()).length;
   const normalizedSourcePreview =
     route.params.variant === "new"
@@ -265,7 +267,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         mode: route.params.mode,
         sourceText: sourceDraft,
         points: newPoints,
-        selectedQuestionCount: Math.min(selectedQuestionCount, remainingQuestionsTonight),
+        selectedQuestionCount: Math.min(selectedQuestionCount, maxSelectableQuestions),
         imageBase64: route.params.imageBase64,
         imageMimeType: route.params.imageMimeType,
       });
@@ -282,7 +284,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
       studyInputId: route.params.studyInputId,
       topicId: route.params.topicId,
       selectedTopicIds,
-      selectedQuestionCount: Math.min(selectedQuestionCount, remainingQuestionsTonight),
+      selectedQuestionCount: Math.min(selectedQuestionCount, maxSelectableQuestions),
     });
   };
 
@@ -395,7 +397,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
             <QuantitySelector
               values={[1, 2, 3]}
               selectedValue={selectedQuestionCount}
-              maxEnabledValue={remainingQuestionsTonight}
+              maxEnabledValue={maxSelectableQuestions}
               disabled={tonightIsFull}
               onChange={setSelectedQuestionCount}
             />

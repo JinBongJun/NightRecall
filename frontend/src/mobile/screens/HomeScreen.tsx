@@ -7,9 +7,14 @@ import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { BottomDock } from "../components/BottomDock";
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { useStatsRefresh } from "../hooks/useStatsRefresh";
 import { useTonightQuestion } from "../hooks/useTonightQuestion";
 import { useUsageLimits } from "../hooks/useUsageLimits";
-import { fetchStats } from "../services/statsService";
+import {
+  formatRemainingCount,
+  remainingPhotoReads,
+  remainingQuestionGenerations,
+} from "../utils/usageLimitDisplay";
 import { useReminderStore } from "../store/reminderStore";
 import { useReviewStore } from "../store/reviewStore";
 import { useStatsStore } from "../store/statsStore";
@@ -28,37 +33,15 @@ export function HomeScreen({ navigation }: Props) {
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const streak = useStatsStore((state) => state.streak);
   const answeredToday = useStatsStore((state) => state.answeredToday);
-  const setStats = useStatsStore((state) => state.setStats);
 
   const heroAnim = useRef(new Animated.Value(0)).current;
 
+  useStatsRefresh();
+
   useFocusEffect(
     useCallback(() => {
-      let active = true;
       void loadTonightQuestion();
-      void fetchStats()
-        .then((stats) => {
-          if (!active) {
-            return;
-          }
-
-          setStats({
-            streak: stats.current_streak,
-            totalAnswered: stats.total_answered,
-            accuracy: stats.accuracy,
-            answeredToday: stats.answered_today,
-            recentWrongTopics: stats.recent_wrong_topics,
-            answeredDatesThisMonth: stats.answered_dates_this_month,
-          });
-        })
-        .catch(() => {
-          // Keep the last known stats if refresh fails.
-        });
-
-      return () => {
-        active = false;
-      };
-    }, [loadTonightQuestion, setStats]),
+    }, [loadTonightQuestion]),
   );
 
   useEffect(() => {
@@ -80,8 +63,9 @@ export function HomeScreen({ navigation }: Props) {
       : currentQuestion
         ? 1
         : 0;
-  const remainingQuestionsTonight = usageLimits?.question_generation_daily.remaining ?? 3;
-  const remainingPhotoReadsTonight = usageLimits?.photo_extract_daily.remaining ?? 3;
+  const remainingQuestionsTonight = remainingQuestionGenerations(usageLimits);
+  const remainingPhotoReadsTonight = remainingPhotoReads(usageLimits);
+  const canAddQuestionTonight = remainingQuestionsTonight === null || remainingQuestionsTonight > 0;
   const todayLabel = useMemo(
     () =>
       new Intl.DateTimeFormat("en-US", {
@@ -101,8 +85,8 @@ export function HomeScreen({ navigation }: Props) {
             : "Pull it back before sleep.",
         primaryLabel: "Start recall",
         primaryAction: () => navigation.navigate("Review", { mode: "auto" }),
-        secondaryLabel: remainingQuestionsTonight > 0 ? "Add question" : null,
-        secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Capture") : null,
+        secondaryLabel: canAddQuestionTonight ? "Add question" : null,
+        secondaryAction: canAddQuestionTonight ? () => navigation.navigate("Capture") : null,
       }
     : answeredToday
       ? {
@@ -111,8 +95,8 @@ export function HomeScreen({ navigation }: Props) {
           body: "Come back tomorrow, or add one more question.",
           primaryLabel: null,
           primaryAction: null,
-          secondaryLabel: remainingQuestionsTonight > 0 ? "Add question" : null,
-          secondaryAction: remainingQuestionsTonight > 0 ? () => navigation.navigate("Capture") : null,
+          secondaryLabel: canAddQuestionTonight ? "Add question" : null,
+          secondaryAction: canAddQuestionTonight ? () => navigation.navigate("Capture") : null,
         }
       : {
           eyebrow: "Tonight",
@@ -159,12 +143,12 @@ export function HomeScreen({ navigation }: Props) {
 
         <View style={styles.summaryStrip}>
           <View style={styles.summaryStat}>
-            <Text style={styles.summaryValue}>{remainingQuestionsTonight}</Text>
+            <Text style={styles.summaryValue}>{formatRemainingCount(remainingQuestionsTonight)}</Text>
             <Text style={styles.summaryText}>Questions</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryStat}>
-            <Text style={styles.summaryValue}>{remainingPhotoReadsTonight}</Text>
+            <Text style={styles.summaryValue}>{formatRemainingCount(remainingPhotoReadsTonight)}</Text>
             <Text style={styles.summaryText}>Photos</Text>
           </View>
           <View style={styles.summaryDivider} />

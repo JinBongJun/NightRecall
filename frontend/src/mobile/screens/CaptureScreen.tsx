@@ -95,7 +95,7 @@ export function CaptureScreen({ navigation }: Props) {
   };
 
   return (
-    <ScreenContainer footer={<BottomDock active="Create" navigation={navigation} />}>
+    <ScreenContainer footer={<BottomDock active="Capture" navigation={navigation} />}>
       <TopBar leftIcon="settings" onLeftPress={() => navigation.navigate("Settings")} rightIcon="account-circle" onRightPress={() => navigation.navigate("Account")} />
 
       <ScreenHeader iconName="add-photo-alternate" title="Capture learning" subtitle="Photo or note for tonight's question." />

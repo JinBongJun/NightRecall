@@ -1,6 +1,15 @@
 import { create } from "zustand";
 
+import {
+  clearReviewSession,
+  localDateKey,
+  saveReviewSession,
+  type PersistedReviewSession,
+} from "../services/reviewSessionStorage";
 import { AnswerResponse, Question, Topic } from "../types/models";
+import { capSessionQuestions, mergeSessionQuestions } from "./reviewSessionLogic";
+
+export { MAX_SESSION_QUESTIONS } from "./reviewSessionLogic";
 
 type ReviewState = {
   sessionQuestions: Question[];
@@ -23,6 +32,8 @@ type ReviewState = {
   queueRetryQuestion: (question: Question) => void;
   consumeRetryQuestion: () => boolean;
   resetSession: () => void;
+  releaseActiveRecall: () => void;
+  hydrateFromPersisted: (session: PersistedReviewSession) => void;
   setTonightQuestion: (question: Question | null) => void;
   setServerTonightQuestion: (question: Question | null) => void;
   setPickableTopics: (topics: Topic[]) => void;
@@ -51,11 +62,39 @@ const defaultReviewState = {
   error: null,
 };
 
+function snapshotFromState(state: ReviewState): PersistedReviewSession | null {
+  if (!state.currentQuestion && !state.sessionQuestions.length) {
+    return null;
+  }
+
+  return {
+    dateKey: localDateKey(),
+    sessionQuestions: state.sessionQuestions,
+    sessionIndex: state.sessionIndex,
+    sessionSource: state.sessionSource,
+    tonightQuestion: state.tonightQuestion,
+    currentQuestion: state.currentQuestion,
+    retryQuestion: state.retryQuestion,
+    retryUsed: state.retryUsed,
+    currentQuestionMode: state.currentQuestionMode,
+  };
+}
+
+function syncReviewSessionToStorage() {
+  const snapshot = snapshotFromState(useReviewStore.getState());
+  if (!snapshot) {
+    void clearReviewSession();
+    return;
+  }
+
+  void saveReviewSession(snapshot);
+}
+
 export const useReviewStore = create<ReviewState>((set) => ({
   ...defaultReviewState,
-  setSessionQuestions: (questions) =>
+  setSessionQuestions: (questions) => {
     set(() => {
-      const sanitized = questions.filter(Boolean).slice(0, 3);
+      const sanitized = capSessionQuestions(questions);
       return {
         sessionQuestions: sanitized,
         sessionIndex: 0,
@@ -68,8 +107,10 @@ export const useReviewStore = create<ReviewState>((set) => ({
         selectedChoice: null,
         fillBlankAnswer: "",
       };
-    }),
-  addSessionQuestions: (questions) =>
+    });
+    syncReviewSessionToStorage();
+  },
+  addSessionQuestions: (questions) => {
     set((state) => {
       const incoming = questions.filter(Boolean);
       if (!incoming.length) {
@@ -81,8 +122,7 @@ export const useReviewStore = create<ReviewState>((set) => ({
         : state.currentQuestion
           ? [state.currentQuestion]
           : [];
-      // Multiple generation sessions can happen in a night; the server enforces limits.
-      const nextQuestions = [...existingQuestions, ...incoming];
+      const nextQuestions = mergeSessionQuestions(existingQuestions, incoming);
       const nextIndex = Math.min(state.sessionIndex, Math.max(0, nextQuestions.length - 1));
 
       return {
@@ -95,7 +135,9 @@ export const useReviewStore = create<ReviewState>((set) => ({
         selectedChoice: null,
         fillBlankAnswer: "",
       };
-    }),
+    });
+    syncReviewSessionToStorage();
+  },
   advanceSessionQuestion: () => {
     let advanced = false;
     set((state) => {
@@ -112,9 +154,12 @@ export const useReviewStore = create<ReviewState>((set) => ({
         fillBlankAnswer: "",
       };
     });
+    if (advanced) {
+      syncReviewSessionToStorage();
+    }
     return advanced;
   },
-  queueRetryQuestion: (question) =>
+  queueRetryQuestion: (question) => {
     set((state) => {
       if (state.retryQuestion || state.retryUsed) {
         return state;
@@ -123,7 +168,9 @@ export const useReviewStore = create<ReviewState>((set) => ({
       return {
         retryQuestion: question,
       };
-    }),
+    });
+    syncReviewSessionToStorage();
+  },
   consumeRetryQuestion: () => {
     let consumed = false;
     set((state) => {
@@ -141,18 +188,58 @@ export const useReviewStore = create<ReviewState>((set) => ({
         fillBlankAnswer: "",
       };
     });
+    if (consumed) {
+      syncReviewSessionToStorage();
+    }
     return consumed;
   },
-  resetSession: () =>
+  resetSession: () => {
     set(() => ({
       ...defaultReviewState,
       pickableTopics: useReviewStore.getState().pickableTopics,
-    })),
-  resetReview: () =>
+    }));
+    void clearReviewSession();
+  },
+  releaseActiveRecall: () => {
+    set((state) => ({
+      sessionQuestions: [],
+      sessionIndex: 0,
+      sessionSource: null,
+      tonightQuestion: null,
+      currentQuestion: null,
+      retryQuestion: null,
+      retryUsed: false,
+      currentQuestionMode: "normal",
+      selectedChoice: null,
+      fillBlankAnswer: "",
+      result: state.result,
+      loading: state.loading,
+      error: state.error,
+      pickableTopics: state.pickableTopics,
+    }));
+    void clearReviewSession();
+  },
+  hydrateFromPersisted: (session) => {
+    set({
+      sessionQuestions: capSessionQuestions(session.sessionQuestions),
+      sessionIndex: Math.min(session.sessionIndex, Math.max(0, session.sessionQuestions.length - 1)),
+      sessionSource: session.sessionSource,
+      tonightQuestion: session.tonightQuestion,
+      currentQuestion: session.currentQuestion,
+      retryQuestion: session.retryQuestion,
+      retryUsed: session.retryUsed,
+      currentQuestionMode: session.currentQuestionMode,
+      selectedChoice: null,
+      fillBlankAnswer: "",
+    });
+  },
+  resetReview: () => {
     set(() => ({
       ...defaultReviewState,
-    })),
-  setTonightQuestion: (question) =>
+    }));
+    void clearReviewSession();
+  },
+  setTonightQuestion: (question) => {
     set(() => ({
       sessionSource: question ? "local" : null,
       tonightQuestion: question,
@@ -160,22 +247,26 @@ export const useReviewStore = create<ReviewState>((set) => ({
       currentQuestionMode: "normal",
       selectedChoice: null,
       fillBlankAnswer: "",
-    })),
-  setServerTonightQuestion: (question) =>
+    }));
+    syncReviewSessionToStorage();
+  },
+  setServerTonightQuestion: (question) => {
     set((state) => {
       if (state.sessionSource === "local") {
         return state;
       }
 
       return {
-        sessionSource: question ? "server" : null,
+        sessionSource: question ? ("server" as const) : null,
         tonightQuestion: question,
         currentQuestion: question,
-        currentQuestionMode: "normal",
+        currentQuestionMode: "normal" as const,
         selectedChoice: null,
         fillBlankAnswer: "",
       };
-    }),
+    });
+    syncReviewSessionToStorage();
+  },
   setPickableTopics: (topics) => set({ pickableTopics: topics }),
   setSelectedChoice: (selectedChoice) => set({ selectedChoice }),
   setFillBlankAnswer: (fillBlankAnswer) => set({ fillBlankAnswer }),

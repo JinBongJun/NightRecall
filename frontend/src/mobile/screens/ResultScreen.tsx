@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -6,7 +7,9 @@ import { TopBar } from "../components/TopBar";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { ResultBanner } from "../components/ResultBanner";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { useStatsRefresh } from "../hooks/useStatsRefresh";
 import { useReviewStore } from "../store/reviewStore";
+import { useStatsStore } from "../store/statsStore";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
@@ -23,9 +26,31 @@ export function ResultScreen({ navigation }: Props) {
   const advanceSessionQuestion = useReviewStore((state) => state.advanceSessionQuestion);
   const consumeRetryQuestion = useReviewStore((state) => state.consumeRetryQuestion);
   const resetSession = useReviewStore((state) => state.resetSession);
+  const releaseActiveRecall = useReviewStore((state) => state.releaseActiveRecall);
+  const setStats = useStatsStore((state) => state.setStats);
   const remaining = sessionQuestions.length ? Math.max(0, sessionQuestions.length - (sessionIndex + 1)) : 0;
   const retryReady = Boolean(retryQuestion) && !retryUsed && currentQuestionMode !== "retry";
   const isCorrect = Boolean(result?.is_correct);
+  const sessionFinished = remaining === 0 && !retryReady;
+
+  useStatsRefresh();
+
+  useEffect(() => {
+    if (sessionFinished) {
+      releaseActiveRecall();
+    }
+  }, [releaseActiveRecall, sessionFinished]);
+
+  useEffect(() => {
+    if (!result) {
+      return;
+    }
+
+    setStats({
+      streak: result.current_streak,
+      answeredToday: true,
+    });
+  }, [result, setStats]);
 
   const done = () => {
     resetSession();
