@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     height: theme.spacing.sm,
   },
   section: {
-    gap: 10,
+    gap: theme.spacing.sm,
   },
   syncingText: {
     color: colors.primary,

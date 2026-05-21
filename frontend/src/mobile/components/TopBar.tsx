@@ -99,9 +99,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
   },
   iconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceLow,
@@ -109,12 +109,12 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   iconSpacer: {
-    width: 34,
-    height: 34,
+    width: 38,
+    height: 38,
   },
   centerSection: {
     flex: 1,
-    minHeight: 34,
+    minHeight: 38,
     justifyContent: "center",
     paddingHorizontal: 2,
   },
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   titleWrap: {
     alignItems: "center",
-    gap: 1,
+    gap: 3,
   },
   metaRow: {
     flexDirection: "row",
@@ -158,14 +158,14 @@ const styles = StyleSheet.create({
   },
   planBadgeText: {
     color: colors.primary,
-    fontSize: 9,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     letterSpacing: 0.9,
   },
   profileButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surfaceLow,

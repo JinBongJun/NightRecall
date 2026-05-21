@@ -28,7 +28,7 @@ export function ScreenHeader({ title, subtitle, iconName }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: 3,
+    gap: 5,
   },
   titleRow: {
     flexDirection: "row",

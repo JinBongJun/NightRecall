@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 4,
   },
   libraryLinkText: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   limitNote: {
-    marginTop: -4,
+    marginTop: 0,
     marginBottom: 4,
     color: colors.muted,
     fontSize: 11,
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   },
   writeEntryCopy: {
     flex: 1,
-    gap: 2,
+    gap: 4,
     minWidth: 0,
   },
   writeEntryTitle: {

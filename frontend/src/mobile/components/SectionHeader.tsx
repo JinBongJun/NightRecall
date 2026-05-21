@@ -19,7 +19,7 @@ export function SectionHeader({ title, subtitle }: Props) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    gap: 3,
+    gap: 5,
   },
   title: {
     fontSize: theme.typography.display.fontSize,

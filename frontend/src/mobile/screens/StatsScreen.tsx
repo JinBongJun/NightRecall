@@ -240,11 +240,11 @@ function formatCount(value: number): string {
 
 const styles = StyleSheet.create({
   header: {
-    gap: 4,
+    gap: 6,
   },
   sectionEyebrow: {
     color: colors.mutedSoft,
-    fontSize: 9,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     letterSpacing: 0.8,
     textTransform: "uppercase",
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   heroLabel: {
     color: "rgba(255,255,255,0.65)",
-    fontSize: 10,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     letterSpacing: 0.6,
     textTransform: "uppercase",
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   heroStatusText: {
     color: "rgba(255,255,255,0.72)",
-    fontSize: 10,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "700",
   },
   heroIconWrap: {
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
-    gap: 12,
+    gap: theme.spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   },
   calendarMonth: {
     color: colors.mutedSoft,
-    fontSize: 9,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.6,
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     width: 36,
     textAlign: "center",
     color: colors.mutedSoft,
-    fontSize: 9,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "700",
   },
   calendarGrid: {

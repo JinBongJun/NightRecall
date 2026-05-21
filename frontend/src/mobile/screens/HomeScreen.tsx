@@ -248,13 +248,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.surfaceLow,
     borderRadius: theme.radius.md,
-    paddingVertical: 8,
-    paddingHorizontal: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
   },
   summaryStat: {
     flex: 1,
     alignItems: "center",
-    gap: 2,
+    gap: 4,
   },
   summaryValue: {
     color: colors.primary,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   },
   summaryText: {
     color: colors.muted,
-    fontSize: 9,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "700",
   },
   summaryDivider: {
@@ -279,21 +279,21 @@ const styles = StyleSheet.create({
   },
   streakText: {
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "700",
   },
   statsLink: {
     color: colors.primary,
-    fontSize: 10,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
   },
   tonightCopy: {
-    gap: 3,
+    gap: 6,
     paddingTop: 2,
   },
   tonightEyebrow: {
     color: colors.mutedSoft,
-    fontSize: 9,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.8,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   heroActions: {
-    gap: 8,
+    gap: theme.spacing.sm,
     paddingTop: 4,
   },
   heroPrimaryButton: {

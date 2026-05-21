@@ -79,14 +79,14 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     alignItems: "center",
     justifyContent: "center",
-    gap: 2,
+    gap: 4,
   },
   itemActive: {
     backgroundColor: colors.primary,
   },
   label: {
     color: colors.mutedSoft,
-    fontSize: 8,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.7,

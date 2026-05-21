@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   copy: {
     flex: 1,
-    gap: 3,
+    gap: 5,
   },
   title: {
     color: colors.text,

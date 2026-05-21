@@ -3,14 +3,14 @@ import { StyleSheet } from "react-native";
 import { colors } from "./colors";
 
 /** Approximate fixed height of BottomDock (excluding safe area). */
-export const BOTTOM_DOCK_HEIGHT = 54;
+export const BOTTOM_DOCK_HEIGHT = 56;
 
 export const theme = {
   colors,
   spacing: {
     xs: 4,
-    sm: 8,
-    md: 12,
+    sm: 10,
+    md: 14,
     lg: 16,
     xl: 22,
   },
@@ -27,13 +27,13 @@ export const theme = {
     body: { fontSize: 13, lineHeight: 18, fontWeight: "600" as const },
     caption: { fontSize: 11, lineHeight: 15, fontWeight: "700" as const },
     button: { fontSize: 14, lineHeight: 18, fontWeight: "800" as const },
-    micro: { fontSize: 10, lineHeight: 13, fontWeight: "700" as const },
+    micro: { fontSize: 11, lineHeight: 14, fontWeight: "700" as const },
   },
   control: {
-    buttonMinHeight: 40,
-    buttonMinHeightCompact: 36,
+    buttonMinHeight: 44,
+    buttonMinHeightCompact: 40,
     inputMinHeight: 44,
-    touchTarget: 40,
+    touchTarget: 44,
   },
 };
 
