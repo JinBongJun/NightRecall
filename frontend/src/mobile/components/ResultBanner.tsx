@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+import { useEntranceAnimation } from "../hooks/useEntranceAnimation";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import { MAX_FONT_SCALE } from "../theme/typography";
@@ -14,31 +15,35 @@ type Props = {
 export function ResultBanner({ correct, body, meta }: Props) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useAppTheme();
+  const { animatedStyle } = useEntranceAnimation(true);
+
   return (
-    <View
-      style={[styles.card, correct ? styles.cardCorrect : styles.cardIncorrect]}
+    <Animated.View
+      style={[animatedStyle]}
       accessibilityRole="summary"
       accessibilityLabel={correct ? "Correct answer" : "Incorrect answer"}
     >
-      <View style={styles.row}>
-        <View style={[styles.iconWrap, correct ? styles.iconCorrect : styles.iconIncorrect]}>
-          <MaterialIcons name={correct ? "check-circle" : "cancel"} size={26} color={correct ? colors.primary : colors.accent} />
-        </View>
-        <View style={styles.copy}>
-          <Text style={styles.title} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
-            {correct ? "Correct" : "Not quite"}
-          </Text>
-          <Text style={styles.body} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
-            {body}
-          </Text>
-          {meta ? (
-            <Text style={styles.meta} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
-              {meta}
+      <View style={[styles.card, correct ? styles.cardCorrect : styles.cardIncorrect]}>
+        <View style={styles.row}>
+          <View style={[styles.iconWrap, correct ? styles.iconCorrect : styles.iconIncorrect]}>
+            <MaterialIcons name={correct ? "check-circle" : "cancel"} size={26} color={correct ? colors.primary : colors.accent} />
+          </View>
+          <View style={styles.copy}>
+            <Text style={styles.title} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+              {correct ? "Correct" : "Not quite"}
             </Text>
-          ) : null}
+            <Text style={styles.body} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+              {body}
+            </Text>
+            {meta ? (
+              <Text style={styles.meta} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+                {meta}
+              </Text>
+            ) : null}
+          </View>
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -78,7 +83,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   },
   copy: {
     flex: 1,
-    gap: 5,
+    gap: 4,
   },
   title: {
     color: colors.text,
@@ -90,11 +95,14 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     color: colors.muted,
     fontSize: typography.body.fontSize,
     lineHeight: typography.body.lineHeight,
+    fontWeight: "600",
   },
   meta: {
-    color: colors.primary,
+    color: colors.mutedSoft,
     fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
     fontWeight: "700",
+    marginTop: 2,
   },
 });
 }

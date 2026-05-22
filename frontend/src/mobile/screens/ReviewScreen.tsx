@@ -15,6 +15,7 @@ import { useReviewStore } from "../store/reviewStore";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import { navigateToCapture, navigateToHome } from "../navigation/navigationHelpers";
+import { playLightTapHaptic } from "../utils/feedback";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Review">;
@@ -179,7 +180,10 @@ export function ReviewScreen({ navigation }: Props) {
                 key={`${choice}-${index}`}
                 label={choice}
                 selected={selectedChoice === index}
-                onPress={() => setSelectedChoice(index)}
+                onPress={() => {
+                  void playLightTapHaptic();
+                  setSelectedChoice(index);
+                }}
               />
             ))}
           </View>

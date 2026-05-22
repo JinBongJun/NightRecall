@@ -3,6 +3,7 @@ export type { ThemePreference } from "../services/themePreferenceStorage";
 export { lightColors, darkColors, colors, type ColorPalette } from "./colors";
 export { baseTypography, buildTypography, MAX_FONT_SCALE, type AppTypography } from "./typography";
 export { useThemedStyles, type ThemedStyleContext } from "./useThemedStyles";
+export { MOTION_DURATION, MOTION_EASING, MOTION_ENTRANCE, MOTION_PRESS } from "./motion";
 
 /** Approximate fixed height of the main tab bar (excluding safe area). */
 export const TAB_BAR_HEIGHT = 56;

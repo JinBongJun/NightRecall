@@ -1,7 +1,10 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Pressable, StyleSheet, Text } from "react-native";
 
+import { useReduceMotion } from "../hooks/useReduceMotion";
+import { MOTION_DURATION, MOTION_EASING, MOTION_PRESS } from "../theme/motion";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
-import { theme, useAppTheme } from "../theme";
+import { theme } from "../theme";
 
 type Props = {
   label: string;
@@ -11,7 +14,31 @@ type Props = {
 
 export function ChoiceButton({ label, selected, onPress }: Props) {
   const styles = useThemedStyles(createStyles);
-  const { colors } = useAppTheme();
+  const reduceMotion = useReduceMotion();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!selected || reduceMotion) {
+      scaleAnim.setValue(1);
+      return;
+    }
+
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.02,
+        duration: MOTION_DURATION.fast,
+        easing: MOTION_EASING.out,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 150,
+        easing: MOTION_EASING.inOut,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [reduceMotion, scaleAnim, selected]);
+
   return (
     <Pressable
       onPress={onPress}
@@ -20,12 +47,14 @@ export function ChoiceButton({ label, selected, onPress }: Props) {
       accessibilityState={{ selected: Boolean(selected) }}
       style={({ pressed }) => [styles.button, selected && styles.selected, pressed && styles.pressed]}
     >
-      <Text style={[styles.text, selected && styles.selectedText]}>{label}</Text>
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <Text style={[styles.text, selected && styles.selectedText]}>{label}</Text>
+      </Animated.View>
     </Pressable>
   );
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   button: {
     paddingHorizontal: 12,
@@ -42,12 +71,12 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     shadowOffset: { width: 0, height: 4 },
   },
   selected: {
-    backgroundColor: "rgba(213,230,220,0.86)",
-    borderColor: "rgba(15,76,63,0.28)",
+    backgroundColor: isDark ? colors.primarySoft : "rgba(213,230,220,0.86)",
+    borderColor: isDark ? "rgba(114,168,134,0.45)" : "rgba(15,76,63,0.28)",
   },
   pressed: {
-    opacity: 0.96,
-    transform: [{ scale: 0.992 }],
+    opacity: MOTION_PRESS.opacity,
+    transform: [{ scale: MOTION_PRESS.scale }],
   },
   text: {
     color: colors.text,

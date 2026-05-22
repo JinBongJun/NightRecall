@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+import { MOTION_PRESS } from "../theme/motion";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import { MAX_FONT_SCALE } from "../theme/typography";
@@ -89,8 +90,8 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     opacity: 0.45,
   },
   pressed: {
-    opacity: 0.88,
-    transform: [{ scale: 0.96 }],
+    opacity: MOTION_PRESS.opacity,
+    transform: [{ scale: MOTION_PRESS.scale }],
   },
   content: {
     flexDirection: "row",

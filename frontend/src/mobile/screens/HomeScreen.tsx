@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
@@ -8,6 +8,7 @@ import { TopBar } from "../components/TopBar";
 import { navigateToAccount, navigateToCapture, navigateToLibrary, navigateToReview } from "../navigation/navigationHelpers";
 import type { HomeStackParamList } from "../navigation/types";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { useReduceMotion } from "../hooks/useReduceMotion";
 import { useStatsRefresh } from "../hooks/useStatsRefresh";
 import { useTonightQuestion } from "../hooks/useTonightQuestion";
 import { useUsageLimits } from "../hooks/useUsageLimits";
@@ -20,6 +21,7 @@ import { useReminderStore } from "../store/reminderStore";
 import { useReviewStore } from "../store/reviewStore";
 import { useStatsStore } from "../store/statsStore";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { MOTION_DURATION, MOTION_EASING } from "../theme/motion";
 import { theme, useAppTheme } from "../theme";
 type Props = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -36,6 +38,8 @@ export function HomeScreen({ navigation }: Props) {
   const streak = useStatsStore((state) => state.streak);
   const answeredToday = useStatsStore((state) => state.answeredToday);
 
+  const heroPlayedRef = useRef(false);
+  const reduceMotion = useReduceMotion();
   const heroAnim = useRef(new Animated.Value(0)).current;
 
   useStatsRefresh();
@@ -43,17 +47,22 @@ export function HomeScreen({ navigation }: Props) {
   useFocusEffect(
     useCallback(() => {
       void loadTonightQuestion();
-    }, [loadTonightQuestion]),
-  );
 
-  useEffect(() => {
-    heroAnim.setValue(0);
-    Animated.timing(heroAnim, {
-      toValue: 1,
-      duration: 360,
-      useNativeDriver: true,
-    }).start();
-  }, [heroAnim]);
+      if (heroPlayedRef.current || reduceMotion) {
+        heroAnim.setValue(1);
+        return;
+      }
+
+      heroPlayedRef.current = true;
+      heroAnim.setValue(0);
+      Animated.timing(heroAnim, {
+        toValue: 1,
+        duration: MOTION_DURATION.slow,
+        easing: MOTION_EASING.out,
+        useNativeDriver: true,
+      }).start();
+    }, [heroAnim, loadTonightQuestion, reduceMotion]),
+  );
 
   const queuedQuestionCount =
     sessionSource === "local"

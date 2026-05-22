@@ -55,8 +55,8 @@ export async function touchForegroundResyncAttempt(nowMs = Date.now()): Promise<
   const existing = await loadReminderResyncState();
 
   const payload: StoredReminderResyncState = {
-    lastLocalResyncDate: existing?.lastLocalResyncDate,
-    lastLocalResyncFingerprint: existing?.lastLocalResyncFingerprint,
+    lastLocalResyncDate: existing?.lastLocalResyncDate ?? undefined,
+    lastLocalResyncFingerprint: existing?.lastLocalResyncFingerprint ?? undefined,
     lastForegroundResyncAtMs: nowMs,
   };
 
