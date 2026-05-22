@@ -4,7 +4,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
-import { BottomDock } from "../components/BottomDock";
+import { navigateToAccount, navigateToLibrary } from "../navigation/navigationHelpers";
+import type { CaptureStackParamList } from "../navigation/types";
 import { SectionRow } from "../components/SectionRow";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -13,9 +14,7 @@ import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
-import { RootStackParamList } from "../types/navigation";
-
-type Props = NativeStackScreenProps<RootStackParamList, "Capture">;
+type Props = NativeStackScreenProps<CaptureStackParamList, "Capture">;
 
 export function CaptureScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
@@ -95,14 +94,14 @@ export function CaptureScreen({ navigation }: Props) {
   };
 
   return (
-    <ScreenContainer footer={<BottomDock active="Capture" navigation={navigation} />}>
-      <TopBar leftIcon="settings" onLeftPress={() => navigation.navigate("Settings")} rightIcon="account-circle" onRightPress={() => navigation.navigate("Account")} />
+    <ScreenContainer>
+      <TopBar rightIcon="account-circle" onRightPress={() => navigateToAccount(navigation)} />
 
       <ScreenHeader iconName="add-photo-alternate" title="Capture learning" subtitle="Photo or note for tonight's question." />
 
       <TonightLimitsBar />
 
-      <Pressable style={styles.libraryLink} onPress={() => navigation.navigate("Library")}>
+      <Pressable style={styles.libraryLink} onPress={() => navigateToLibrary(navigation)}>
         <MaterialIcons name="auto-stories" size={18} color={colors.primary} />
         <Text style={styles.libraryLinkText}>Use saved learning instead</Text>
         <MaterialIcons name="chevron-right" size={18} color={colors.mutedSoft} />

@@ -12,7 +12,8 @@ import { useReviewStore } from "../store/reviewStore";
 import { useStatsStore } from "../store/statsStore";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
-import { RootStackParamList } from "../types/navigation";
+import { navigateToReview } from "../navigation/navigationHelpers";
+import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Result">;
 
@@ -62,7 +63,7 @@ export function ResultScreen({ navigation }: Props) {
     if (!advanced) {
       return;
     }
-    navigation.navigate("Review", { mode: "auto" });
+    navigateToReview(navigation, "auto");
   };
 
   const retryTonight = () => {
@@ -70,7 +71,7 @@ export function ResultScreen({ navigation }: Props) {
     if (!consumed) {
       return;
     }
-    navigation.navigate("Review", { mode: "auto" });
+    navigateToReview(navigation, "auto");
   };
 
   const meta =

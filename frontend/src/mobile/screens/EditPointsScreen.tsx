@@ -20,12 +20,15 @@ import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
 import type { StudyInputType } from "../types/domain";
 import { Topic } from "../types/models";
-import { RootStackParamList } from "../types/navigation";
+import { navigateToLibrary, navigateToQuestionGenerating } from "../navigation/navigationHelpers";
+import type { CaptureStackParamList, LibraryStackParamList } from "../navigation/types";
 import { ReviewDraftPoint } from "../types/reviewDraft";
 import { extractKeyPoints } from "../utils/extractKeyPoints";
 import { toStudyInputPayload } from "../utils/reviewDraft";
 
-type Props = NativeStackScreenProps<RootStackParamList, "EditPoints">;
+type Props =
+  | NativeStackScreenProps<CaptureStackParamList, "EditPoints">
+  | NativeStackScreenProps<LibraryStackParamList, "EditPoints">;
 
 const resolveTopicText = (topic: Topic, index: number, sourceText: string): string => {
   if (typeof topic.text === "string" && topic.text.trim()) {
@@ -206,7 +209,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         topic_id: studyInput.topics.find((topic) => topic.is_starred)?.id ?? studyInput.topics[0]?.id ?? "",
       });
       if (destination === "library") {
-        navigation.navigate("Library");
+        navigateToLibrary(navigation);
       } else {
         navigation.goBack();
       }
@@ -262,7 +265,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
         return;
       }
 
-      navigation.navigate("QuestionGenerating", {
+      navigateToQuestionGenerating(navigation, {
         variant: "new",
         mode: route.params.mode,
         sourceText: sourceDraft,
@@ -279,7 +282,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
       return;
     }
 
-    navigation.navigate("QuestionGenerating", {
+    navigateToQuestionGenerating(navigation, {
       variant: "saved",
       studyInputId: route.params.studyInputId,
       topicId: route.params.topicId,

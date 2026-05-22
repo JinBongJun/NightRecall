@@ -119,7 +119,7 @@ export function OnboardingScreen({ navigation }: Props) {
     }
 
     setReminder(reminderTime, notificationsEnabled);
-    navigation.replace("Home");
+    navigation.replace("MainTabs");
     setLoading(false);
   };
 
@@ -144,7 +144,7 @@ export function OnboardingScreen({ navigation }: Props) {
       } catch {
         setSession(payload);
       }
-      navigation.replace("Home");
+      navigation.replace("MainTabs");
     } catch (error) {
       if (isGoogleSignInCancelled(error)) {
         return;

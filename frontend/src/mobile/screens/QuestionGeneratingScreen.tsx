@@ -20,11 +20,12 @@ import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
 import type { SourceKind, StudyInputType } from "../types/domain";
 import type { Question } from "../types/models";
-import { RootStackParamList } from "../types/navigation";
+import { resetToHomeAfterFlow } from "../navigation/navigationHelpers";
+import type { CaptureStackParamList } from "../navigation/types";
 import { asUsageLimitReason } from "../utils/usageLimits";
 import { toStudyInputPayload } from "../utils/reviewDraft";
 
-type Props = NativeStackScreenProps<RootStackParamList, "QuestionGenerating">;
+type Props = NativeStackScreenProps<CaptureStackParamList, "QuestionGenerating">;
 
 const getErrorMessage = (error: unknown): string | null => {
   if (error instanceof Error) {
@@ -155,7 +156,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
         setTonightQuestion(questions[0]);
       }
 
-      navigation.replace("Home");
+      resetToHomeAfterFlow(navigation);
     };
 
     const run = async () => {

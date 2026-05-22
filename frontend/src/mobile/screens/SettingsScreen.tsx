@@ -19,7 +19,7 @@ import { useAuthStore } from "../store/authStore";
 import { useOnboardingStore } from "../store/onboardingStore";
 import { useReminderStore } from "../store/reminderStore";
 import { colors } from "../theme/colors";
-import { RootStackParamList } from "../types/navigation";
+import type { RootStackParamList } from "../navigation/types";
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 const ACCOUNT_DELETION_URL = "https://night-recall.vercel.app/account-deletion/";

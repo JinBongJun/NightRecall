@@ -8,9 +8,9 @@ import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
-import { RootStackParamList } from "../types/navigation";
+import type { CaptureStackParamList } from "../navigation/types";
 
-type Props = NativeStackScreenProps<RootStackParamList, "CaptureNote">;
+type Props = NativeStackScreenProps<CaptureStackParamList, "CaptureNote">;
 
 export function CaptureNoteScreen({ navigation }: Props) {
   const [sourceText, setSourceText] = useState("");

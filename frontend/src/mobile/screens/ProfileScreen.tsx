@@ -12,7 +12,8 @@ import { fetchMe } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
-import { RootStackParamList } from "../types/navigation";
+import { navigateToMainTab } from "../navigation/navigationHelpers";
+import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Account">;
 
@@ -114,7 +115,7 @@ export function AccountScreen({ navigation }: Props) {
           <MaterialIcons name="chevron-right" size={22} color={colors.primary} />
         </Pressable>
 
-        <Pressable style={styles.actionCard} onPress={() => navigation.navigate("Stats")}>
+        <Pressable style={styles.actionCard} onPress={() => navigateToMainTab(navigation, "HomeTab", "Stats")}>
           <View style={[styles.actionIconWrap, styles.secondaryActionIconWrap]}>
             <MaterialIcons name="insights" size={22} color={colors.primary} />
           </View>

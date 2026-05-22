@@ -8,11 +8,11 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { startStudyInputExtractJob, waitForStudyInputExtractJob } from "../services/studyService";
 import { colors } from "../theme/colors";
-import { RootStackParamList } from "../types/navigation";
+import type { CaptureStackParamList } from "../navigation/types";
 import { asUsageLimitReason } from "../utils/usageLimits";
 import { extractKeyPoints } from "../utils/extractKeyPoints";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Processing">;
+type Props = NativeStackScreenProps<CaptureStackParamList, "Processing">;
 
 export function ProcessingScreen({ route, navigation }: Props) {
   const { mode, sourceText, imageBase64, imageUri, imageMimeType } = route.params;

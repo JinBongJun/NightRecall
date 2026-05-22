@@ -14,7 +14,8 @@ import { submitAnswer } from "../services/reviewService";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
-import { RootStackParamList } from "../types/navigation";
+import { navigateToCapture, navigateToHome } from "../navigation/navigationHelpers";
+import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Review">;
 
@@ -56,10 +57,10 @@ export function ReviewScreen({ navigation }: Props) {
             title="No question loaded"
             body="Capture learning first, then come back to recall it tonight."
             actionLabel="Capture for tonight"
-            onAction={() => navigation.navigate("Capture")}
+            onAction={() => navigateToCapture(navigation)}
           />
           <View style={{ paddingHorizontal: 24, marginTop: 24 }}>
-            <PrimaryButton label="Go to Home" onPress={() => navigation.navigate("Home")} />
+            <PrimaryButton label="Go to Home" onPress={() => navigateToHome(navigation)} />
           </View>
         </View>
       </ScreenContainer>

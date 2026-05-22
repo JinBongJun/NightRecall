@@ -8,9 +8,9 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { useStatsStore } from "../store/statsStore";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
-import { RootStackParamList } from "../types/navigation";
+import type { HomeStackParamList } from "../navigation/types";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Stats">;
+type Props = NativeStackScreenProps<HomeStackParamList, "Stats">;
 
 const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 

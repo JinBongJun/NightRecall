@@ -7,9 +7,9 @@ import { BrandWordmark } from "../components/BrandWordmark";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { colors } from "../theme/colors";
-import { RootStackParamList } from "../types/navigation";
+import type { CaptureStackParamList } from "../navigation/types";
 
-type Props = NativeStackScreenProps<RootStackParamList, "ExtractionHelp">;
+type Props = NativeStackScreenProps<CaptureStackParamList, "ExtractionHelp">;
 
 export function ExtractionHelpScreen({ route, navigation }: Props) {
   const { imageUri, imageBase64, imageMimeType, detail, sourceText } = route.params;

@@ -18,7 +18,8 @@ import {
 import type { ScrollView } from "react-native";
 import axios from "axios";
 
-import { BottomDock } from "../components/BottomDock";
+import { navigateToAccount, navigateToCapture } from "../navigation/navigationHelpers";
+import type { LibraryStackParamList } from "../navigation/types";
 import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
 import { EmptyState } from "../components/EmptyState";
@@ -32,9 +33,7 @@ import { useTopicsStore } from "../store/topicsStore";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
 import { SavedStudyInputSummary, Topic } from "../types/models";
-import { RootStackParamList } from "../types/navigation";
-
-type Props = NativeStackScreenProps<RootStackParamList, "Library">;
+type Props = NativeStackScreenProps<LibraryStackParamList, "Library">;
 
 const PAGE_SIZE = 20;
 
@@ -274,12 +273,7 @@ export function LibraryScreen({ navigation }: Props) {
   const listHeader = useMemo(
     () => (
       <>
-        <TopBar
-          leftIcon="settings"
-          onLeftPress={() => navigation.navigate("Settings")}
-          rightIcon="account-circle"
-          onRightPress={() => navigation.navigate("Account")}
-        />
+        <TopBar rightIcon="account-circle" onRightPress={() => navigateToAccount(navigation)} />
 
         <ScreenHeader
           iconName="collections-bookmark"
@@ -343,7 +337,7 @@ export function LibraryScreen({ navigation }: Props) {
             : "Saved cards appear after you capture learning and bookmark at least one point."
         }
         actionLabel={savedInputs.length ? undefined : "Capture for tonight"}
-        onAction={savedInputs.length ? undefined : () => navigation.navigate("Capture")}
+        onAction={savedInputs.length ? undefined : () => navigateToCapture(navigation)}
       />
     );
   }, [loading, navigation, savedInputs.length]);
@@ -371,7 +365,7 @@ export function LibraryScreen({ navigation }: Props) {
   );
 
   return (
-    <ScreenContainer footer={<BottomDock active="Library" navigation={navigation} />} scrollable={false}>
+    <ScreenContainer scrollable={false}>
       <FlatList
         ref={flatListRef}
         data={loading ? [] : filteredInputs}

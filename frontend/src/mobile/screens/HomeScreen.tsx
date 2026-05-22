@@ -4,8 +4,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { BottomDock } from "../components/BottomDock";
 import { TopBar } from "../components/TopBar";
+import { navigateToAccount, navigateToCapture, navigateToLibrary, navigateToReview } from "../navigation/navigationHelpers";
+import type { HomeStackParamList } from "../navigation/types";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useStatsRefresh } from "../hooks/useStatsRefresh";
 import { useTonightQuestion } from "../hooks/useTonightQuestion";
@@ -20,9 +21,7 @@ import { useReviewStore } from "../store/reviewStore";
 import { useStatsStore } from "../store/statsStore";
 import { colors } from "../theme/colors";
 import { theme } from "../theme";
-import { RootStackParamList } from "../types/navigation";
-
-type Props = NativeStackScreenProps<RootStackParamList, "Home">;
+type Props = NativeStackScreenProps<HomeStackParamList, "Home">;
 
 export function HomeScreen({ navigation }: Props) {
   const loadTonightQuestion = useTonightQuestion();
@@ -95,9 +94,9 @@ export function HomeScreen({ navigation }: Props) {
             ? `${queuedQuestionCount} questions queued.`
             : "Pull it back before sleep.",
         primaryLabel: "Start recall",
-        primaryAction: () => navigation.navigate("Review", { mode: "auto" }),
+        primaryAction: () => navigateToReview(navigation, "auto"),
         secondaryLabel: canAddQuestionTonight ? addAnotherLabel : null,
-        secondaryAction: canAddQuestionTonight ? () => navigation.navigate("Capture") : null,
+        secondaryAction: canAddQuestionTonight ? () => navigateToCapture(navigation) : null,
       }
     : answeredToday
       ? {
@@ -107,26 +106,21 @@ export function HomeScreen({ navigation }: Props) {
           primaryLabel: null,
           primaryAction: null,
           secondaryLabel: canAddQuestionTonight ? addAnotherLabel : null,
-          secondaryAction: canAddQuestionTonight ? () => navigation.navigate("Capture") : null,
+          secondaryAction: canAddQuestionTonight ? () => navigateToCapture(navigation) : null,
         }
       : {
           eyebrow: "Tonight",
           title: "Capture learning for tonight",
           body: "Photo, note, or saved learning — one focused recall.",
           primaryLabel: "Capture for tonight",
-          primaryAction: () => navigation.navigate("Capture"),
+          primaryAction: () => navigateToCapture(navigation),
           secondaryLabel: "Saved learning",
-          secondaryAction: () => navigation.navigate("Library"),
+          secondaryAction: () => navigateToLibrary(navigation),
         };
 
   return (
-    <ScreenContainer footer={<BottomDock active="Home" navigation={navigation} />}>
-      <TopBar
-        leftIcon="settings"
-        onLeftPress={() => navigation.navigate("Settings")}
-        rightIcon="account-circle"
-        onRightPress={() => navigation.navigate("Account")}
-      />
+    <ScreenContainer>
+      <TopBar rightIcon="account-circle" onRightPress={() => navigateToAccount(navigation)} />
 
       <Animated.View
         style={[

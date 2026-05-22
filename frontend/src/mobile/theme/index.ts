@@ -2,8 +2,11 @@ import { StyleSheet } from "react-native";
 
 import { colors } from "./colors";
 
-/** Approximate fixed height of BottomDock (excluding safe area). */
-export const BOTTOM_DOCK_HEIGHT = 56;
+/** Approximate fixed height of the main tab bar (excluding safe area). */
+export const TAB_BAR_HEIGHT = 56;
+
+/** @deprecated Use TAB_BAR_HEIGHT */
+export const BOTTOM_DOCK_HEIGHT = TAB_BAR_HEIGHT;
 
 export const theme = {
   colors,

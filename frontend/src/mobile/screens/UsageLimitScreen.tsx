@@ -4,9 +4,15 @@ import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { useReviewStore } from "../store/reviewStore";
-import { RootStackParamList } from "../types/navigation";
+import {
+  navigateToCapture,
+  navigateToHome,
+  navigateToLibrary,
+  navigateToReview,
+} from "../navigation/navigationHelpers";
+import type { CaptureStackParamList } from "../navigation/types";
 
-type Props = NativeStackScreenProps<RootStackParamList, "UsageLimit">;
+type Props = NativeStackScreenProps<CaptureStackParamList, "UsageLimit">;
 
 export function UsageLimitScreen({ route, navigation }: Props) {
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
@@ -29,10 +35,10 @@ export function UsageLimitScreen({ route, navigation }: Props) {
       return;
     }
     if (hasReviewReady) {
-      navigation.replace("Review", { mode: "auto" });
+      navigateToReview(navigation, "auto");
       return;
     }
-    navigation.navigate("Home");
+    navigateToHome(navigation);
   };
 
   return (
@@ -42,8 +48,8 @@ export function UsageLimitScreen({ route, navigation }: Props) {
       <ScreenHeader iconName={iconName} title={title} subtitle={subtitle} />
 
       <ActionButton label={primaryLabel} onPress={primaryAction} variant="primary" />
-      {!isPhotoLimit ? <ActionButton label="Go to library" onPress={() => navigation.navigate("Library")} variant="secondary" /> : null}
-      <ActionButton label="Not now" onPress={() => navigation.navigate("Home")} variant="tertiary" />
+      {!isPhotoLimit ? <ActionButton label="Go to library" onPress={() => navigateToLibrary(navigation)} variant="secondary" /> : null}
+      <ActionButton label="Not now" onPress={() => navigateToHome(navigation)} variant="tertiary" />
     </ScreenContainer>
   );
 }

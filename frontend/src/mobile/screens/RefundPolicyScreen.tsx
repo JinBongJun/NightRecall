@@ -5,7 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { BrandWordmark } from "../components/BrandWordmark";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { colors } from "../theme/colors";
-import { RootStackParamList } from "../types/navigation";
+import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "RefundPolicy">;
 
