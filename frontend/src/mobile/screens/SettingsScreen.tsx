@@ -23,6 +23,7 @@ import { useThemeStore } from "../store/themeStore";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import type { RootStackParamList } from "../navigation/types";
+import { playLightTapHaptic } from "../utils/feedback";
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 const ACCOUNT_DELETION_URL = "https://night-recall.vercel.app/account-deletion/";
@@ -61,6 +62,27 @@ export function SettingsScreen({ navigation }: Props) {
   const syncedNotificationsEnabledRef = useRef(notificationsEnabled);
   const saveInFlightRef = useRef(false);
   const lastRequestedSaveRef = useRef<string | null>(null);
+  const [testReminderMessage, setTestReminderMessage] = useState<string | null>(null);
+  const testReminderMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showTestReminderFeedback = useCallback((message: string) => {
+    if (testReminderMessageTimeoutRef.current) {
+      clearTimeout(testReminderMessageTimeoutRef.current);
+    }
+    setTestReminderMessage(message);
+    testReminderMessageTimeoutRef.current = setTimeout(() => {
+      setTestReminderMessage(null);
+      testReminderMessageTimeoutRef.current = null;
+    }, 8000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (testReminderMessageTimeoutRef.current) {
+        clearTimeout(testReminderMessageTimeoutRef.current);
+      }
+    };
+  }, []);
   useEffect(() => {
     setTimeValue(reminderTime);
     setDraftTimeValue(reminderTime);
@@ -521,13 +543,21 @@ export function SettingsScreen({ navigation }: Props) {
             onPress={() => {
               void sendTestReminder().then((sent) => {
                 if (!sent) {
+                  setTestReminderMessage(null);
                   Alert.alert("Notifications blocked", "Allow notifications for NightRecall in system settings.");
+                  return;
                 }
+
+                void playLightTapHaptic();
+                showTestReminderFeedback("Test sent. Check your notification in a few seconds.");
               });
             }}
           >
             <Text style={styles.testReminderText}>Send test notification</Text>
           </Pressable>
+          {testReminderMessage ? (
+            <Text style={styles.testReminderFeedback}>{testReminderMessage}</Text>
+          ) : null}
           <View style={styles.settingRow}>
             <View style={styles.settingCopy}>
               <Text style={styles.label}>Timezone</Text>
@@ -785,6 +815,15 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     color: colors.primary,
     fontSize: typography.caption.fontSize,
     fontWeight: "800",
+  },
+  testReminderFeedback: {
+    marginHorizontal: 18,
+    marginTop: -4,
+    marginBottom: 12,
+    color: colors.primary,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "600",
+    lineHeight: typography.caption.lineHeight,
   },
   settingValueWrap: {
     flexDirection: "row",

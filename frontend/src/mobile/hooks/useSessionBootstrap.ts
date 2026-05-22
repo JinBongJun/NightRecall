@@ -9,6 +9,18 @@ import { fetchMe } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
 import { useReminderStore } from "../store/reminderStore";
 
+async function syncReminderFromLocalFallback(sessionTimezone: string) {
+  const reminder = useReminderStore.getState();
+  await syncReminderWithServer({
+    reminderTime: reminder.reminderTime,
+    enabled: reminder.notificationsEnabled,
+    timezone: sessionTimezone,
+    requestPermission: false,
+    patchServer: false,
+    forceLocalReschedule: true,
+  });
+}
+
 export function useSessionBootstrap() {
   const finishBootstrap = useAuthStore((state) => state.finishBootstrap);
   const setPlan = useAuthStore((state) => state.setPlan);
@@ -70,7 +82,15 @@ export function useSessionBootstrap() {
           avatarUrl: me.user.avatar_url ?? null,
         });
       } catch {
-        // Keep the restored local session if account sync is unavailable.
+        if (!active) {
+          return;
+        }
+
+        try {
+          await syncReminderFromLocalFallback(session.timezone);
+        } catch {
+          // Keep the restored local session if reminder resync is unavailable.
+        }
       }
     })();
 

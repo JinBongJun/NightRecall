@@ -1,6 +1,8 @@
 import { applyNightlyReminder, type ApplyNightlyReminderResult } from "./reminderService";
+import { recordReminderLocalResync, loadReminderResyncState } from "./reminderResyncStorage";
 import { updateReminderSettings } from "./settingsService";
 import { useReminderStore } from "../store/reminderStore";
+import { shouldRescheduleLocalReminder } from "../utils/reminderResyncPolicy";
 
 export type SyncReminderParams = {
   reminderTime: string;
@@ -8,9 +10,35 @@ export type SyncReminderParams = {
   timezone: string;
   requestPermission?: boolean;
   patchServer?: boolean;
+  forceLocalReschedule?: boolean;
+  onlyIfRescheduleNeeded?: boolean;
 };
 
+function resultFromReminderStore(): ApplyNightlyReminderResult {
+  const state = useReminderStore.getState();
+  return {
+    scheduled: state.notificationsEnabled,
+    normalizedTime: state.reminderTime,
+    permissionDenied: state.permissionDenied,
+    nextReminderLabel: state.nextReminderLabel,
+  };
+}
+
 export async function syncReminderWithServer(params: SyncReminderParams): Promise<ApplyNightlyReminderResult> {
+  if (params.onlyIfRescheduleNeeded && !params.forceLocalReschedule) {
+    const stored = await loadReminderResyncState();
+    if (
+      !shouldRescheduleLocalReminder({
+        timezone: params.timezone,
+        reminderTime: params.reminderTime,
+        enabled: params.enabled,
+        stored,
+      })
+    ) {
+      return resultFromReminderStore();
+    }
+  }
+
   const result = await applyNightlyReminder({
     reminderTime: params.reminderTime,
     enabled: params.enabled,
@@ -34,6 +62,12 @@ export async function syncReminderWithServer(params: SyncReminderParams): Promis
     notificationsEnabled,
     nextReminderLabel: result.nextReminderLabel,
     permissionDenied: result.permissionDenied,
+  });
+
+  await recordReminderLocalResync({
+    reminderTime: normalizedTime,
+    timezone: params.timezone,
+    enabled: notificationsEnabled,
   });
 
   return result;
