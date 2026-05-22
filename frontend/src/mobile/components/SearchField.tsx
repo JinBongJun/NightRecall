@@ -90,10 +90,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   clearText: {
     color: colors.primary,
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   clearPressed: {
     opacity: 0.92,

@@ -87,12 +87,12 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     height: 40,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 14,
     gap: 18,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.line,
   },
   previewImage: {
     width: "100%",
@@ -109,7 +109,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     width: 44,
     height: 44,
     borderRadius: 16,
-    backgroundColor: colors.surfaceLow,
+    backgroundColor: colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },

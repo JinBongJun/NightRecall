@@ -203,7 +203,7 @@ export function HomeScreen({ navigation }: Props) {
               accessibilityLabel={tonightState.primaryLabel}
             >
               <Text style={styles.heroPrimaryText}>{tonightState.primaryLabel}</Text>
-              <MaterialIcons name="arrow-forward" size={16} color="#FFFFFF" />
+              <MaterialIcons name="arrow-forward" size={16} color={colors.onPrimary} />
             </Pressable>
 
             {tonightState.secondaryLabel && tonightState.secondaryAction ? (
@@ -232,7 +232,7 @@ export function HomeScreen({ navigation }: Props) {
   );
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   tonightCard: {
     backgroundColor: colors.surface,
@@ -329,7 +329,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
-    borderColor: "rgba(15,76,63,0.12)",
+    borderColor: isDark ? "rgba(114,168,134,0.35)" : "rgba(15,76,63,0.12)",
   },
   statusChipText: {
     color: colors.secondary,
@@ -348,10 +348,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   tonightEyebrow: {
     color: colors.mutedSoft,
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   tonightTitle: {
     color: colors.text,
@@ -370,7 +368,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   heroPrimaryButton: {
     minHeight: theme.control.buttonMinHeight,
-    backgroundColor: colors.primary,
+    backgroundColor: isDark ? colors.primaryContainer : colors.primary,
     borderRadius: theme.radius.md,
     flexDirection: "row",
     alignItems: "center",
@@ -379,7 +377,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     paddingHorizontal: 16,
   },
   heroPrimaryText: {
-    color: "#FFFFFF",
+    color: colors.onPrimary,
     fontSize: typography.button.fontSize,
     fontWeight: typography.button.fontWeight,
   },

@@ -74,7 +74,7 @@ export function PrivacyPolicyScreen({ navigation }: Props) {
   );
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   topBar: {
     flexDirection: "row",
@@ -106,19 +106,17 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     lineHeight: 24,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.line,
     padding: 14,
     gap: 12,
   },
   sectionTitle: {
     color: colors.primary,
-    fontSize: 13,
+    fontSize: typography.section.fontSize,
     fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
     marginTop: 4,
   },
   body: {
@@ -131,11 +129,11 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.primary,
+    backgroundColor: isDark ? colors.primaryContainer : colors.primary,
     paddingHorizontal: 18,
   },
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: colors.onPrimary,
     fontSize: 13,
     fontWeight: "800",
   },
@@ -147,7 +145,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     paddingHorizontal: 18,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceLow,
   },
   secondaryButtonText: {
     color: colors.primary,

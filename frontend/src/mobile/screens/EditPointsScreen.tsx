@@ -353,7 +353,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
                     <MaterialIcons
                       name={point.isStarred ? "bookmark" : "bookmark-border"}
                       size={22}
-                      color={point.isStarred ? "#FFFFFF" : colors.mutedSoft}
+                      color={point.isStarred ? colors.onPrimary : colors.mutedSoft}
                     />
                   </Pressable>
                 </View>
@@ -386,7 +386,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
                       <View style={styles.pointHeader}>
                         <Text style={styles.pointLabel}>{index === 0 ? "Main point" : `Point ${index + 1}`}</Text>
                         <View style={[styles.checkButton, selected && styles.checkButtonSelected]}>
-                          <MaterialIcons name={selected ? "check" : "add"} size={18} color={selected ? "#FFFFFF" : colors.primary} />
+                          <MaterialIcons name={selected ? "check" : "add"} size={18} color={selected ? colors.onPrimary : colors.primary} />
                         </View>
                       </View>
                       <Text style={styles.topicText}>{resolveTopicText(topic, index, normalizedSavedSourceText)}</Text>
@@ -425,7 +425,7 @@ export function EditPointsScreen({ route, navigation }: Props) {
   );
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   loadingCard: {
     backgroundColor: colors.surfaceLow,
@@ -443,7 +443,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     fontWeight: "700",
   },
   sourceCard: {
-    backgroundColor: "rgba(255,253,248,0.94)",
+    backgroundColor: colors.surface,
     borderRadius: 26,
     padding: 14,
     gap: 12,
@@ -452,10 +452,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   sourceLabel: {
     color: colors.mutedSoft,
-    fontSize: 11,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   sourceImage: {
     width: "100%",
@@ -485,7 +483,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     lineHeight: 23,
   },
   featureCard: {
-    backgroundColor: "rgba(255,253,248,0.96)",
+    backgroundColor: colors.surface,
     borderRadius: 28,
     padding: 24,
     gap: 14,
@@ -493,7 +491,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     borderColor: colors.border,
   },
   secondaryCard: {
-    backgroundColor: "rgba(255,253,248,0.88)",
+    backgroundColor: colors.surfaceLow,
     borderRadius: 16,
     padding: 14,
     gap: 14,
@@ -508,10 +506,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   pointLabel: {
     color: colors.mutedSoft,
-    fontSize: 11,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.1,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   bookmarkButton: {
     width: 40,
@@ -519,9 +515,9 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(213,230,220,0.5)",
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: "rgba(18,67,67,0.08)",
+    borderColor: isDark ? "rgba(114,168,134,0.35)" : "rgba(15,76,63,0.12)",
   },
   bookmarkButtonActive: {
     backgroundColor: colors.primary,
@@ -541,10 +537,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   sectionLabel: {
     color: colors.muted,
-    fontSize: 11,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   sectionHelper: {
     color: colors.muted,
@@ -565,7 +559,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   topicCardSelected: {
     borderColor: colors.primary,
-    backgroundColor: "#F8FCFB",
+    backgroundColor: colors.primarySoft,
   },
   topicText: {
     color: colors.text,
@@ -579,7 +573,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -588,7 +582,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     borderColor: colors.primary,
   },
   summaryCard: {
-    backgroundColor: "rgba(255,253,248,0.92)",
+    backgroundColor: colors.surfaceLow,
     borderRadius: 26,
     padding: 14,
     gap: 10,

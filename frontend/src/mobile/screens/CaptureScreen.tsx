@@ -124,7 +124,7 @@ export function CaptureScreen({ navigation }: Props) {
           ]}
           onPress={() => void handlePhoto("camera")}
         >
-          <MaterialIcons name="photo-camera" size={28} color="#FFFFFF" />
+          <MaterialIcons name="photo-camera" size={28} color={colors.onPrimary} />
           <Text style={styles.actionTitle}>Camera</Text>
         </Pressable>
 
@@ -138,7 +138,7 @@ export function CaptureScreen({ navigation }: Props) {
           ]}
           onPress={() => void handlePhoto("gallery")}
         >
-          <MaterialIcons name="image" size={28} color="#FFFFFF" />
+          <MaterialIcons name="image" size={28} color={colors.onPrimary} />
           <Text style={styles.actionTitle}>Gallery</Text>
         </Pressable>
       </View>
@@ -199,7 +199,7 @@ export function CaptureScreen({ navigation }: Props) {
   );
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   libraryLink: {
     flexDirection: "row",
@@ -247,13 +247,13 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     opacity: 0.45,
   },
   actionHeroCamera: {
-    backgroundColor: colors.primary,
+    backgroundColor: isDark ? colors.primaryContainer : colors.primary,
   },
   actionHeroGallery: {
-    backgroundColor: colors.primaryContainer,
+    backgroundColor: isDark ? colors.primarySoft : colors.primaryContainer,
   },
   actionTitle: {
-    color: "#FFFFFF",
+    color: colors.onPrimary,
     fontSize: 13,
     fontWeight: "800",
   },
@@ -306,10 +306,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   previewLabel: {
     color: colors.primary,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-    fontSize: 11,
+    fontWeight: "700",
+    fontSize: typography.caption.fontSize,
   },
   previewActionButton: {
     minHeight: 30,
@@ -361,7 +359,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     opacity: 0.5,
   },
   extractButtonText: {
-    color: "#FFFFFF",
+    color: colors.onPrimary,
     fontSize: 13,
     fontWeight: "800",
   },
@@ -373,7 +371,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     paddingHorizontal: 18,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: "rgba(255,253,248,0.94)",
+    backgroundColor: colors.surfaceLow,
   },
   ctaPlaceholderText: {
     color: colors.muted,

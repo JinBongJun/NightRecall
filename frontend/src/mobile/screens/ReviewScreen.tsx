@@ -167,7 +167,7 @@ export function ReviewScreen({ navigation }: Props) {
               style={styles.textArea}
               multiline
               placeholder="Type what you remember..."
-              placeholderTextColor="rgba(27,28,25,0.3)"
+              placeholderTextColor={colors.mutedSoft}
             />
             <View style={styles.hintRow}>
               <Text style={styles.hintText}>Use a short, direct answer.</Text>
@@ -221,10 +221,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   statusEyebrow: {
     color: colors.mutedSoft,
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.1,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   statusTitle: {
     color: colors.text,
@@ -271,17 +269,15 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   questionMeta: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(213,230,220,0.7)",
+    backgroundColor: colors.primarySoft,
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   questionMetaText: {
     color: colors.secondary,
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   questionText: {
     color: colors.primary,

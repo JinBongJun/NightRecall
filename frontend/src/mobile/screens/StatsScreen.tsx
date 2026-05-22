@@ -265,7 +265,7 @@ function formatCount(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   statsWarning: {
     backgroundColor: colors.accentSoft,
@@ -294,7 +294,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     opacity: 0.9,
   },
   statsWarningButtonText: {
-    color: "#FFFFFF",
+    color: colors.onPrimary,
     fontSize: typography.caption.fontSize,
     fontWeight: "800",
   },
@@ -303,10 +303,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   sectionEyebrow: {
     color: colors.mutedSoft,
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   title: {
     color: colors.text,
@@ -321,25 +319,23 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     lineHeight: 16,
   },
   heroCard: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primarySoft,
     borderRadius: theme.radius.lg,
     padding: theme.spacing.md,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: isDark ? "rgba(114,168,134,0.35)" : "rgba(15,76,63,0.16)",
   },
   heroContent: {
     flex: 1,
     gap: 6,
   },
   heroLabel: {
-    color: "rgba(255,255,255,0.65)",
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
+    color: colors.mutedSoft,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   heroValueRow: {
     flexDirection: "row",
@@ -347,21 +343,21 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     gap: 6,
   },
   heroValue: {
-    color: "#FFFFFF",
+    color: colors.primary,
     fontSize: 34,
     lineHeight: 48,
     fontWeight: "800",
     letterSpacing: -1,
   },
   heroUnit: {
-    color: "rgba(255,255,255,0.7)",
+    color: colors.muted,
     fontSize: 13,
     lineHeight: 16,
     fontWeight: "600",
     marginBottom: 4,
   },
   heroBody: {
-    color: "rgba(255,255,255,0.88)",
+    color: colors.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "500",
@@ -381,10 +377,10 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     backgroundColor: colors.primarySoft,
   },
   heroStatusDotOff: {
-    backgroundColor: "rgba(255,255,255,0.35)",
+    backgroundColor: colors.border,
   },
   heroStatusText: {
-    color: "rgba(255,255,255,0.72)",
+    color: colors.mutedSoft,
     fontSize: typography.micro.fontSize,
     fontWeight: "700",
   },
@@ -421,10 +417,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   calendarMonth: {
     color: colors.mutedSoft,
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   calendarWeekHeader: {
     flexDirection: "row",
@@ -459,9 +453,9 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     backgroundColor: "transparent",
   },
   calendarCellTodayComplete: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: "rgba(18,67,67,0.12)",
+    borderColor: isDark ? "rgba(114,168,134,0.45)" : "rgba(15,76,63,0.2)",
   },
   calendarCellTodayPending: {
     borderWidth: 1,
@@ -478,10 +472,11 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     opacity: 0.35,
   },
   calendarDayTextCompleted: {
-    color: "rgba(18,67,67,0.85)",
+    color: colors.primary,
   },
   calendarDayTextTodayComplete: {
-    color: "#FFFFFF",
+    color: colors.primary,
+    fontWeight: "800",
   },
   calendarDayTextTodayPending: {
     color: colors.primary,
@@ -490,14 +485,14 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     width: 5,
     height: 5,
     borderRadius: 999,
-    backgroundColor: "rgba(18,67,67,0.2)",
+    backgroundColor: colors.border,
   },
   calendarDotCompleted: {
     backgroundColor: colors.primary,
     opacity: 0.4,
   },
   calendarDotTodayComplete: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.primary,
     opacity: 1,
   },
   calendarDotTodayPending: {

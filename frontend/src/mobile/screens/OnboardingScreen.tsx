@@ -372,7 +372,7 @@ function FlowMiniCard({
   );
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -496,7 +496,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     width: 12,
     height: 12,
     borderRadius: 999,
-    backgroundColor: "#FFF8EC",
+    backgroundColor: colors.surface,
   },
   copyCenter: {
     gap: 8,
@@ -504,10 +504,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   overline: {
     color: colors.mutedSoft,
-    fontSize: 9,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 1.3,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   posterTitle: {
     color: colors.primary,
@@ -532,7 +530,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
-    backgroundColor: "rgba(255,253,248,0.42)",
+    backgroundColor: isDark ? colors.surfaceLow : "rgba(255,253,248,0.42)",
   },
   flowArtworkCompact: {
     height: 128,
@@ -544,14 +542,14 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     position: "absolute",
     inset: 0,
     borderRadius: theme.radius.xl,
-    backgroundColor: "rgba(213,230,220,0.18)",
+    backgroundColor: isDark ? "rgba(114,168,134,0.12)" : "rgba(213,230,220,0.18)",
   },
   flowHalo: {
     position: "absolute",
     width: 180,
     height: 120,
     borderRadius: 999,
-    backgroundColor: "rgba(213,230,220,0.2)",
+    backgroundColor: isDark ? "rgba(114,168,134,0.16)" : "rgba(213,230,220,0.2)",
     top: 18,
   },
   flowOrbit: {
@@ -578,7 +576,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   flowMiniCard: {
     flex: 1,
-    backgroundColor: "rgba(255,253,248,0.96)",
+    backgroundColor: colors.surface,
     borderRadius: theme.radius.lg,
     minHeight: 88,
     paddingHorizontal: 12,
@@ -589,7 +587,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     shadowOffset: { width: 0, height: 8 },
   },
   flowMiniCardActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: isDark ? colors.primaryContainer : colors.primary,
     minHeight: 104,
     transform: [{ translateY: -4 }],
   },
@@ -602,13 +600,13 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     width: 44,
     height: 44,
     borderRadius: 999,
-    backgroundColor: "#D7F0F1",
+    backgroundColor: colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
   },
   flowMiniIconBubbleActive: {
-    backgroundColor: "#BCEBEB",
+    backgroundColor: isDark ? colors.surfaceHigh : colors.primarySoft,
   },
   flowMiniIconBubbleCompact: {
     width: 38,
@@ -619,8 +617,6 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     color: colors.mutedSoft,
     fontSize: 8,
     fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
     marginBottom: 6,
   },
   flowMiniStepActive: {
@@ -633,7 +629,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     fontWeight: "700",
   },
   flowMiniTitleActive: {
-    color: "#FFFFFF",
+    color: colors.onPrimary,
   },
   flowMiniTitleCompact: {
     fontSize: 13,
@@ -675,7 +671,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     shadowOffset: { width: 0, height: 8 },
   },
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: colors.onPrimary,
     fontSize: 13,
     fontWeight: "800",
   },
@@ -684,7 +680,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: "rgba(255,253,248,0.96)",
+    backgroundColor: colors.surface,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

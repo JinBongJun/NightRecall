@@ -169,10 +169,8 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   subtitle: {
     color: colors.mutedSoft,
-    fontSize: typography.micro.fontSize,
-    fontWeight: "800",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
+    fontSize: typography.caption.fontSize,
+    fontWeight: "700",
   },
   title: {
     color: colors.primary,

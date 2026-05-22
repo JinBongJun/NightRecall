@@ -69,7 +69,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     width: 50,
     height: 50,
     borderRadius: 18,
-    backgroundColor: "rgba(213,230,220,0.76)",
+    backgroundColor: colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -111,9 +111,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   ctaText: {
     color: colors.primary,
     fontSize: 11,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
+    fontWeight: "700",
   },
 });
 }

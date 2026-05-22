@@ -23,6 +23,7 @@ export type ColorPalette = {
   border: string;
   line: string;
   shadow: string;
+  onPrimary: string;
 };
 
 export const lightColors: ColorPalette = {
@@ -50,6 +51,7 @@ export const lightColors: ColorPalette = {
   border: "#D4C7B3",
   line: "#E7DDCF",
   shadow: "#10231E",
+  onPrimary: "#FFFFFF",
 };
 
 /** Warm night — layered surfaces, sage + amber accents (not flat gray or mint). */
@@ -78,6 +80,7 @@ export const darkColors: ColorPalette = {
   border: "#524B40",
   line: "#423C33",
   shadow: "#000000",
+  onPrimary: "#F5EFE3",
 };
 
 /** @deprecated Prefer `useAppTheme().colors` */
