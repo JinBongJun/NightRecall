@@ -54,7 +54,14 @@ export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         };
 
         return (
-          <Pressable key={route.key} style={styles.itemFrame} onPress={onPress}>
+          <Pressable
+            key={route.key}
+            style={styles.itemFrame}
+            onPress={onPress}
+            accessibilityRole="tab"
+            accessibilityLabel={config.label}
+            accessibilityState={{ selected }}
+          >
             <View style={[styles.item, selected && styles.itemActive]}>
               <MaterialIcons name={config.icon} size={18} color={selected ? "#FFFFFF" : colors.mutedSoft} />
               <Text style={[styles.label, selected && styles.labelActive]}>{config.label}</Text>

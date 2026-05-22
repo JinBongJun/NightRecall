@@ -6,6 +6,16 @@ import { theme } from "../theme";
 import { BrandWordmark } from "./BrandWordmark";
 import { useAuthStore } from "../store/authStore";
 
+const LEFT_ICON_LABELS: Partial<Record<keyof typeof MaterialIcons.glyphMap, string>> = {
+  "arrow-back": "Go back",
+  close: "Close",
+  settings: "Settings",
+};
+
+const RIGHT_ICON_LABELS: Partial<Record<keyof typeof MaterialIcons.glyphMap, string>> = {
+  "account-circle": "Account",
+};
+
 type Props = {
   title?: string;
   subtitle?: string;
@@ -29,7 +39,13 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
     <View style={styles.root}>
       <View style={styles.shell}>
         {leftIcon ? (
-          <Pressable onPress={onLeftPress} style={styles.iconButton} hitSlop={8}>
+          <Pressable
+            onPress={onLeftPress}
+            style={styles.iconButton}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={LEFT_ICON_LABELS[leftIcon] ?? "Back"}
+          >
             <MaterialIcons name={leftIcon} size={20} color={colors.primary} />
           </Pressable>
         ) : (
@@ -54,7 +70,13 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
 
         {rightIcon ? (
           showProfileAction ? (
-            <Pressable onPress={onRightPress} style={styles.profileButton} hitSlop={8}>
+            <Pressable
+              onPress={onRightPress}
+              style={styles.profileButton}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={RIGHT_ICON_LABELS[rightIcon] ?? "Account"}
+            >
               <View style={styles.profileGlyphWrap}>
                 {avatarUrl ? (
                   <Image source={{ uri: avatarUrl }} style={styles.profileImage} />
@@ -66,7 +88,13 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
               </View>
             </Pressable>
           ) : (
-            <Pressable onPress={onRightPress} style={styles.iconButton} hitSlop={8}>
+            <Pressable
+              onPress={onRightPress}
+              style={styles.iconButton}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={RIGHT_ICON_LABELS[rightIcon] ?? "Open menu"}
+            >
               <MaterialIcons name={rightIcon} size={20} color={colors.primary} />
             </Pressable>
           )

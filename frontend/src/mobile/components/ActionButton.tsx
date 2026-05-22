@@ -10,13 +10,17 @@ type Props = {
   disabled?: boolean;
   variant?: "primary" | "secondary" | "tertiary";
   iconName?: keyof typeof MaterialIcons.glyphMap;
+  accessibilityLabel?: string;
 };
 
-export function ActionButton({ label, onPress, disabled = false, variant = "primary", iconName }: Props) {
+export function ActionButton({ label, onPress, disabled = false, variant = "primary", iconName, accessibilityLabel }: Props) {
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityState={{ disabled }}
       style={({ pressed }) => [
         styles.base,
         variant === "primary" && styles.primary,

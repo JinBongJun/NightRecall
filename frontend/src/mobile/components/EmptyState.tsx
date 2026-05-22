@@ -21,7 +21,12 @@ export function EmptyState({ title, body, iconName = "auto-stories", actionLabel
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.body}>{body}</Text>
       {actionLabel && onAction ? (
-        <Pressable style={({ pressed }) => [styles.actionButton, pressed && styles.actionButtonPressed]} onPress={onAction}>
+        <Pressable
+          style={({ pressed }) => [styles.actionButton, pressed && styles.actionButtonPressed]}
+          onPress={onAction}
+          accessibilityRole="button"
+          accessibilityLabel={actionLabel}
+        >
           <Text style={styles.actionText}>{actionLabel}</Text>
           <MaterialIcons name="arrow-forward" size={16} color="#FFFFFF" />
         </Pressable>

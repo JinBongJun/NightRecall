@@ -146,7 +146,12 @@ export function HomeScreen({ navigation }: Props) {
           </View>
         </View>
 
-        <Pressable style={styles.streakCard} onPress={() => navigation.navigate("Stats")}>
+        <Pressable
+          style={styles.streakCard}
+          onPress={() => navigation.navigate("Stats")}
+          accessibilityRole="button"
+          accessibilityLabel={`${streak} night streak. View progress.`}
+        >
           <View style={styles.streakMain}>
             <MaterialIcons name="local-fire-department" size={22} color={colors.primary} />
             <View style={styles.streakCopy}>
@@ -174,19 +179,34 @@ export function HomeScreen({ navigation }: Props) {
 
         {tonightState.primaryLabel && tonightState.primaryAction ? (
           <View style={styles.heroActions}>
-            <Pressable style={styles.heroPrimaryButton} onPress={tonightState.primaryAction}>
+            <Pressable
+              style={styles.heroPrimaryButton}
+              onPress={tonightState.primaryAction}
+              accessibilityRole="button"
+              accessibilityLabel={tonightState.primaryLabel}
+            >
               <Text style={styles.heroPrimaryText}>{tonightState.primaryLabel}</Text>
               <MaterialIcons name="arrow-forward" size={16} color="#FFFFFF" />
             </Pressable>
 
             {tonightState.secondaryLabel && tonightState.secondaryAction ? (
-              <Pressable style={styles.heroSecondaryButton} onPress={tonightState.secondaryAction}>
+              <Pressable
+                style={styles.heroSecondaryButton}
+                onPress={tonightState.secondaryAction}
+                accessibilityRole="button"
+                accessibilityLabel={tonightState.secondaryLabel}
+              >
                 <Text style={styles.heroSecondaryText}>{tonightState.secondaryLabel}</Text>
               </Pressable>
             ) : null}
           </View>
         ) : tonightState.secondaryLabel && tonightState.secondaryAction ? (
-          <Pressable style={styles.heroPrimaryButton} onPress={tonightState.secondaryAction}>
+          <Pressable
+            style={styles.heroPrimaryButton}
+            onPress={tonightState.secondaryAction}
+            accessibilityRole="button"
+            accessibilityLabel={tonightState.secondaryLabel}
+          >
             <Text style={styles.heroPrimaryText}>{tonightState.secondaryLabel}</Text>
           </Pressable>
         ) : null}

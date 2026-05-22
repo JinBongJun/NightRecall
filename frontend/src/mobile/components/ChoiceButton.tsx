@@ -11,7 +11,13 @@ type Props = {
 
 export function ChoiceButton({ label, selected, onPress }: Props) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.button, selected && styles.selected, pressed && styles.pressed]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: Boolean(selected) }}
+      style={({ pressed }) => [styles.button, selected && styles.selected, pressed && styles.pressed]}
+    >
       <Text style={[styles.text, selected && styles.selectedText]}>{label}</Text>
     </Pressable>
   );

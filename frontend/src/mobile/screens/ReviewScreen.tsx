@@ -185,9 +185,10 @@ export function ReviewScreen({ navigation }: Props) {
       </View>
 
       <PrimaryButton
-        label={submitting ? "Submitting..." : "Submit Answer"}
+        label={submitting ? "Submitting..." : "Submit answer"}
         onPress={() => void onSubmit()}
         disabled={!canSubmit || submitting}
+        accessibilityLabel={submitting ? "Submitting answer" : "Submit answer"}
       />
     </ScreenContainer>
   );

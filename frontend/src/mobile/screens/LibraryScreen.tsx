@@ -51,6 +51,7 @@ export function LibraryScreen({ navigation }: Props) {
   const [deletingStudyInputId, setDeletingStudyInputId] = useState<string | null>(null);
   const [usingLegacyFallback, setUsingLegacyFallback] = useState(false);
   const [syncFailed, setSyncFailed] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -110,6 +111,30 @@ export function LibraryScreen({ navigation }: Props) {
     starredTopicsRef.current = starredTopics;
   }, [starredTopics]);
 
+  const syncSavedInputs = useCallback(
+    async (options?: { showCacheWhileLoading?: boolean }) => {
+      const hasImmediateItems = options?.showCacheWhileLoading ? hydrateImmediateItems() : false;
+      if (options?.showCacheWhileLoading) {
+        setSyncing(hasImmediateItems);
+      }
+
+      try {
+        const response = await fetchSavedInputs({ page: 1, limit: PAGE_SIZE });
+        setSavedInputs(response.items);
+        setPage(response.page);
+        setHasMore(response.has_more);
+        setTotalCount(response.total_count);
+        setSavedInputsCache(response.items);
+        setUsingLegacyFallback(false);
+        setSyncFailed(false);
+      } catch {
+        hydrateImmediateItems();
+        setSyncFailed(true);
+      }
+    },
+    [setSavedInputsCache],
+  );
+
   const loadSavedInputs = useCallback(() => {
     let cancelled = false;
 
@@ -118,27 +143,11 @@ export function LibraryScreen({ navigation }: Props) {
       setLoading(!hasImmediateItems);
       setSyncing(hasImmediateItems);
 
-      try {
-        const response = await fetchSavedInputs({ page: 1, limit: PAGE_SIZE });
-        if (!cancelled) {
-          setSavedInputs(response.items);
-          setPage(response.page);
-          setHasMore(response.has_more);
-          setTotalCount(response.total_count);
-          setSavedInputsCache(response.items);
-          setUsingLegacyFallback(false);
-          setSyncFailed(false);
-        }
-      } catch {
-        if (!cancelled) {
-          hydrateImmediateItems();
-          setSyncFailed(true);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-          setSyncing(false);
-        }
+      await syncSavedInputs();
+
+      if (!cancelled) {
+        setLoading(false);
+        setSyncing(false);
       }
     };
 
@@ -147,7 +156,16 @@ export function LibraryScreen({ navigation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [setSavedInputsCache]);
+  }, [syncSavedInputs]);
+
+  const refreshSavedInputs = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await syncSavedInputs({ showCacheWhileLoading: true });
+    } finally {
+      setRefreshing(false);
+    }
+  }, [syncSavedInputs]);
 
   useFocusEffect(loadSavedInputs);
 
@@ -380,6 +398,8 @@ export function LibraryScreen({ navigation }: Props) {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
+        refreshing={refreshing}
+        onRefresh={() => void refreshSavedInputs()}
       />
     </ScreenContainer>
   );

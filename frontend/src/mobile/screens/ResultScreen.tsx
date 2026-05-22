@@ -14,6 +14,7 @@ import { colors } from "../theme/colors";
 import { theme } from "../theme";
 import { navigateToReview } from "../navigation/navigationHelpers";
 import type { RootStackParamList } from "../navigation/types";
+import { playAnswerResultHaptic } from "../utils/feedback";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Result">;
 
@@ -46,6 +47,8 @@ export function ResultScreen({ navigation }: Props) {
     if (!result) {
       return;
     }
+
+    void playAnswerResultHaptic(result.is_correct);
 
     setStats({
       streak: result.current_streak,
@@ -137,7 +140,7 @@ const styles = StyleSheet.create({
     color: colors.mutedSoft,
     textTransform: "uppercase",
     letterSpacing: 0.8,
-    fontSize: 10,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
   },
   body: {
