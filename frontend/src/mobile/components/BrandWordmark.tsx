@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 const brandLogo = require("../../../assets/logo.png");
 
@@ -11,6 +12,8 @@ type Props = {
 };
 
 export function BrandWordmark({ size = "medium", showBetaBadge = false, badgeLabel = "FREE" }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const compact = size === "small";
 
   return (
@@ -33,7 +36,8 @@ export function BrandWordmark({ size = "medium", showBetaBadge = false, badgeLab
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   wrap: {
     flexDirection: "row",
     alignItems: "center",
@@ -111,3 +115,4 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
 });
+}

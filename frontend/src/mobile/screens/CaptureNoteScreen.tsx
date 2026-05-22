@@ -6,13 +6,15 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 import type { CaptureStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<CaptureStackParamList, "CaptureNote">;
 
 export function CaptureNoteScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const [sourceText, setSourceText] = useState("");
   const trimmedText = sourceText.trim();
   const canContinue = trimmedText.length >= 5;
@@ -52,7 +54,8 @@ export function CaptureNoteScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   editorCard: {
     backgroundColor: colors.surface,
     borderRadius: theme.radius.lg,
@@ -74,3 +77,4 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 });
+}

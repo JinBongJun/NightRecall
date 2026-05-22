@@ -1,8 +1,8 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 type Props = {
   title: string;
@@ -16,6 +16,8 @@ type Props = {
 };
 
 export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, imageHeaders, onPress, onDelete, deleting = false }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <Pressable style={({ pressed }) => [styles.card, pressed && styles.cardPressed]} onPress={onPress}>
       {imageUri ? (
@@ -63,7 +65,8 @@ export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, i
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   card: {
     backgroundColor: "rgba(255,253,248,0.92)",
     borderRadius: theme.radius.lg,
@@ -109,14 +112,14 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     color: colors.text,
-    fontSize: theme.typography.section.fontSize,
-    lineHeight: theme.typography.section.lineHeight,
-    fontWeight: theme.typography.section.fontWeight,
+    fontSize: typography.section.fontSize,
+    lineHeight: typography.section.lineHeight,
+    fontWeight: typography.section.fontWeight,
   },
   preview: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.lineHeight,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
   },
   metaRow: {
     flexDirection: "row",
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     color: colors.primary,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
   },
   openPill: {
@@ -146,7 +149,7 @@ const styles = StyleSheet.create({
   },
   openText: {
     color: colors.primary,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.6,
@@ -166,3 +169,4 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.96 }],
   },
 });
+}

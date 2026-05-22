@@ -1,12 +1,15 @@
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 type LoadingStateProps = {
   fullScreen?: boolean;
 };
 
 export function LoadingState({ fullScreen = false }: LoadingStateProps) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={[styles.container, fullScreen && styles.fullScreen]}>
       <ActivityIndicator color={colors.primary} />
@@ -14,7 +17,8 @@ export function LoadingState({ fullScreen = false }: LoadingStateProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   container: {
     padding: 24,
     alignItems: "center",
@@ -24,3 +28,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+}

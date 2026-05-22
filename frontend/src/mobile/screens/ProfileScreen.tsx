@@ -10,14 +10,16 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { getCachedGoogleProfile } from "../services/googleAuthService";
 import { fetchMe } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 import { navigateToMainTab } from "../navigation/navigationHelpers";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Account">;
 
 export function AccountScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const provider = useAuthStore((state) => state.provider);
   const authMode = useAuthStore((state) => state.authMode);
   const timezone = useAuthStore((state) => state.timezone);
@@ -130,7 +132,8 @@ export function AccountScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
 
   heroCard: {
     backgroundColor: colors.surface,
@@ -284,3 +287,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
+}

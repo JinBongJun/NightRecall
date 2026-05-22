@@ -2,7 +2,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { Topic } from "../types/models";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 type Props = {
   topic: Topic;
@@ -14,6 +15,8 @@ type Props = {
 };
 
 export function TopicCard({ topic, onPress, ctaLabel = "Pick", subtitle, disabled = false, titleOverride }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const rawTitle =
     (typeof topic.text === "string" && topic.text.trim()) ||
     (typeof topic.topic_text === "string" && topic.topic_text.trim()) ||
@@ -39,7 +42,8 @@ export function TopicCard({ topic, onPress, ctaLabel = "Pick", subtitle, disable
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   card: {
     backgroundColor: "rgba(255,253,248,0.92)",
     borderRadius: 24,
@@ -112,3 +116,4 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 });
+}

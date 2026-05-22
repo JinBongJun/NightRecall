@@ -4,7 +4,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { BrandWordmark } from "../components/BrandWordmark";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "PrivacyPolicy">;
@@ -14,6 +15,8 @@ const ACCOUNT_DELETION_URL = "https://night-recall.vercel.app/account-deletion/"
 const SUPPORT_EMAIL = "bongjun0289@gmail.com";
 
 export function PrivacyPolicyScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const openExternalUrl = async (url: string, failureTitle: string, failureBody: string) => {
     try {
       const supported = await Linking.canOpenURL(url);
@@ -71,7 +74,8 @@ export function PrivacyPolicyScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -151,3 +155,4 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 });
+}

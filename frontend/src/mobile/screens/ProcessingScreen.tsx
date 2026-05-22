@@ -7,7 +7,8 @@ import { ActionButton } from "../components/ActionButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TopBar } from "../components/TopBar";
 import { startStudyInputExtractJob, waitForStudyInputExtractJob } from "../services/studyService";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 import type { CaptureStackParamList } from "../navigation/types";
 import { asUsageLimitReason } from "../utils/usageLimits";
 import { extractKeyPoints } from "../utils/extractKeyPoints";
@@ -15,6 +16,8 @@ import { extractKeyPoints } from "../utils/extractKeyPoints";
 type Props = NativeStackScreenProps<CaptureStackParamList, "Processing">;
 
 export function ProcessingScreen({ route, navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const { mode, sourceText, imageBase64, imageUri, imageMimeType } = route.params;
   const pulse = useRef(new Animated.Value(0)).current;
   const shimmer = useRef(new Animated.Value(0)).current;
@@ -325,7 +328,8 @@ export function ProcessingScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   wrap: {
     flex: 1,
     minHeight: 280,
@@ -416,3 +420,4 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
+}

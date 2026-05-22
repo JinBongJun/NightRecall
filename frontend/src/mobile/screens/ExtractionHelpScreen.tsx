@@ -6,12 +6,15 @@ import { ActionButton } from "../components/ActionButton";
 import { BrandWordmark } from "../components/BrandWordmark";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 import type { CaptureStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<CaptureStackParamList, "ExtractionHelp">;
 
 export function ExtractionHelpScreen({ route, navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const { imageUri, imageBase64, imageMimeType, detail, sourceText } = route.params;
 
   const continueManually = () => {
@@ -65,7 +68,8 @@ export function ExtractionHelpScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -123,3 +127,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
+}

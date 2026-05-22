@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 type Props = {
   title: string;
@@ -13,6 +13,8 @@ type Props = {
 };
 
 export function EmptyState({ title, body, iconName = "auto-stories", actionLabel, onAction }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={styles.container}>
       <View style={styles.iconBadge}>
@@ -35,7 +37,8 @@ export function EmptyState({ title, body, iconName = "auto-stories", actionLabel
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   container: {
     padding: theme.spacing.md,
     borderRadius: theme.radius.md,
@@ -55,13 +58,13 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontWeight: theme.typography.section.fontWeight,
-    fontSize: theme.typography.section.fontSize,
+    fontWeight: typography.section.fontWeight,
+    fontSize: typography.section.fontSize,
   },
   body: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.lineHeight,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
   },
   actionButton: {
     marginTop: 4,
@@ -79,7 +82,8 @@ const styles = StyleSheet.create({
   },
   actionText: {
     color: "#FFFFFF",
-    fontSize: theme.typography.button.fontSize,
-    fontWeight: theme.typography.button.fontWeight,
+    fontSize: typography.button.fontSize,
+    fontWeight: typography.button.fontWeight,
   },
 });
+}

@@ -3,8 +3,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { theme } from "../theme";
-import { colors } from "../theme/colors";
+import { theme, useAppTheme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import type { MainTabParamList } from "./types";
 
 const TAB_CONFIG: Array<{
@@ -18,6 +18,8 @@ const TAB_CONFIG: Array<{
 ];
 
 export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
 
   return (
@@ -83,7 +85,8 @@ function getTabRootScreen(routeName: string) {
   return "Home";
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   wrap: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -115,7 +118,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.7,
@@ -124,3 +127,4 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
+}

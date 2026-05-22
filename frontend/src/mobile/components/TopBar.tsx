@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 import { BrandWordmark } from "./BrandWordmark";
 import { useAuthStore } from "../store/authStore";
@@ -26,6 +26,8 @@ type Props = {
 };
 
 export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRightPress }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const showTitle = Boolean(title);
   const showProfileAction = rightIcon === "account-circle";
   const plan = useAuthStore((state) => state.plan);
@@ -64,7 +66,9 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
               <Text style={styles.title}>{title}</Text>
             </View>
           ) : (
-            <BrandWordmark size="small" showBetaBadge badgeLabel={planLabel} />
+            <View accessibilityRole="header" accessibilityLabel="NightRecall">
+              <BrandWordmark size="small" showBetaBadge badgeLabel={planLabel} />
+            </View>
           )}
         </View>
 
@@ -106,7 +110,8 @@ export function TopBar({ title, subtitle, leftIcon, rightIcon, onLeftPress, onRi
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   root: {
     minHeight: theme.control.touchTarget + 2,
   },
@@ -164,16 +169,16 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     letterSpacing: 0.8,
     textTransform: "uppercase",
   },
   title: {
     color: colors.primary,
-    fontSize: theme.typography.section.fontSize,
-    lineHeight: theme.typography.section.lineHeight,
-    fontWeight: theme.typography.section.fontWeight,
+    fontSize: typography.section.fontSize,
+    lineHeight: typography.section.lineHeight,
+    fontWeight: typography.section.fontWeight,
     letterSpacing: -0.4,
   },
   planBadge: {
@@ -186,7 +191,7 @@ const styles = StyleSheet.create({
   },
   planBadgeText: {
     color: colors.primary,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     letterSpacing: 0.9,
   },
@@ -215,7 +220,8 @@ const styles = StyleSheet.create({
   },
   profileInitial: {
     color: colors.primary,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "800",
   },
 });
+}

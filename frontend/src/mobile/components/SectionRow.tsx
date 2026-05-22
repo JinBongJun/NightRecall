@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 type Props = {
   title: string;
@@ -12,6 +12,8 @@ type Props = {
 };
 
 export function SectionRow({ title, iconName, actionLabel, onActionPress }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={styles.row}>
       <View style={styles.titleRow}>
@@ -31,7 +33,8 @@ export function SectionRow({ title, iconName, actionLabel, onActionPress }: Prop
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -54,13 +57,14 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: theme.typography.section.fontSize,
-    fontWeight: theme.typography.section.fontWeight,
+    fontSize: typography.section.fontSize,
+    fontWeight: typography.section.fontWeight,
     letterSpacing: -0.2,
   },
   action: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
+    fontSize: typography.body.fontSize,
     fontWeight: "700",
   },
 });
+}

@@ -30,8 +30,8 @@ import { SearchField } from "../components/SearchField";
 import { deleteSavedInput, deleteTopic, fetchSavedInputs } from "../services/reviewService";
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useTopicsStore } from "../store/topicsStore";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 import { SavedStudyInputSummary, Topic } from "../types/models";
 type Props = NativeStackScreenProps<LibraryStackParamList, "Library">;
 
@@ -43,6 +43,8 @@ const resolveTopicText = (topic: Topic) =>
   "";
 
 export function LibraryScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [savedInputs, setSavedInputs] = useState<SavedStudyInputSummary[]>([]);
   const [loading, setLoading] = useState(false);
@@ -405,7 +407,8 @@ export function LibraryScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   list: {
     flex: 1,
   },
@@ -472,3 +475,4 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 });
+}

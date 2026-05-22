@@ -2,8 +2,9 @@ import { forwardRef } from "react";
 import { Pressable, StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
+import { MAX_FONT_SCALE } from "../theme/typography";
 
 type Props = {
   value: string;
@@ -17,9 +18,16 @@ export const SearchField = forwardRef<TextInput, Props>(function SearchField(
   { value, onChangeText, placeholder, onFocus, onBlur },
   ref,
 ) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.wrap}>
-      <MaterialIcons name="search" size={16} color={colors.muted} />
+    <View
+      style={styles.wrap}
+      accessibilityRole="search"
+      accessibilityLabel="Search saved learning"
+      accessibilityHint="Filters saved photos and notes"
+    >
+      <MaterialIcons name="search" size={16} color={colors.muted} importantForAccessibility="no" />
       <TextInput
         ref={ref}
         value={value}
@@ -32,23 +40,34 @@ export const SearchField = forwardRef<TextInput, Props>(function SearchField(
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="search"
+        allowFontScaling
+        maxFontSizeMultiplier={MAX_FONT_SCALE}
+        accessibilityLabel="Search query"
       />
       {value ? (
-        <Pressable style={({ pressed }) => [styles.clearButton, pressed && styles.clearPressed]} onPress={() => onChangeText("")}>
-          <Text style={styles.clearText}>Clear</Text>
+        <Pressable
+          style={({ pressed }) => [styles.clearButton, pressed && styles.clearPressed]}
+          onPress={() => onChangeText("")}
+          accessibilityRole="button"
+          accessibilityLabel="Clear search"
+        >
+          <Text style={styles.clearText} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+            Clear
+          </Text>
         </Pressable>
       ) : null}
     </View>
   );
 });
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   wrap: {
     minHeight: theme.control.inputMinHeight,
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -57,8 +76,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     color: colors.text,
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.lineHeight,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
     paddingVertical: 0,
   },
   clearButton: {
@@ -71,7 +90,7 @@ const styles = StyleSheet.create({
   },
   clearText: {
     color: colors.primary,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.6,
@@ -81,3 +100,4 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
 });
+}

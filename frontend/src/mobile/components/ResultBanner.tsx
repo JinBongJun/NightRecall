@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
+import { MAX_FONT_SCALE } from "../theme/typography";
 
 type Props = {
   correct: boolean;
@@ -11,46 +12,61 @@ type Props = {
 };
 
 export function ResultBanner({ correct, body, meta }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
-    <View style={[styles.card, correct ? styles.cardCorrect : styles.cardIncorrect]}>
+    <View
+      style={[styles.card, correct ? styles.cardCorrect : styles.cardIncorrect]}
+      accessibilityRole="summary"
+      accessibilityLabel={correct ? "Correct answer" : "Incorrect answer"}
+    >
       <View style={styles.row}>
         <View style={[styles.iconWrap, correct ? styles.iconCorrect : styles.iconIncorrect]}>
-          <MaterialIcons name={correct ? "check" : "close"} size={18} color={correct ? colors.primary : colors.accent} />
+          <MaterialIcons name={correct ? "check-circle" : "cancel"} size={26} color={correct ? colors.primary : colors.accent} />
         </View>
         <View style={styles.copy}>
-          <Text style={styles.title}>{correct ? "Correct" : "Not quite"}</Text>
-          <Text style={styles.body}>{body}</Text>
-          {meta ? <Text style={styles.meta}>{meta}</Text> : null}
+          <Text style={styles.title} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+            {correct ? "Correct" : "Not quite"}
+          </Text>
+          <Text style={styles.body} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+            {body}
+          </Text>
+          {meta ? (
+            <Text style={styles.meta} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+              {meta}
+            </Text>
+          ) : null}
         </View>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
+  return StyleSheet.create({
   card: {
     borderRadius: theme.radius.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1,
+    padding: theme.spacing.lg,
+    borderWidth: 1.5,
     gap: 3,
   },
   cardCorrect: {
     backgroundColor: colors.primarySoft,
-    borderColor: "rgba(15,76,63,0.15)",
+    borderColor: isDark ? "rgba(76,179,151,0.45)" : "rgba(15,76,63,0.2)",
   },
   cardIncorrect: {
     backgroundColor: colors.accentSoft,
-    borderColor: "rgba(199,123,74,0.2)",
+    borderColor: isDark ? "rgba(224,154,106,0.45)" : "rgba(199,123,74,0.28)",
   },
   row: {
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
     alignItems: "flex-start",
   },
   iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: theme.radius.sm,
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.md,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -66,18 +82,19 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: theme.typography.title.fontSize,
-    lineHeight: theme.typography.title.lineHeight,
+    fontSize: typography.title.fontSize,
+    lineHeight: typography.title.lineHeight,
     fontWeight: "800",
   },
   body: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.lineHeight,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
   },
   meta: {
     color: colors.primary,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "700",
   },
 });
+}

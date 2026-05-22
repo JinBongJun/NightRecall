@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 type Props = {
   title: string;
@@ -9,6 +9,8 @@ type Props = {
 };
 
 export function SectionHeader({ title, subtitle }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={styles.wrapper}>
       <Text style={styles.title}>{title}</Text>
@@ -17,19 +19,21 @@ export function SectionHeader({ title, subtitle }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   wrapper: {
     gap: 5,
   },
   title: {
-    fontSize: theme.typography.display.fontSize,
-    lineHeight: theme.typography.display.lineHeight,
+    fontSize: typography.display.fontSize,
+    lineHeight: typography.display.lineHeight,
     color: colors.text,
     fontWeight: "800",
   },
   subtitle: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.lineHeight,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
   },
 });
+}

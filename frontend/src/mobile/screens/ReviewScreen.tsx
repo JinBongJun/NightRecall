@@ -12,14 +12,16 @@ import { SectionRow } from "../components/SectionRow";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { submitAnswer } from "../services/reviewService";
 import { useReviewStore } from "../store/reviewStore";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 import { navigateToCapture, navigateToHome } from "../navigation/navigationHelpers";
 import type { RootStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Review">;
 
 export function ReviewScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const sessionIndex = useReviewStore((state) => state.sessionIndex);
@@ -194,7 +196,8 @@ export function ReviewScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   statusCard: {
     backgroundColor: colors.surface,
     borderRadius: 18,
@@ -214,7 +217,7 @@ const styles = StyleSheet.create({
   },
   statusEyebrow: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.1,
@@ -271,7 +274,7 @@ const styles = StyleSheet.create({
   },
   questionMetaText: {
     color: colors.secondary,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1,
@@ -308,3 +311,4 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 });
+}

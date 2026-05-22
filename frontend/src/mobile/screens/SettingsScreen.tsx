@@ -18,7 +18,8 @@ import { deleteMyAccount, fetchMe, linkGoogleIdToken, logoutSession } from "../s
 import { useAuthStore } from "../store/authStore";
 import { useOnboardingStore } from "../store/onboardingStore";
 import { useReminderStore } from "../store/reminderStore";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 import type { RootStackParamList } from "../navigation/types";
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
@@ -26,6 +27,8 @@ const ACCOUNT_DELETION_URL = "https://night-recall.vercel.app/account-deletion/"
 const SUPPORT_EMAIL = "bongjun0289@gmail.com";
 
 export function SettingsScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const userId = useAuthStore((state) => state.userId);
   const timezone = useAuthStore((state) => state.timezone);
   const provider = useAuthStore((state) => state.provider);
@@ -573,7 +576,8 @@ export function SettingsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
 
   header: {
     gap: 4,
@@ -766,3 +770,4 @@ const styles = StyleSheet.create({
     color: colors.danger,
   },
 });
+}

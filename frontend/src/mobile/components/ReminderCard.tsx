@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 type Props = {
   reminderTime?: string | null;
@@ -8,6 +9,8 @@ type Props = {
 };
 
 export function ReminderCard({ reminderTime, enabled }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Night reminder</Text>
@@ -18,7 +21,8 @@ export function ReminderCard({ reminderTime, enabled }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
     borderRadius: 18,
@@ -36,3 +40,4 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+}

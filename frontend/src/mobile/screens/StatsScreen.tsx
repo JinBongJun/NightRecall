@@ -6,8 +6,8 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useStatsStore } from "../store/statsStore";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 import type { HomeStackParamList } from "../navigation/types";
 
 type Props = NativeStackScreenProps<HomeStackParamList, "Stats">;
@@ -15,6 +15,8 @@ type Props = NativeStackScreenProps<HomeStackParamList, "Stats">;
 const WEEKDAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
 export function StatsScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   useStatsRefresh();
 
   const streak = useStatsStore((state) => state.streak);
@@ -161,6 +163,9 @@ function StatCard({
   fullWidth?: boolean;
   icon: keyof typeof MaterialIcons.glyphMap;
 }) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
+
   return (
     <View style={[styles.statCard, fullWidth && styles.statCardFull]}>
       <View style={styles.statRowLeft}>
@@ -241,22 +246,23 @@ function formatCount(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   header: {
     gap: 6,
   },
   sectionEyebrow: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     letterSpacing: 0.8,
     textTransform: "uppercase",
   },
   title: {
     color: colors.text,
-    fontSize: theme.typography.title.fontSize,
+    fontSize: typography.title.fontSize,
     fontWeight: "800",
-    lineHeight: theme.typography.title.lineHeight,
+    lineHeight: typography.title.lineHeight,
     letterSpacing: -0.4,
   },
   subtitle: {
@@ -280,7 +286,7 @@ const styles = StyleSheet.create({
   },
   heroLabel: {
     color: "rgba(255,255,255,0.65)",
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     letterSpacing: 0.6,
     textTransform: "uppercase",
@@ -329,7 +335,7 @@ const styles = StyleSheet.create({
   },
   heroStatusText: {
     color: "rgba(255,255,255,0.72)",
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "700",
   },
   heroIconWrap: {
@@ -365,7 +371,7 @@ const styles = StyleSheet.create({
   },
   calendarMonth: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.6,
@@ -379,7 +385,7 @@ const styles = StyleSheet.create({
     width: 36,
     textAlign: "center",
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "700",
   },
   calendarGrid: {
@@ -514,3 +520,4 @@ const styles = StyleSheet.create({
     maxWidth: 280,
   },
 });
+}

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 type Props = {
   label: string;
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export function TopicChip({ label, selected, onPress }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <Pressable onPress={onPress} style={[styles.chip, selected && styles.selected]}>
       <Text style={[styles.text, selected && styles.selectedText]}>{label}</Text>
@@ -16,7 +19,8 @@ export function TopicChip({ label, selected, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 11,
@@ -40,3 +44,4 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
 });
+}

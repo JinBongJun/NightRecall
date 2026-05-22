@@ -1,8 +1,12 @@
 import { StyleSheet, View } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 
 export function BrandBackdrop() {
+  const styles = useThemedStyles(createStyles);
+  const orbitNodes = [styles.nodeOne, styles.nodeTwo, styles.nodeThree, styles.nodeFour, styles.nodeFive, styles.nodeSix];
+  const orbitLines = [styles.lineOne, styles.lineTwo, styles.lineThree, styles.lineFour];
+
   return (
     <View pointerEvents="none" style={styles.root}>
       <View style={styles.topGlow} />
@@ -24,7 +28,15 @@ export function BrandBackdrop() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, isDark }: ThemedStyleContext) {
+  const primaryGlow = isDark ? "rgba(76,179,151,0.14)" : "rgba(15,76,63,0.09)";
+  const accentGlow = isDark ? "rgba(224,154,106,0.12)" : "rgba(199,123,74,0.08)";
+  const arcBorder = isDark ? "rgba(76,179,151,0.16)" : "rgba(15,76,63,0.09)";
+  const lineColor = isDark ? "rgba(76,179,151,0.22)" : "rgba(15,76,63,0.12)";
+  const nodeFill = isDark ? "rgba(76,179,151,0.28)" : "rgba(15,76,63,0.18)";
+  const nodeBorder = isDark ? colors.surface : "rgba(255,253,248,0.9)";
+
+  return StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
     overflow: "hidden",
@@ -36,7 +48,7 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 999,
-    backgroundColor: "rgba(15,76,63,0.09)",
+    backgroundColor: primaryGlow,
   },
   bottomGlow: {
     position: "absolute",
@@ -45,13 +57,13 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
     borderRadius: 999,
-    backgroundColor: "rgba(199,123,74,0.08)",
+    backgroundColor: accentGlow,
   },
   arc: {
     position: "absolute",
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "rgba(15,76,63,0.09)",
+    borderColor: arcBorder,
   },
   arcLarge: {
     width: 360,
@@ -81,7 +93,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     height: 1.5,
     borderRadius: 999,
-    backgroundColor: "rgba(15,76,63,0.12)",
+    backgroundColor: lineColor,
   },
   lineOne: {
     width: 138,
@@ -112,9 +124,9 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 999,
-    backgroundColor: "rgba(15,76,63,0.18)",
+    backgroundColor: nodeFill,
     borderWidth: 2,
-    borderColor: "rgba(255,253,248,0.9)",
+    borderColor: nodeBorder,
   },
   nodeOne: {
     top: 150,
@@ -141,14 +153,4 @@ const styles = StyleSheet.create({
     bottom: 116,
   },
 });
-
-const orbitNodes = [
-  styles.nodeOne,
-  styles.nodeTwo,
-  styles.nodeThree,
-  styles.nodeFour,
-  styles.nodeFive,
-  styles.nodeSix,
-];
-
-const orbitLines = [styles.lineOne, styles.lineTwo, styles.lineThree, styles.lineFour];
+}

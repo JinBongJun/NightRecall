@@ -17,7 +17,8 @@ import {
 } from "../services/studyService";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 import type { SourceKind, StudyInputType } from "../types/domain";
 import type { Question } from "../types/models";
 import { resetToHomeAfterFlow } from "../navigation/navigationHelpers";
@@ -35,6 +36,8 @@ const getErrorMessage = (error: unknown): string | null => {
 };
 
 export function QuestionGeneratingScreen({ route, navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const pulse = useRef(new Animated.Value(0)).current;
   const shimmer = useRef(new Animated.Value(0)).current;
   const copyFade = useRef(new Animated.Value(1)).current;
@@ -471,7 +474,8 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   wrap: {
     flex: 1,
     minHeight: 280,
@@ -562,3 +566,4 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
+}

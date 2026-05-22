@@ -12,11 +12,13 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 type Props = NativeStackScreenProps<CaptureStackParamList, "Capture">;
 
 export function CaptureScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const [loading, setLoading] = useState(false);
   const usageLimits = useUsageLimits();
   const [selectedImage, setSelectedImage] = useState<{
@@ -197,7 +199,8 @@ export function CaptureScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   libraryLink: {
     flexDirection: "row",
     alignItems: "center",
@@ -390,3 +393,4 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.992 }],
   },
 });
+}

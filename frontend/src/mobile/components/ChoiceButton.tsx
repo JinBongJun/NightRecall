@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 type Props = {
   label: string;
@@ -10,6 +10,8 @@ type Props = {
 };
 
 export function ChoiceButton({ label, selected, onPress }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <Pressable
       onPress={onPress}
@@ -23,7 +25,8 @@ export function ChoiceButton({ label, selected, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   button: {
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -48,11 +51,12 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.text,
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.lineHeight,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
     fontWeight: "700",
   },
   selectedText: {
     color: colors.primary,
   },
 });
+}

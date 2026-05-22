@@ -3,7 +3,8 @@ import { Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BOTTOM_DOCK_HEIGHT, theme } from "../theme";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 type Props = PropsWithChildren<{
   footer?: ReactNode;
@@ -13,6 +14,8 @@ type Props = PropsWithChildren<{
 }>;
 
 export function ScreenContainer({ children, footer, scrollRef, scrollable = true }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -71,7 +74,8 @@ export function ScreenContainer({ children, footer, scrollRef, scrollable = true
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -100,3 +104,4 @@ const styles = StyleSheet.create({
     minHeight: 0,
   },
 });
+}

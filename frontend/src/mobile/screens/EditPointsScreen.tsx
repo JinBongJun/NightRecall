@@ -17,7 +17,8 @@ import { createStudyInput, deleteSourceImage, uploadSourceImage } from "../servi
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
 import { useReviewStore } from "../store/reviewStore";
 import { useTopicsStore } from "../store/topicsStore";
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 import type { StudyInputType } from "../types/domain";
 import { Topic } from "../types/models";
 import { navigateToLibrary, navigateToQuestionGenerating } from "../navigation/navigationHelpers";
@@ -51,6 +52,8 @@ const toInitialPoints = (texts: string[]): ReviewDraftPoint[] =>
 type SaveDestination = "library" | "back";
 
 export function EditPointsScreen({ route, navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const usageLimits = useUsageLimits();
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
@@ -422,7 +425,8 @@ export function EditPointsScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   loadingCard: {
     backgroundColor: colors.surfaceLow,
     borderRadius: 16,
@@ -619,3 +623,4 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
 });
+}

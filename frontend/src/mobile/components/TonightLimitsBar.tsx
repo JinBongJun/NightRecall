@@ -2,10 +2,12 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import { formatTonightLimitsLine } from "../utils/usageLimitDisplay";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 export function TonightLimitsBar() {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const usageLimits = useUsageLimits();
   const line = formatTonightLimitsLine(usageLimits);
 
@@ -20,7 +22,8 @@ export function TonightLimitsBar() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   bar: {
     backgroundColor: colors.surfaceLow,
     borderRadius: theme.radius.sm,
@@ -31,8 +34,9 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.muted,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "700",
     textAlign: "center",
   },
 });
+}

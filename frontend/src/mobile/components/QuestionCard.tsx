@@ -1,14 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { Question } from "../types/models";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 
 type Props = {
   question: Question;
 };
 
 export function QuestionCard({ question }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={styles.card}>
       <Text style={styles.kicker}>Tonight's question</Text>
@@ -17,7 +19,8 @@ export function QuestionCard({ question }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
     borderRadius: theme.radius.lg,
@@ -30,13 +33,14 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontWeight: "700",
     textTransform: "uppercase",
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     letterSpacing: 0.5,
   },
   text: {
-    fontSize: theme.typography.display.fontSize,
-    lineHeight: theme.typography.display.lineHeight,
+    fontSize: typography.display.fontSize,
+    lineHeight: typography.display.lineHeight,
     color: colors.text,
     fontWeight: "700",
   },
 });
+}

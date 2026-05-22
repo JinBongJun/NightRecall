@@ -19,11 +19,13 @@ import {
 import { useReminderStore } from "../store/reminderStore";
 import { useReviewStore } from "../store/reviewStore";
 import { useStatsStore } from "../store/statsStore";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 type Props = NativeStackScreenProps<HomeStackParamList, "Home">;
 
 export function HomeScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const loadTonightQuestion = useTonightQuestion();
   const usageLimits = useUsageLimits();
   const reminderTime = useReminderStore((state) => state.reminderTime);
@@ -215,7 +217,8 @@ export function HomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   tonightCard: {
     backgroundColor: colors.surface,
     borderRadius: theme.radius.lg,
@@ -235,7 +238,7 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "700",
   },
   reminderRow: {
@@ -245,7 +248,7 @@ const styles = StyleSheet.create({
   },
   reminderText: {
     color: colors.primary,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "700",
   },
   streakCard: {
@@ -274,7 +277,7 @@ const styles = StyleSheet.create({
   },
   streakUnit: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
+    fontSize: typography.body.fontSize,
     fontWeight: "700",
   },
   streakMeta: {
@@ -284,12 +287,12 @@ const styles = StyleSheet.create({
   },
   ritualText: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "700",
   },
   statsLink: {
     color: colors.primary,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "800",
   },
   statusChip: {
@@ -303,14 +306,14 @@ const styles = StyleSheet.create({
   },
   statusChipText: {
     color: colors.secondary,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "800",
   },
   limitsLine: {
     color: colors.muted,
-    fontSize: theme.typography.caption.fontSize,
+    fontSize: typography.caption.fontSize,
     fontWeight: "600",
-    lineHeight: theme.typography.caption.lineHeight,
+    lineHeight: typography.caption.lineHeight,
   },
   tonightCopy: {
     gap: 6,
@@ -318,21 +321,21 @@ const styles = StyleSheet.create({
   },
   tonightEyebrow: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 0.8,
   },
   tonightTitle: {
     color: colors.text,
-    fontSize: theme.typography.title.fontSize,
-    lineHeight: theme.typography.title.lineHeight,
+    fontSize: typography.title.fontSize,
+    lineHeight: typography.title.lineHeight,
     fontWeight: "800",
   },
   tonightBody: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
-    lineHeight: theme.typography.body.lineHeight,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
   },
   heroActions: {
     gap: theme.spacing.sm,
@@ -350,8 +353,8 @@ const styles = StyleSheet.create({
   },
   heroPrimaryText: {
     color: "#FFFFFF",
-    fontSize: theme.typography.button.fontSize,
-    fontWeight: theme.typography.button.fontWeight,
+    fontSize: typography.button.fontSize,
+    fontWeight: typography.button.fontWeight,
   },
   heroSecondaryButton: {
     minHeight: theme.control.buttonMinHeightCompact,
@@ -365,7 +368,8 @@ const styles = StyleSheet.create({
   },
   heroSecondaryText: {
     color: colors.primary,
-    fontSize: theme.typography.body.fontSize,
+    fontSize: typography.body.fontSize,
     fontWeight: "700",
   },
 });
+}

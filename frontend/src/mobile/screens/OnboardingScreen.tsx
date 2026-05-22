@@ -26,8 +26,8 @@ import { updateReminderSettings } from "../services/settingsService";
 import { createGuestSession, signInWithGoogleIdToken } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
 import { useReminderStore } from "../store/reminderStore";
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Onboarding">;
@@ -36,6 +36,8 @@ const GOOGLE_G_LOGO = "https://developers.google.com/static/identity/images/g-lo
 const BRAND_LOGO = require("../../../assets/logo.png");
 
 export function OnboardingScreen({ navigation }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const setSession = useAuthStore((state) => state.setSession);
   const setReminder = useReminderStore((state) => state.setReminder);
   const [loading, setLoading] = useState(false);
@@ -350,6 +352,9 @@ function FlowMiniCard({
   active: boolean;
   compact: boolean;
 }) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
+
   return (
     <View style={[styles.flowMiniCard, active && styles.flowMiniCardActive, compact && styles.flowMiniCardCompact]}>
       <View style={[styles.flowMiniIconBubble, active && styles.flowMiniIconBubbleActive, compact && styles.flowMiniIconBubbleCompact]}>
@@ -361,7 +366,8 @@ function FlowMiniCard({
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
@@ -686,7 +692,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+}
 
 function OrbitNode() {
+  const styles = useThemedStyles(createStyles);
   return <View style={styles.heroNode} />;
 }

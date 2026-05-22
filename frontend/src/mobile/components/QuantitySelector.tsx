@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 type Props = {
   values: number[];
@@ -11,6 +12,8 @@ type Props = {
 };
 
 export function QuantitySelector({ values, selectedValue, maxEnabledValue, disabled = false, onChange }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={styles.row}>
       {values.map((value) => {
@@ -37,7 +40,8 @@ export function QuantitySelector({ values, selectedValue, maxEnabledValue, disab
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   row: {
     flexDirection: "row",
     gap: 12,
@@ -79,3 +83,4 @@ const styles = StyleSheet.create({
     color: colors.mutedSoft,
   },
 });
+}

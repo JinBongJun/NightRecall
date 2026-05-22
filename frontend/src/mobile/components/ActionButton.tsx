@@ -1,8 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { colors } from "../theme/colors";
-import { theme } from "../theme";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { theme, useAppTheme } from "../theme";
+import { MAX_FONT_SCALE } from "../theme/typography";
 
 type Props = {
   label: string;
@@ -14,6 +15,8 @@ type Props = {
 };
 
 export function ActionButton({ label, onPress, disabled = false, variant = "primary", iconName, accessibilityLabel }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <Pressable
       onPress={onPress}
@@ -39,6 +42,8 @@ export function ActionButton({ label, onPress, disabled = false, variant = "prim
           />
         ) : null}
         <Text
+          allowFontScaling
+          maxFontSizeMultiplier={MAX_FONT_SCALE}
           style={[
             styles.text,
             variant === "primary" && styles.textPrimary,
@@ -53,7 +58,8 @@ export function ActionButton({ label, onPress, disabled = false, variant = "prim
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
+  return StyleSheet.create({
   base: {
     minHeight: theme.control.buttonMinHeight,
     borderRadius: theme.radius.md,
@@ -71,11 +77,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
   },
   secondary: {
-    backgroundColor: "rgba(255,253,248,0.92)",
+    backgroundColor: isDark ? colors.surfaceLow : colors.surface,
     borderColor: colors.border,
   },
   tertiary: {
-    backgroundColor: "rgba(255,253,248,0.46)",
+    backgroundColor: isDark ? "transparent" : colors.surfaceLow,
     minHeight: theme.control.buttonMinHeightCompact,
     borderColor: "transparent",
   },
@@ -93,9 +99,9 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   text: {
-    fontSize: theme.typography.button.fontSize,
-    lineHeight: theme.typography.button.lineHeight,
-    fontWeight: theme.typography.button.fontWeight,
+    fontSize: typography.button.fontSize,
+    lineHeight: typography.button.lineHeight,
+    fontWeight: typography.button.fontWeight,
   },
   textPrimary: {
     color: "#FFFFFF",
@@ -105,7 +111,8 @@ const styles = StyleSheet.create({
   },
   textTertiary: {
     color: colors.muted,
-    fontSize: theme.typography.body.fontSize,
+    fontSize: typography.body.fontSize,
     fontWeight: "700",
   },
 });
+}

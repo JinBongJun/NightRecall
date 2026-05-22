@@ -1,12 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
+import { useAppTheme } from "../theme";
 
 type Props = {
   message: string;
 };
 
 export function ErrorState({ message }: Props) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Something went wrong</Text>
@@ -15,7 +18,8 @@ export function ErrorState({ message }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles({ colors, typography }: ThemedStyleContext) {
+  return StyleSheet.create({
   container: {
     backgroundColor: "#F7E5E2",
     borderRadius: 18,
@@ -30,3 +34,4 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
 });
+}
