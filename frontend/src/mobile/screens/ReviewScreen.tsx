@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -13,6 +13,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { submitAnswer } from "../services/reviewService";
 import { useReviewStore } from "../store/reviewStore";
 import { colors } from "../theme/colors";
+import { theme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Review">;
@@ -29,6 +30,7 @@ export function ReviewScreen({ navigation }: Props) {
   const setResult = useReviewStore((state) => state.setResult);
   const queueRetryQuestion = useReviewStore((state) => state.queueRetryQuestion);
   const startedAt = useRef(Date.now());
+  const [submitting, setSubmitting] = useState(false);
   const totalQuestions = sessionQuestions.length ? sessionQuestions.length : 1;
   const currentNumber = currentQuestionMode === "retry" ? totalQuestions : sessionQuestions.length ? sessionIndex + 1 : 1;
   const progressRatio = currentQuestionMode === "retry" ? 1 : Math.min(1, Math.max(0, currentNumber / totalQuestions));
@@ -49,7 +51,13 @@ export function ReviewScreen({ navigation }: Props) {
           onLeftPress={() => navigation.goBack()} 
         />
         <View style={{ flex: 1, justifyContent: "center", paddingBottom: 60 }}>
-          <EmptyState iconName="quiz" title="No question loaded" body="Make a question first to review it here tonight." />
+          <EmptyState
+            iconName="quiz"
+            title="No question loaded"
+            body="Capture learning first, then come back to recall it tonight."
+            actionLabel="Capture for tonight"
+            onAction={() => navigation.navigate("Capture")}
+          />
           <View style={{ paddingHorizontal: 24, marginTop: 24 }}>
             <PrimaryButton label="Go to Home" onPress={() => navigation.navigate("Home")} />
           </View>
@@ -59,6 +67,11 @@ export function ReviewScreen({ navigation }: Props) {
   }
 
   const onSubmit = async () => {
+    if (submitting) {
+      return;
+    }
+
+    setSubmitting(true);
     try {
       const result = await submitAnswer({
         question_id: currentQuestion.id,
@@ -84,6 +97,8 @@ export function ReviewScreen({ navigation }: Props) {
       }
 
       Alert.alert("Answer failed", "Your answer could not be submitted.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -168,7 +183,11 @@ export function ReviewScreen({ navigation }: Props) {
         )}
       </View>
 
-      <PrimaryButton label="Submit Answer" onPress={() => void onSubmit()} disabled={!canSubmit} />
+      <PrimaryButton
+        label={submitting ? "Submitting..." : "Submit Answer"}
+        onPress={() => void onSubmit()}
+        disabled={!canSubmit || submitting}
+      />
     </ScreenContainer>
   );
 }
@@ -193,7 +212,7 @@ const styles = StyleSheet.create({
   },
   statusEyebrow: {
     color: colors.mutedSoft,
-    fontSize: 10,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1.1,
@@ -250,7 +269,7 @@ const styles = StyleSheet.create({
   },
   questionMetaText: {
     color: colors.secondary,
-    fontSize: 9,
+    fontSize: theme.typography.micro.fontSize,
     fontWeight: "800",
     textTransform: "uppercase",
     letterSpacing: 1,

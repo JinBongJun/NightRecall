@@ -3,7 +3,9 @@ import { Alert, Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 
+import { ActionButton } from "../components/ActionButton";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TopBar } from "../components/TopBar";
 import { deleteSavedInput, generateQuestionsFromSavedInput, generateQuestionsFromSavedTopic } from "../services/reviewService";
 import {
   createStudyInput,
@@ -35,7 +37,13 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
   const pulse = useRef(new Animated.Value(0)).current;
   const shimmer = useRef(new Animated.Value(0)).current;
   const copyFade = useRef(new Animated.Value(1)).current;
+  const cancelledRef = useRef(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
+
+  const cancel = () => {
+    cancelledRef.current = true;
+    navigation.goBack();
+  };
 
   const setTopics = useTopicsStore((state) => state.setTopics);
   const upsertSavedInput = useTopicsStore((state) => state.upsertSavedInput);
@@ -129,12 +137,12 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
   }, [copyFade, phases.length]);
 
   useEffect(() => {
-    let cancelled = false;
+    cancelledRef.current = false;
 
     const finishWithQuestions = (
       questions: Question[],
     ) => {
-      if (!questions.length || cancelled) {
+      if (!questions.length || cancelledRef.current) {
         return;
       }
 
@@ -194,7 +202,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             source_image_ref: uploadedSourceImageRef ?? undefined,
           });
 
-          if (cancelled) {
+          if (cancelledRef.current) {
             return;
           }
 
@@ -224,7 +232,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             count: route.params.selectedQuestionCount,
           });
           const completedJob = await waitForQuestionGenerationJob(job.job_id, {
-            isCancelled: () => cancelled,
+            isCancelled: () => cancelledRef.current,
           });
           const questions = completedJob.questions;
           if (!Array.isArray(questions) || !questions.length) {
@@ -299,7 +307,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
             // Best-effort cleanup for an image that was uploaded before save failed.
           }
         }
-        if (cancelled) {
+        if (cancelledRef.current) {
           return;
         }
         if (axios.isAxiosError(error) && error.code === "ECONNABORTED") {
@@ -329,7 +337,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
     void run();
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
   }, [
     addSessionQuestions,
@@ -345,6 +353,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
 
   return (
     <ScreenContainer>
+      <TopBar leftIcon="close" onLeftPress={cancel} />
       <View style={styles.wrap}>
         <Animated.View
           style={[
@@ -456,6 +465,7 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
           <Animated.Text style={[styles.phase, { opacity: copyFade }]}>{phases[phaseIndex]}</Animated.Text>
         </View>
       </View>
+      <ActionButton label="Cancel" onPress={cancel} variant="tertiary" />
     </ScreenContainer>
   );
 }

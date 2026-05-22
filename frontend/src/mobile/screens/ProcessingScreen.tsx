@@ -3,7 +3,9 @@ import { Alert, Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import axios from "axios";
 
+import { ActionButton } from "../components/ActionButton";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TopBar } from "../components/TopBar";
 import { startStudyInputExtractJob, waitForStudyInputExtractJob } from "../services/studyService";
 import { colors } from "../theme/colors";
 import { RootStackParamList } from "../types/navigation";
@@ -17,7 +19,13 @@ export function ProcessingScreen({ route, navigation }: Props) {
   const pulse = useRef(new Animated.Value(0)).current;
   const shimmer = useRef(new Animated.Value(0)).current;
   const copyFade = useRef(new Animated.Value(1)).current;
+  const cancelledRef = useRef(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
+
+  const cancel = () => {
+    cancelledRef.current = true;
+    navigation.goBack();
+  };
   const title = useMemo(() => (mode === "photo" ? "AI is reading your photo" : "AI is reading your note"), [mode]);
   const body = useMemo(
     () => (mode === "photo" ? "Pulling out what matters for tonight's questions." : "Pulling out what matters for tonight's questions."),
@@ -98,7 +106,7 @@ export function ProcessingScreen({ route, navigation }: Props) {
   }, [copyFade, phases.length]);
 
   useEffect(() => {
-    let cancelled = false;
+    cancelledRef.current = false;
 
     const run = async () => {
       try {
@@ -110,7 +118,7 @@ export function ProcessingScreen({ route, navigation }: Props) {
             return;
           }
 
-          if (!cancelled) {
+          if (!cancelledRef.current) {
             navigation.replace("EditPoints", {
               variant: "new",
               mode: "manual",
@@ -136,10 +144,10 @@ export function ProcessingScreen({ route, navigation }: Props) {
           image_mime_type: imageMimeType,
         });
         const completed = await waitForStudyInputExtractJob(job.job_id, {
-          isCancelled: () => cancelled,
+          isCancelled: () => cancelledRef.current,
         });
 
-        if (!cancelled) {
+        if (!cancelledRef.current) {
           if (!completed.points?.length) {
             throw new Error("study_input_extract_job_returned_no_points");
           }
@@ -161,7 +169,7 @@ export function ProcessingScreen({ route, navigation }: Props) {
               ? error.message
               : null;
         const usageLimitReason = asUsageLimitReason(apiDetail);
-        if (!cancelled && usageLimitReason === "photo_extract") {
+        if (!cancelledRef.current && usageLimitReason === "photo_extract") {
           navigation.replace("UsageLimit", {
             reason: usageLimitReason,
             sourceText: sourceText || "",
@@ -171,7 +179,7 @@ export function ProcessingScreen({ route, navigation }: Props) {
           });
           return;
         }
-        if (!cancelled && mode === "photo") {
+        if (!cancelledRef.current && mode === "photo") {
           navigation.replace("ExtractionHelp", {
             mode: "photo",
             sourceText: sourceText || "",
@@ -194,12 +202,13 @@ export function ProcessingScreen({ route, navigation }: Props) {
     void run();
 
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
     };
   }, [imageBase64, imageMimeType, imageUri, mode, navigation, sourceText]);
 
   return (
     <ScreenContainer>
+      <TopBar leftIcon="close" onLeftPress={cancel} />
       <View style={styles.wrap}>
         <Animated.View
           style={[
@@ -311,6 +320,7 @@ export function ProcessingScreen({ route, navigation }: Props) {
           <Animated.Text style={[styles.phase, { opacity: copyFade }]}>{phases[phaseIndex]}</Animated.Text>
         </View>
       </View>
+      <ActionButton label="Cancel" onPress={cancel} variant="tertiary" />
     </ScreenContainer>
   );
 }

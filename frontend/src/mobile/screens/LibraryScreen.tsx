@@ -340,11 +340,13 @@ export function LibraryScreen({ navigation }: Props) {
         body={
           savedInputs.length
             ? "Try a different word or clear the search."
-            : "Saved cards will appear here after you extract points and save at least one of them."
+            : "Saved cards appear after you capture learning and bookmark at least one point."
         }
+        actionLabel={savedInputs.length ? undefined : "Capture for tonight"}
+        onAction={savedInputs.length ? undefined : () => navigation.navigate("Capture")}
       />
     );
-  }, [loading, savedInputs.length]);
+  }, [loading, navigation, savedInputs.length]);
 
   const renderItem = useCallback(
     ({ item }: { item: SavedStudyInputSummary }) => (

@@ -11,8 +11,8 @@ import { useStatsRefresh } from "../hooks/useStatsRefresh";
 import { useTonightQuestion } from "../hooks/useTonightQuestion";
 import { useUsageLimits } from "../hooks/useUsageLimits";
 import {
-  formatRemainingCount,
-  remainingPhotoReads,
+  formatAddAnotherLabel,
+  formatTonightLimitsLine,
   remainingQuestionGenerations,
 } from "../utils/usageLimitDisplay";
 import { useReminderStore } from "../store/reminderStore";
@@ -63,9 +63,13 @@ export function HomeScreen({ navigation }: Props) {
       : currentQuestion
         ? 1
         : 0;
+
   const remainingQuestionsTonight = remainingQuestionGenerations(usageLimits);
-  const remainingPhotoReadsTonight = remainingPhotoReads(usageLimits);
-  const canAddQuestionTonight = remainingQuestionsTonight === null || remainingQuestionsTonight > 0;
+  const addAnotherLabel = formatAddAnotherLabel(remainingQuestionsTonight);
+  const canAddQuestionTonight = Boolean(addAnotherLabel);
+  const limitsLine = formatTonightLimitsLine(usageLimits);
+  const ritualStatus = answeredToday ? "1/1 tonight" : "0/1 tonight";
+
   const todayLabel = useMemo(
     () =>
       new Intl.DateTimeFormat("en-US", {
@@ -74,6 +78,13 @@ export function HomeScreen({ navigation }: Props) {
       }).format(new Date()),
     [],
   );
+
+  const readyStatusLabel =
+    queuedQuestionCount > 0
+      ? `${queuedQuestionCount} ready for recall`
+      : answeredToday
+        ? ritualStatus
+        : "Nothing ready yet";
 
   const tonightState = currentQuestion
     ? {
@@ -85,24 +96,24 @@ export function HomeScreen({ navigation }: Props) {
             : "Pull it back before sleep.",
         primaryLabel: "Start recall",
         primaryAction: () => navigation.navigate("Review", { mode: "auto" }),
-        secondaryLabel: canAddQuestionTonight ? "Add question" : null,
+        secondaryLabel: canAddQuestionTonight ? addAnotherLabel : null,
         secondaryAction: canAddQuestionTonight ? () => navigation.navigate("Capture") : null,
       }
     : answeredToday
       ? {
           eyebrow: "Done",
           title: "Tonight's recall is complete",
-          body: "Come back tomorrow, or add one more question.",
+          body: "Come back tomorrow, or capture one more if you still have room.",
           primaryLabel: null,
           primaryAction: null,
-          secondaryLabel: canAddQuestionTonight ? "Add question" : null,
+          secondaryLabel: canAddQuestionTonight ? addAnotherLabel : null,
           secondaryAction: canAddQuestionTonight ? () => navigation.navigate("Capture") : null,
         }
       : {
           eyebrow: "Tonight",
-          title: "Make a question for tonight",
+          title: "Capture learning for tonight",
           body: "Photo, note, or saved learning — one focused recall.",
-          primaryLabel: "Create question",
+          primaryLabel: "Capture for tonight",
           primaryAction: () => navigation.navigate("Capture"),
           secondaryLabel: "Saved learning",
           secondaryAction: () => navigation.navigate("Library"),
@@ -141,29 +152,25 @@ export function HomeScreen({ navigation }: Props) {
           </View>
         </View>
 
-        <View style={styles.summaryStrip}>
-          <View style={styles.summaryStat}>
-            <Text style={styles.summaryValue}>{formatRemainingCount(remainingQuestionsTonight)}</Text>
-            <Text style={styles.summaryText}>Questions</Text>
+        <Pressable style={styles.streakCard} onPress={() => navigation.navigate("Stats")}>
+          <View style={styles.streakMain}>
+            <MaterialIcons name="local-fire-department" size={22} color={colors.primary} />
+            <View style={styles.streakCopy}>
+              <Text style={styles.streakValue}>{streak}</Text>
+              <Text style={styles.streakUnit}>night streak</Text>
+            </View>
           </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryStat}>
-            <Text style={styles.summaryValue}>{formatRemainingCount(remainingPhotoReadsTonight)}</Text>
-            <Text style={styles.summaryText}>Photos</Text>
+          <View style={styles.streakMeta}>
+            <Text style={styles.ritualText}>{ritualStatus}</Text>
+            <Text style={styles.statsLink}>Progress</Text>
           </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryStat}>
-            <Text style={styles.summaryValue}>{queuedQuestionCount}</Text>
-            <Text style={styles.summaryText}>Ready</Text>
-          </View>
+        </Pressable>
+
+        <View style={styles.statusChip}>
+          <Text style={styles.statusChipText}>{readyStatusLabel}</Text>
         </View>
 
-        <View style={styles.metaRow}>
-          <Text style={styles.streakText}>{streak}-day streak</Text>
-          <Pressable onPress={() => navigation.navigate("Stats")} hitSlop={8}>
-            <Text style={styles.statsLink}>See progress</Text>
-          </Pressable>
-        </View>
+        {limitsLine ? <Text style={styles.limitsLine}>{limitsLine}</Text> : null}
 
         <View style={styles.tonightCopy}>
           <Text style={styles.tonightEyebrow}>{tonightState.eyebrow}</Text>
@@ -214,7 +221,7 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     color: colors.mutedSoft,
-    fontSize: 11,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: "700",
   },
   reminderRow: {
@@ -224,52 +231,72 @@ const styles = StyleSheet.create({
   },
   reminderText: {
     color: colors.primary,
-    fontSize: 11,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: "700",
   },
-  summaryStrip: {
-    flexDirection: "row",
-    alignItems: "center",
+  streakCard: {
     backgroundColor: colors.surfaceLow,
     borderRadius: theme.radius.md,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    padding: 12,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: colors.line,
   },
-  summaryStat: {
-    flex: 1,
+  streakMain: {
+    flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 10,
   },
-  summaryValue: {
+  streakCopy: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 6,
+  },
+  streakValue: {
     color: colors.primary,
-    fontSize: 14,
+    fontSize: 22,
     fontWeight: "800",
+    lineHeight: 26,
   },
-  summaryText: {
+  streakUnit: {
     color: colors.muted,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: theme.typography.body.fontSize,
     fontWeight: "700",
   },
-  summaryDivider: {
-    width: 1,
-    height: 26,
-    backgroundColor: colors.line,
-  },
-  metaRow: {
+  streakMeta: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 2,
   },
-  streakText: {
+  ritualText: {
     color: colors.mutedSoft,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: "700",
   },
   statsLink: {
     color: colors.primary,
-    fontSize: theme.typography.micro.fontSize,
+    fontSize: theme.typography.caption.fontSize,
     fontWeight: "800",
+  },
+  statusChip: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.primarySoft,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: "rgba(15,76,63,0.12)",
+  },
+  statusChipText: {
+    color: colors.secondary,
+    fontSize: theme.typography.caption.fontSize,
+    fontWeight: "800",
+  },
+  limitsLine: {
+    color: colors.muted,
+    fontSize: theme.typography.caption.fontSize,
+    fontWeight: "600",
+    lineHeight: theme.typography.caption.lineHeight,
   },
   tonightCopy: {
     gap: 6,
@@ -290,8 +317,8 @@ const styles = StyleSheet.create({
   },
   tonightBody: {
     color: colors.muted,
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: theme.typography.body.fontSize,
+    lineHeight: theme.typography.body.lineHeight,
   },
   heroActions: {
     gap: theme.spacing.sm,
@@ -324,7 +351,7 @@ const styles = StyleSheet.create({
   },
   heroSecondaryText: {
     color: colors.primary,
-    fontSize: 12,
+    fontSize: theme.typography.body.fontSize,
     fontWeight: "700",
   },
 });
