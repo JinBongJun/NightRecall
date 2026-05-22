@@ -7,7 +7,8 @@ type StatsState = {
   answeredToday: boolean;
   recentWrongTopics: string[];
   answeredDatesThisMonth: string[];
-  setStats: (stats: Partial<Omit<StatsState, "setStats">>) => void;
+  statsRefreshFailed: boolean;
+  setStats: (stats: Partial<Omit<StatsState, "setStats" | "resetStats">>) => void;
   resetStats: () => void;
 };
 
@@ -18,6 +19,7 @@ const defaultStats = {
   answeredToday: false,
   recentWrongTopics: [],
   answeredDatesThisMonth: [],
+  statsRefreshFailed: false,
 };
 
 export const useStatsStore = create<StatsState>((set) => ({

@@ -5,7 +5,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { refreshStatsFromServer } from "../services/refreshStats";
+import { useAuthStore } from "../store/authStore";
 import { useStatsStore } from "../store/statsStore";
+import { calendarDateInTimezone } from "../utils/timezoneDate";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import type { HomeStackParamList } from "../navigation/types";
@@ -24,8 +27,10 @@ export function StatsScreen({ navigation }: Props) {
   const accuracy = useStatsStore((state) => state.accuracy);
   const answeredToday = useStatsStore((state) => state.answeredToday);
   const answeredDatesThisMonth = useStatsStore((state) => state.answeredDatesThisMonth);
+  const statsRefreshFailed = useStatsStore((state) => state.statsRefreshFailed);
+  const timezone = useAuthStore((state) => state.timezone);
 
-  const today = new Date();
+  const today = calendarDateInTimezone(timezone);
   const currentMonthLabel = today.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
@@ -43,6 +48,20 @@ export function StatsScreen({ navigation }: Props) {
         <Text style={styles.title}>Streak & recall</Text>
         <Text style={styles.subtitle}>How your nightly habit is going.</Text>
       </View>
+
+      {statsRefreshFailed ? (
+        <View style={styles.statsWarning}>
+          <Text style={styles.statsWarningText}>Could not refresh your stats. Check your connection and try again.</Text>
+          <Pressable
+            style={({ pressed }) => [styles.statsWarningButton, pressed && styles.statsWarningButtonPressed]}
+            onPress={() => void refreshStatsFromServer()}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading stats"
+          >
+            <Text style={styles.statsWarningButtonText}>Retry</Text>
+          </Pressable>
+        </View>
+      ) : null}
 
       <View style={styles.heroCard}>
         <View style={styles.heroContent}>
@@ -126,19 +145,19 @@ export function StatsScreen({ navigation }: Props) {
         <StatCard
           label="Ritual status"
           value={ritualStatus}
-          helper=""
+          helper="Tonight's recall check-in"
           icon="radio-button-checked"
         />
         <StatCard
-          label="Memory Accuracy"
+          label="Correct so far"
           value={`${Math.round(accuracy * 100)}%`}
-          helper=""
+          helper="Across all submitted answers"
           icon="track-changes"
         />
         <StatCard
           label="Total recalled"
           value={formatCount(totalAnswered)}
-          helper=""
+          helper="Answers submitted so far"
           icon="timeline"
         />
       </View>
@@ -248,6 +267,37 @@ function formatCount(value: number): string {
 
 function createStyles({ colors, typography }: ThemedStyleContext) {
   return StyleSheet.create({
+  statsWarning: {
+    backgroundColor: colors.accentSoft,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  statsWarningText: {
+    color: colors.text,
+    fontSize: typography.body.fontSize,
+    lineHeight: typography.body.lineHeight,
+    fontWeight: "600",
+  },
+  statsWarningButton: {
+    alignSelf: "flex-start",
+    minHeight: theme.control.buttonMinHeightCompact,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: theme.radius.md,
+    backgroundColor: colors.primary,
+  },
+  statsWarningButtonPressed: {
+    opacity: 0.9,
+  },
+  statsWarningButtonText: {
+    color: "#FFFFFF",
+    fontSize: typography.caption.fontSize,
+    fontWeight: "800",
+  },
   header: {
     gap: 6,
   },

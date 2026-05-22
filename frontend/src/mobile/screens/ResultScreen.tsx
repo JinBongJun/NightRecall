@@ -8,8 +8,8 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { ResultBanner } from "../components/ResultBanner";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useStatsRefresh } from "../hooks/useStatsRefresh";
+import { refreshStatsFromServer } from "../services/refreshStats";
 import { useReviewStore } from "../store/reviewStore";
-import { useStatsStore } from "../store/statsStore";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import { navigateToReview } from "../navigation/navigationHelpers";
@@ -32,7 +32,6 @@ export function ResultScreen({ navigation }: Props) {
   const consumeRetryQuestion = useReviewStore((state) => state.consumeRetryQuestion);
   const resetSession = useReviewStore((state) => state.resetSession);
   const releaseActiveRecall = useReviewStore((state) => state.releaseActiveRecall);
-  const setStats = useStatsStore((state) => state.setStats);
   const remaining = sessionQuestions.length ? Math.max(0, sessionQuestions.length - (sessionIndex + 1)) : 0;
   const retryReady = Boolean(retryQuestion) && !retryUsed && currentQuestionMode !== "retry";
   const isCorrect = Boolean(result?.is_correct);
@@ -52,12 +51,8 @@ export function ResultScreen({ navigation }: Props) {
     }
 
     void playAnswerResultHaptic(result.is_correct);
-
-    setStats({
-      streak: result.current_streak,
-      answeredToday: true,
-    });
-  }, [result, setStats]);
+    void refreshStatsFromServer();
+  }, [result]);
 
   const done = () => {
     resetSession();

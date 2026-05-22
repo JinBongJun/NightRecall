@@ -68,7 +68,7 @@ export function SavedLearningCard({ title, preview, bookmarkedCount, imageUri, i
 function createStyles({ colors, typography }: ThemedStyleContext) {
   return StyleSheet.create({
   card: {
-    backgroundColor: "rgba(255,253,248,0.92)",
+    backgroundColor: colors.surface,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: colors.border,

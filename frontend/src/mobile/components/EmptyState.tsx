@@ -42,7 +42,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   container: {
     padding: theme.spacing.md,
     borderRadius: theme.radius.md,
-    backgroundColor: "rgba(255,253,248,0.88)",
+    backgroundColor: colors.surface,
     gap: 8,
     borderWidth: 1,
     borderColor: colors.border,
