@@ -21,11 +21,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { BrandWordmark } from "../components/BrandWordmark";
 import { persistSession } from "../services/authSessionService";
 import { getGoogleIdToken, isGoogleSignInCancelled } from "../services/googleAuthService";
-import { scheduleLocalReminder } from "../services/reminderService";
-import { updateReminderSettings } from "../services/settingsService";
+import { syncReminderWithServer } from "../services/syncReminderSettings";
 import { createGuestSession, signInWithGoogleIdToken } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
-import { useReminderStore } from "../store/reminderStore";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import { RootStackParamList } from "../types/navigation";
@@ -39,7 +37,6 @@ export function OnboardingScreen({ navigation }: Props) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useAppTheme();
   const setSession = useAuthStore((state) => state.setSession);
-  const setReminder = useReminderStore((state) => state.setReminder);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<0 | 1>(0);
   const pagerRef = useRef<ScrollView>(null);
@@ -98,13 +95,6 @@ export function OnboardingScreen({ navigation }: Props) {
 
     const payload = session;
 
-    let notificationsEnabled = false;
-    try {
-      notificationsEnabled = await scheduleLocalReminder(22, 30);
-    } catch {
-      notificationsEnabled = false;
-    }
-
     try {
       await persistSession(payload);
     } catch {
@@ -112,15 +102,18 @@ export function OnboardingScreen({ navigation }: Props) {
       // Keep the user moving even if secure storage fails on this device.
     }
 
-    if (!notificationsEnabled) {
-      await updateReminderSettings({
-        reminder_time: reminderTime,
-        notifications_enabled: false,
+    try {
+      await syncReminderWithServer({
+        reminderTime,
+        enabled: true,
         timezone,
-      }).catch(() => undefined);
+        requestPermission: true,
+        patchServer: true,
+      });
+    } catch {
+      // Keep onboarding moving if reminder sync fails.
     }
 
-    setReminder(reminderTime, notificationsEnabled);
     navigation.replace("MainTabs");
     setLoading(false);
   };
@@ -146,6 +139,19 @@ export function OnboardingScreen({ navigation }: Props) {
       } catch {
         setSession(payload);
       }
+
+      try {
+        await syncReminderWithServer({
+          reminderTime: "22:30",
+          enabled: true,
+          timezone: payload.timezone,
+          requestPermission: true,
+          patchServer: true,
+        });
+      } catch {
+        // Keep onboarding moving if reminder sync fails.
+      }
+
       navigation.replace("MainTabs");
     } catch (error) {
       if (isGoogleSignInCancelled(error)) {

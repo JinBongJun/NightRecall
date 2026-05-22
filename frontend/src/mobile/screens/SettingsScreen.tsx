@@ -12,8 +12,8 @@ import { TopBar } from "../components/TopBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { clearPersistedSession, persistSession } from "../services/authSessionService";
 import { getGoogleIdToken, isGoogleSignInCancelled, signOutGoogle } from "../services/googleAuthService";
-import { cancelNightlyReminder, scheduleLocalReminder, syncNightlyReminder } from "../services/reminderService";
-import { updateReminderSettings } from "../services/settingsService";
+import { cancelNightlyReminder, openSystemNotificationSettings, sendTestReminder } from "../services/reminderService";
+import { syncReminderWithServer } from "../services/syncReminderSettings";
 import { deleteMyAccount, fetchMe, linkGoogleIdToken, logoutSession } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
 import { useOnboardingStore } from "../store/onboardingStore";
@@ -49,7 +49,8 @@ export function SettingsScreen({ navigation }: Props) {
   const setOnboardingReminderTime = useOnboardingStore((state) => state.setReminderTime);
   const reminderTime = useReminderStore((state) => state.reminderTime);
   const notificationsEnabled = useReminderStore((state) => state.notificationsEnabled);
-  const setReminder = useReminderStore((state) => state.setReminder);
+  const nextReminderLabel = useReminderStore((state) => state.nextReminderLabel);
+  const permissionDenied = useReminderStore((state) => state.permissionDenied);
   const [timeValue, setTimeValue] = useState(reminderTime);
   const [enabled, setEnabled] = useState(notificationsEnabled);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -99,22 +100,27 @@ export function SettingsScreen({ navigation }: Props) {
           }
 
           const nextReminderTime = response.user.reminder_time ? response.user.reminder_time.slice(0, 5) : "22:30";
-          const nextNotificationsEnabled = await syncNightlyReminder(
-            nextReminderTime,
-            response.user.notifications_enabled,
-            { requestPermission: false },
-          );
+          const accountTimezone = response.user.timezone || timezone;
+
+          await syncReminderWithServer({
+            reminderTime: nextReminderTime,
+            enabled: response.user.notifications_enabled,
+            timezone: accountTimezone,
+            requestPermission: false,
+            patchServer: true,
+          });
+
           setProfile({
             email: response.user.email_nullable,
             displayName: response.user.display_name ?? null,
             avatarUrl: response.user.avatar_url ?? null,
           });
 
-          setReminder(nextReminderTime, nextNotificationsEnabled);
-          setTimeValue(nextReminderTime);
-          setEnabled(nextNotificationsEnabled);
-          syncedReminderTimeRef.current = nextReminderTime;
-          syncedNotificationsEnabledRef.current = nextNotificationsEnabled;
+          const synced = useReminderStore.getState();
+          setTimeValue(synced.reminderTime);
+          setEnabled(synced.notificationsEnabled);
+          syncedReminderTimeRef.current = synced.reminderTime;
+          syncedNotificationsEnabledRef.current = synced.notificationsEnabled;
         })
         .catch((error) => {
           if (!active) {
@@ -129,7 +135,7 @@ export function SettingsScreen({ navigation }: Props) {
       return () => {
         active = false;
       };
-    }, [accessToken, setProfile, setReminder]),
+    }, [accessToken, setProfile, timezone]),
   );
 
   const parseReminderTime = (value: string) => {
@@ -194,35 +200,27 @@ export function SettingsScreen({ navigation }: Props) {
       try {
         saveInFlightRef.current = true;
         lastRequestedSaveRef.current = requestedSaveKey;
-        setReminder(parsed.normalized, nextEnabled);
         setTimeValue(parsed.normalized);
         setEnabled(nextEnabled);
 
-        let finalEnabled = nextEnabled;
-        if (nextEnabled) {
-          finalEnabled = await scheduleLocalReminder(parsed.hour, parsed.minute);
-        } else {
-          await cancelNightlyReminder();
-        }
-
-        await updateReminderSettings({
-          reminder_time: parsed.normalized,
-          notifications_enabled: finalEnabled,
+        const result = await syncReminderWithServer({
+          reminderTime: parsed.normalized,
+          enabled: nextEnabled,
           timezone,
+          requestPermission: nextEnabled,
+          patchServer: true,
         });
 
-        setReminder(parsed.normalized, finalEnabled);
-        setTimeValue(parsed.normalized);
-        setEnabled(finalEnabled);
-        syncedReminderTimeRef.current = parsed.normalized;
-        syncedNotificationsEnabledRef.current = finalEnabled;
+        setTimeValue(result.normalizedTime ?? parsed.normalized);
+        setEnabled(result.scheduled);
+        syncedReminderTimeRef.current = result.normalizedTime ?? parsed.normalized;
+        syncedNotificationsEnabledRef.current = result.scheduled;
         saveInFlightRef.current = false;
-        lastRequestedSaveRef.current = `${parsed.normalized}:${finalEnabled ? "on" : "off"}`;
+        lastRequestedSaveRef.current = `${result.normalizedTime ?? parsed.normalized}:${result.scheduled ? "on" : "off"}`;
         return true;
       } catch {
         saveInFlightRef.current = false;
         lastRequestedSaveRef.current = null;
-        setReminder(syncedReminderTimeRef.current, syncedNotificationsEnabledRef.current);
         setTimeValue(syncedReminderTimeRef.current);
         setEnabled(syncedNotificationsEnabledRef.current);
         if (options?.showErrorAlert !== false) {
@@ -231,7 +229,7 @@ export function SettingsScreen({ navigation }: Props) {
         return false;
       }
     },
-    [timezone, userId, setReminder],
+    [timezone, userId],
   );
 
   useFocusEffect(
@@ -328,7 +326,7 @@ export function SettingsScreen({ navigation }: Props) {
   const resetOnboarding = async () => {
     await clearPersistedSession();
     await cancelNightlyReminder();
-    setReminder("22:30", false);
+    useReminderStore.getState().resetReminder();
     setOnboardingReminderTime("22:30");
   };
 
@@ -501,7 +499,8 @@ export function SettingsScreen({ navigation }: Props) {
           <View style={styles.settingRow}>
             <View style={styles.settingCopy}>
               <Text style={styles.label}>Notifications</Text>
-              <Text style={styles.helper}>{enabled ? "Enabled" : "Disabled"}</Text>
+              <Text style={styles.helper}>{enabled ? "On for this device" : "Off"}</Text>
+              <Text style={styles.helperMuted}>{nextReminderLabel}</Text>
             </View>
             <Switch
               value={enabled}
@@ -512,10 +511,27 @@ export function SettingsScreen({ navigation }: Props) {
               }}
             />
           </View>
+          {permissionDenied ? (
+            <Pressable style={styles.permissionRow} onPress={() => void openSystemNotificationSettings()}>
+              <Text style={styles.permissionText}>Open system notification settings</Text>
+            </Pressable>
+          ) : null}
+          <Pressable
+            style={({ pressed }) => [styles.testReminderButton, pressed && styles.testReminderButtonPressed]}
+            onPress={() => {
+              void sendTestReminder().then((sent) => {
+                if (!sent) {
+                  Alert.alert("Notifications blocked", "Allow notifications for NightRecall in system settings.");
+                }
+              });
+            }}
+          >
+            <Text style={styles.testReminderText}>Send test notification</Text>
+          </Pressable>
           <View style={styles.settingRow}>
             <View style={styles.settingCopy}>
               <Text style={styles.label}>Timezone</Text>
-              <Text style={styles.helper}>Current account timezone</Text>
+              <Text style={styles.helper}>Reminders follow your account timezone</Text>
               <Text style={styles.helper}>{timezone}</Text>
             </View>
           </View>
@@ -736,6 +752,39 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   helper: {
     color: colors.muted,
     lineHeight: 16,
+  },
+  helperMuted: {
+    color: colors.mutedSoft,
+    fontSize: typography.micro.fontSize,
+    lineHeight: typography.micro.lineHeight,
+  },
+  permissionRow: {
+    paddingHorizontal: 18,
+    paddingBottom: 10,
+  },
+  permissionText: {
+    color: colors.primary,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "800",
+  },
+  testReminderButton: {
+    marginHorizontal: 18,
+    marginBottom: 12,
+    minHeight: theme.control.buttonMinHeightCompact,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceLow,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  testReminderButtonPressed: {
+    opacity: 0.9,
+  },
+  testReminderText: {
+    color: colors.primary,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "800",
   },
   settingValueWrap: {
     flexDirection: "row",

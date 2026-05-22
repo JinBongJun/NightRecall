@@ -29,6 +29,7 @@ export function HomeScreen({ navigation }: Props) {
   const loadTonightQuestion = useTonightQuestion();
   const usageLimits = useUsageLimits();
   const reminderTime = useReminderStore((state) => state.reminderTime);
+  const nextReminderLabel = useReminderStore((state) => state.nextReminderLabel);
   const sessionSource = useReviewStore((state) => state.sessionSource);
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
@@ -144,7 +145,12 @@ export function HomeScreen({ navigation }: Props) {
           <Text style={styles.dateLabel}>{todayLabel}</Text>
           <View style={styles.reminderRow}>
             <MaterialIcons name="schedule" size={14} color={colors.primary} />
-            <Text style={styles.reminderText}>{reminderTime}</Text>
+            <View style={styles.reminderCopy}>
+              <Text style={styles.reminderText}>Daily at {reminderTime}</Text>
+              <Text style={styles.reminderMeta} numberOfLines={2}>
+                {nextReminderLabel}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -243,13 +249,25 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   },
   reminderRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
+    alignItems: "flex-start",
+    gap: 6,
+    flex: 1,
+    maxWidth: "58%",
+  },
+  reminderCopy: {
+    flex: 1,
+    gap: 2,
   },
   reminderText: {
     color: colors.primary,
     fontSize: typography.caption.fontSize,
     fontWeight: "700",
+  },
+  reminderMeta: {
+    color: colors.mutedSoft,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "500",
+    lineHeight: 16,
   },
   streakCard: {
     backgroundColor: colors.surfaceLow,

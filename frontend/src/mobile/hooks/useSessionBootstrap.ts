@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { restorePersistedSession } from "../services/authSessionService";
 import { restoreReviewSession } from "../services/restoreReviewSession";
 import { fetchEntitlements } from "../services/entitlementsService";
-import { syncNightlyReminder } from "../services/reminderService";
+import { syncReminderWithServer } from "../services/syncReminderSettings";
 import { bootstrapSession } from "../services/bootstrapSession";
 import { fetchMe } from "../services/userService";
 import { useAuthStore } from "../store/authStore";
@@ -13,7 +13,6 @@ export function useSessionBootstrap() {
   const finishBootstrap = useAuthStore((state) => state.finishBootstrap);
   const setPlan = useAuthStore((state) => state.setPlan);
   const setProfile = useAuthStore((state) => state.setProfile);
-  const setReminder = useReminderStore((state) => state.setReminder);
 
   useEffect(() => {
     let active = true;
@@ -51,17 +50,20 @@ export function useSessionBootstrap() {
         }
 
         const reminderTime = me.user.reminder_time ? me.user.reminder_time.slice(0, 5) : "22:30";
-        const notificationsEnabled = await syncNightlyReminder(
+        const accountTimezone = me.user.timezone || session.timezone;
+
+        await syncReminderWithServer({
           reminderTime,
-          me.user.notifications_enabled,
-          { requestPermission: false },
-        );
+          enabled: me.user.notifications_enabled,
+          timezone: accountTimezone,
+          requestPermission: false,
+          patchServer: true,
+        });
 
         if (!active) {
           return;
         }
 
-        setReminder(reminderTime, notificationsEnabled);
         setProfile({
           email: me.user.email_nullable,
           displayName: me.user.display_name ?? null,
@@ -75,5 +77,5 @@ export function useSessionBootstrap() {
     return () => {
       active = false;
     };
-  }, [finishBootstrap, setPlan, setProfile, setReminder]);
+  }, [finishBootstrap, setPlan, setProfile]);
 }

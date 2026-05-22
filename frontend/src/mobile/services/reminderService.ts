@@ -1,11 +1,24 @@
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { Linking, Platform } from "react-native";
+
+import {
+  formatNextReminderLabel,
+  parseReminderTime,
+  resolveDeviceTriggerForAccountTime,
+} from "../utils/reminderTimezone";
 
 const NIGHTLY_REMINDER_KEY = "nightly-reminder";
 const NIGHTLY_REMINDER_CHANNEL_ID = "nightly-reminders";
 const NIGHTLY_REMINDER_TITLE = "NightRecall";
 const NIGHTLY_REMINDER_BODY = "1 quick question before bed?";
 let nightlyReminderMutation: Promise<void> = Promise.resolve();
+
+export type ApplyNightlyReminderResult = {
+  scheduled: boolean;
+  normalizedTime: string | null;
+  permissionDenied: boolean;
+  nextReminderLabel: string;
+};
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -15,6 +28,60 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+
+export async function applyNightlyReminder(params: {
+  reminderTime: string;
+  enabled: boolean;
+  timezone: string;
+  requestPermission?: boolean;
+}): Promise<ApplyNightlyReminderResult> {
+  const parsed = parseReminderTime(params.reminderTime);
+  if (!parsed) {
+    return {
+      scheduled: false,
+      normalizedTime: null,
+      permissionDenied: false,
+      nextReminderLabel: "Use a valid reminder time like 22:30.",
+    };
+  }
+
+  if (!params.enabled) {
+    await cancelNightlyReminder();
+    return {
+      scheduled: false,
+      normalizedTime: parsed.normalized,
+      permissionDenied: false,
+      nextReminderLabel: "Reminders are off.",
+    };
+  }
+
+  const deviceTrigger = resolveDeviceTriggerForAccountTime(parsed.normalized, params.timezone);
+  if (!deviceTrigger) {
+    await cancelNightlyReminder();
+    return {
+      scheduled: false,
+      normalizedTime: parsed.normalized,
+      permissionDenied: false,
+      nextReminderLabel: "Could not map reminder time to this device.",
+    };
+  }
+
+  const scheduled = await scheduleLocalReminder(deviceTrigger.hour, deviceTrigger.minute, {
+    requestPermission: params.requestPermission,
+  });
+
+  const permissions = await Notifications.getPermissionsAsync();
+  const permissionDenied = !permissions.granted;
+
+  return {
+    scheduled,
+    normalizedTime: parsed.normalized,
+    permissionDenied,
+    nextReminderLabel: permissionDenied
+      ? "Notifications are blocked. Allow NightRecall in system settings."
+      : formatNextReminderLabel(parsed.normalized, params.timezone, scheduled),
+  };
+}
 
 export async function scheduleLocalReminder(hour: number, minute: number, options?: { requestPermission?: boolean }) {
   return mutateNightlyReminder(async () => {
@@ -48,6 +115,39 @@ export async function scheduleLocalReminder(hour: number, minute: number, option
   });
 }
 
+export async function sendTestReminder() {
+  await ensureAndroidNotificationChannel();
+  const permissions = await Notifications.requestPermissionsAsync();
+  if (!permissions.granted) {
+    return false;
+  }
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: NIGHTLY_REMINDER_TITLE,
+      body: "This is a test reminder. Your nightly reminder still fires at your chosen time.",
+      data: {
+        reminderKey: NIGHTLY_REMINDER_KEY,
+        test: true,
+      },
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 2,
+      channelId: NIGHTLY_REMINDER_CHANNEL_ID,
+    },
+  });
+  return true;
+}
+
+export async function openSystemNotificationSettings() {
+  if (Platform.OS === "ios") {
+    await Linking.openURL("app-settings:");
+    return;
+  }
+  await Linking.openSettings();
+}
+
 function isNightlyReminderRequest(request: Notifications.NotificationRequest) {
   const matchesTaggedReminder = request.content.data?.reminderKey === NIGHTLY_REMINDER_KEY;
   const matchesLegacyReminder =
@@ -62,16 +162,15 @@ export async function cancelNightlyReminder() {
   });
 }
 
+/** @deprecated Use applyNightlyReminder or syncReminderWithServer */
 export async function syncNightlyReminder(reminderTime: string, enabled: boolean, options?: { requestPermission?: boolean }) {
-  const parsed = parseReminderTime(reminderTime);
-  if (!enabled || !parsed) {
-    await cancelNightlyReminder();
-    return false;
-  }
-
-  return scheduleLocalReminder(parsed.hour, parsed.minute, {
-    requestPermission: options?.requestPermission ?? false,
+  const result = await applyNightlyReminder({
+    reminderTime,
+    enabled,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+    requestPermission: options?.requestPermission,
   });
+  return result.scheduled;
 }
 
 async function cancelNightlyReminderInternal() {
@@ -93,21 +192,6 @@ async function ensureAndroidNotificationChannel() {
     importance: Notifications.AndroidImportance.DEFAULT,
     description: "Daily NightRecall reminder before bed.",
   });
-}
-
-function parseReminderTime(value: string) {
-  const match = value.trim().match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) {
-    return null;
-  }
-
-  const hour = Number(match[1]);
-  const minute = Number(match[2]);
-  if (!Number.isInteger(hour) || !Number.isInteger(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    return null;
-  }
-
-  return { hour, minute };
 }
 
 async function mutateNightlyReminder<T>(operation: () => Promise<T>): Promise<T> {
