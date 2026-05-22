@@ -463,10 +463,12 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     justifyContent: "center",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.16)",
+    overflow: "hidden",
+    padding: 16,
   },
   heroLogo: {
-    width: 88,
-    height: 88,
+    width: "100%",
+    height: "100%",
   },
   heroNodeRow: {
     position: "absolute",

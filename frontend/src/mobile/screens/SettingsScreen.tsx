@@ -18,17 +18,27 @@ import { deleteMyAccount, fetchMe, linkGoogleIdToken, logoutSession } from "../s
 import { useAuthStore } from "../store/authStore";
 import { useOnboardingStore } from "../store/onboardingStore";
 import { useReminderStore } from "../store/reminderStore";
+import type { ThemePreference } from "../services/themePreferenceStorage";
+import { useThemeStore } from "../store/themeStore";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
-import { useAppTheme } from "../theme";
+import { theme, useAppTheme } from "../theme";
 import type { RootStackParamList } from "../navigation/types";
 type Props = NativeStackScreenProps<RootStackParamList, "Settings">;
 
 const ACCOUNT_DELETION_URL = "https://night-recall.vercel.app/account-deletion/";
 const SUPPORT_EMAIL = "bongjun0289@gmail.com";
 
+const THEME_OPTIONS: Array<{ value: ThemePreference; label: string }> = [
+  { value: "system", label: "Auto" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
 export function SettingsScreen({ navigation }: Props) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useAppTheme();
+  const themePreference = useThemeStore((state) => state.preference);
+  const setThemePreference = useThemeStore((state) => state.setPreference);
   const userId = useAuthStore((state) => state.userId);
   const timezone = useAuthStore((state) => state.timezone);
   const provider = useAuthStore((state) => state.provider);
@@ -414,6 +424,33 @@ export function SettingsScreen({ navigation }: Props) {
       <View style={styles.section}>
         <SectionRow title="Preferences" iconName="tune" />
         <View style={styles.card}>
+          <View style={styles.appearanceBlock}>
+            <View style={styles.settingCopy}>
+              <Text style={styles.label}>Appearance</Text>
+              <Text style={styles.helper}>Choose light, dark, or match your phone</Text>
+            </View>
+            <View style={styles.themeOptions} accessibilityRole="radiogroup" accessibilityLabel="Appearance">
+              {THEME_OPTIONS.map((option) => {
+                const selected = themePreference === option.value;
+                return (
+                  <Pressable
+                    key={option.value}
+                    style={({ pressed }) => [
+                      styles.themeOption,
+                      selected && styles.themeOptionActive,
+                      pressed && styles.themeOptionPressed,
+                    ]}
+                    onPress={() => void setThemePreference(option.value)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    accessibilityLabel={option.label}
+                  >
+                    <Text style={[styles.themeOptionText, selected && styles.themeOptionTextActive]}>{option.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
           <Pressable
             style={styles.settingRow}
             onPress={() => {
@@ -634,6 +671,46 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     shadowOpacity: 0.04,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 8 },
+  },
+  appearanceBlock: {
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 12,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  themeOptions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  themeOption: {
+    flex: 1,
+    minHeight: theme.control.buttonMinHeightCompact,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceLow,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+  },
+  themeOptionActive: {
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primary,
+  },
+  themeOptionPressed: {
+    opacity: 0.9,
+  },
+  themeOptionText: {
+    color: colors.muted,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  themeOptionTextActive: {
+    color: colors.primary,
   },
   settingRow: {
     flexDirection: "row",

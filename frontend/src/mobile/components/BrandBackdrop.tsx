@@ -29,11 +29,11 @@ export function BrandBackdrop() {
 }
 
 function createStyles({ colors, isDark }: ThemedStyleContext) {
-  const primaryGlow = isDark ? "rgba(76,179,151,0.14)" : "rgba(15,76,63,0.09)";
-  const accentGlow = isDark ? "rgba(224,154,106,0.12)" : "rgba(199,123,74,0.08)";
-  const arcBorder = isDark ? "rgba(76,179,151,0.16)" : "rgba(15,76,63,0.09)";
-  const lineColor = isDark ? "rgba(76,179,151,0.22)" : "rgba(15,76,63,0.12)";
-  const nodeFill = isDark ? "rgba(76,179,151,0.28)" : "rgba(15,76,63,0.18)";
+  const primaryGlow = isDark ? "rgba(114,168,134,0.14)" : "rgba(15,76,63,0.09)";
+  const accentGlow = isDark ? "rgba(212,154,98,0.12)" : "rgba(199,123,74,0.08)";
+  const arcBorder = isDark ? "rgba(114,168,134,0.16)" : "rgba(15,76,63,0.09)";
+  const lineColor = isDark ? "rgba(114,168,134,0.2)" : "rgba(15,76,63,0.12)";
+  const nodeFill = isDark ? "rgba(114,168,134,0.26)" : "rgba(15,76,63,0.18)";
   const nodeBorder = isDark ? colors.surface : "rgba(255,253,248,0.9)";
 
   return StyleSheet.create({

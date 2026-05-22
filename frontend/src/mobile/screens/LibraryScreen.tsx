@@ -20,7 +20,6 @@ import axios from "axios";
 
 import { navigateToAccount, navigateToCapture } from "../navigation/navigationHelpers";
 import type { LibraryStackParamList } from "../navigation/types";
-import { SectionRow } from "../components/SectionRow";
 import { TopBar } from "../components/TopBar";
 import { EmptyState } from "../components/EmptyState";
 import { SavedLearningCard } from "../components/SavedLearningCard";
@@ -292,19 +291,20 @@ export function LibraryScreen({ navigation }: Props) {
 
   const listHeader = useMemo(
     () => (
-      <>
+      <View style={styles.listHeader}>
         <TopBar rightIcon="account-circle" onRightPress={() => navigateToAccount(navigation)} />
 
         <ScreenHeader
           iconName="collections-bookmark"
           title="Saved learning"
           subtitle={
-            keyboardVisible ? undefined : `${totalCount} card${totalCount === 1 ? "" : "s"} · tap one to make tonight's question`
+            keyboardVisible
+              ? undefined
+              : `${totalCount} card${totalCount === 1 ? "" : "s"} · tap one to make tonight's question`
           }
         />
 
         <View style={styles.section}>
-          <SectionRow title="Saved cards" iconName="bookmark" actionLabel={`${totalCount} total`} />
           {syncing ? <Text style={styles.syncingText}>Syncing...</Text> : null}
           {usingLegacyFallback && syncFailed ? (
             <View style={styles.syncWarning}>
@@ -322,9 +322,9 @@ export function LibraryScreen({ navigation }: Props) {
             placeholder="Search saved photos or notes"
           />
         </View>
-      </>
+      </View>
     ),
-    [handleSearchFocus, keyboardVisible, navigation, searchQuery, syncFailed, syncing, totalCount, usingLegacyFallback],
+    [handleSearchFocus, keyboardVisible, navigation, searchQuery, syncFailed, syncing, totalCount, usingLegacyFallback, styles],
   );
 
   const listFooter = useMemo(() => {
@@ -412,16 +412,20 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
   list: {
     flex: 1,
   },
+  listHeader: {
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
   listContent: {
     flexGrow: 1,
     paddingBottom: theme.spacing.md,
     gap: 0,
   },
   itemSeparator: {
-    height: theme.spacing.sm,
+    height: theme.spacing.md,
   },
   section: {
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
   syncingText: {
     color: colors.primary,
@@ -429,7 +433,7 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     fontWeight: "800",
   },
   syncWarning: {
-    backgroundColor: "rgba(213,230,220,0.45)",
+    backgroundColor: colors.primarySoft,
     borderRadius: theme.radius.md,
     paddingHorizontal: 12,
     paddingVertical: 10,

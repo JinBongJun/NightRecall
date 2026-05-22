@@ -111,8 +111,8 @@ export function AccountScreen({ navigation }: Props) {
             <MaterialIcons name="tune" size={22} color="#FFFFFF" />
           </View>
           <View style={styles.actionCopy}>
-            <Text style={styles.actionTitle}>Settings</Text>
-            <Text style={styles.actionBody}>Manage reminders, notifications, and account preferences.</Text>
+            <Text style={styles.primaryActionTitle}>Settings</Text>
+            <Text style={styles.primaryActionBody}>Manage reminders, notifications, and account preferences.</Text>
           </View>
           <MaterialIcons name="chevron-right" size={22} color={colors.primary} />
         </Pressable>
@@ -258,8 +258,18 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     shadowOffset: { width: 0, height: 6 },
   },
   primaryActionCard: {
-    borderColor: "rgba(15,76,63,0.16)",
-    backgroundColor: "#FFFEFB",
+    borderColor: colors.primary,
+    backgroundColor: colors.surfaceLow,
+  },
+  primaryActionTitle: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  primaryActionBody: {
+    color: colors.muted,
+    fontSize: 12,
+    lineHeight: 18,
   },
   actionIconWrap: {
     width: 42,

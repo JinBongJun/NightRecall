@@ -52,11 +52,11 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   },
   cardCorrect: {
     backgroundColor: colors.primarySoft,
-    borderColor: isDark ? "rgba(76,179,151,0.45)" : "rgba(15,76,63,0.2)",
+    borderColor: isDark ? "rgba(114,168,134,0.42)" : "rgba(15,76,63,0.2)",
   },
   cardIncorrect: {
     backgroundColor: colors.accentSoft,
-    borderColor: isDark ? "rgba(224,154,106,0.45)" : "rgba(199,123,74,0.28)",
+    borderColor: isDark ? "rgba(212,154,98,0.42)" : "rgba(199,123,74,0.28)",
   },
   row: {
     flexDirection: "row",

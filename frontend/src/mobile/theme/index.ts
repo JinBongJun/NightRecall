@@ -1,4 +1,5 @@
 export { theme, ThemeProvider, useAppTheme } from "./ThemeContext";
+export type { ThemePreference } from "../services/themePreferenceStorage";
 export { lightColors, darkColors, colors, type ColorPalette } from "./colors";
 export { baseTypography, buildTypography, MAX_FONT_SCALE, type AppTypography } from "./typography";
 export { useThemedStyles, type ThemedStyleContext } from "./useThemedStyles";
