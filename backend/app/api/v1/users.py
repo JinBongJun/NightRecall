@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, get_db
-from app.api.v1.rate_limit import rate_limit_ip, rate_limit_user
+from app.api.v1.rate_limit import rate_limit_ip
 from app.db.models.user import User
 from app.db.schemas.auth import (
     AuthSessionResponse,
@@ -62,7 +62,7 @@ def refresh_session(
     payload: RefreshTokenRequest,
     request: Request,
     db: Session = Depends(get_db),
-    _: None = Depends(rate_limit_user(endpoint="users.refresh", limit=30, window_seconds=60)),
+    _: None = Depends(rate_limit_ip(endpoint="users.refresh", limit=30, window_seconds=60)),
 ) -> TokenPair:
     tokens = AuthService(db).refresh_session(payload)
     # Note: we do not attach user_id here (refresh token may be invalid and we don't want to decode it again).

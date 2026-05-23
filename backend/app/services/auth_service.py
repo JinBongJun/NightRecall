@@ -12,6 +12,7 @@ from app.db.schemas.auth import AuthSessionResponse, GuestSessionRequest, LinkGo
 from app.db.schemas.users import UserResponse
 from app.services.google_auth_service import GoogleAuthService, GoogleIdentity
 from app.utils.ids import make_id
+from app.utils.time import as_utc, utc_now
 
 
 class AuthService:
@@ -127,7 +128,7 @@ class AuthService:
         session = self.auth_repository.get_session(str(token_payload.get("sid")))
         if not session or session.revoked_at is not None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session is not active")
-        if session.expires_at < datetime.now(UTC):
+        if as_utc(session.expires_at) < utc_now():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired")
         if not verify_token_hash(payload.refresh_token, session.refresh_token_hash):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token mismatch")

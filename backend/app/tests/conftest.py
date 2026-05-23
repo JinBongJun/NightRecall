@@ -66,6 +66,35 @@ def client() -> Generator[tuple[TestClient, Session], None, None]:
 
 
 @pytest.fixture
+def open_auth_client() -> Generator[TestClient, None, None]:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+    Base.metadata.create_all(bind=engine)
+
+    db = TestingSessionLocal()
+    app = create_app()
+
+    def override_get_db() -> Generator[Session, None, None]:
+        try:
+            yield db
+        finally:
+            pass
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+    app.dependency_overrides.clear()
+    db.close()
+    Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture
 def unauthorized_client() -> Generator[TestClient, None, None]:
     app = create_app()
     with TestClient(app) as test_client:

@@ -1,9 +1,8 @@
 import axios from "axios";
 import Constants from "expo-constants";
 
-import { clearPersistedSession, persistSession } from "./authSessionService";
+import { refreshAccessToken } from "./refreshAccessToken";
 import { useAuthStore } from "../store/authStore";
-import type { PersistedSession } from "../types/authModels";
 import type { components } from "../types/generated-api";
 
 type RefreshTokenResponse = Pick<components["schemas"]["TokenPair"], "access_token" | "refresh_token">;
@@ -38,6 +37,11 @@ const refreshClient = axios.create({
   maxRedirects: 0,
 });
 
+async function postRefresh(refreshToken: string): Promise<RefreshTokenResponse> {
+  const refreshResponse = await refreshClient.post<RefreshTokenResponse>("/users/refresh", { refresh_token: refreshToken });
+  return refreshResponse.data;
+}
+
 apiClient.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
   if (token) {
@@ -62,25 +66,11 @@ apiClient.interceptors.response.use(
     originalRequest._retry = true;
 
     try {
-      const refreshResponse = await refreshClient.post<RefreshTokenResponse>("/users/refresh", { refresh_token: auth.refreshToken });
-      const refreshed = refreshResponse.data;
-      const nextSession: PersistedSession = {
-        userId: auth.userId,
-        timezone: auth.timezone,
-        authMode: auth.authMode,
-        accessToken: refreshed.access_token,
-        refreshToken: refreshed.refresh_token,
-        provider: auth.provider,
-        email: auth.email,
-        displayName: auth.displayName,
-        avatarUrl: auth.avatarUrl,
-      };
-      await persistSession(nextSession);
+      const refreshed = await refreshAccessToken(postRefresh);
       originalRequest.headers = originalRequest.headers ?? {};
-      originalRequest.headers.Authorization = `Bearer ${refreshed.access_token}`;
+      originalRequest.headers.Authorization = `Bearer ${refreshed.accessToken}`;
       return apiClient(originalRequest);
     } catch (refreshError) {
-      await clearPersistedSession();
       return Promise.reject(refreshError);
     }
   },
