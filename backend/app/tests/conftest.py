@@ -8,6 +8,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.api.v1.dependencies import get_current_user, get_db
 from app.db.base import Base
+from app.db import session as db_session_module
 from app.db.models import (
     Question,
     QuestionGenerationJob,
@@ -57,6 +58,9 @@ def client() -> Generator[tuple[TestClient, Session], None, None]:
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_current_user] = override_get_current_user
 
+    db_session_module.engine = engine
+    db_session_module.SessionLocal = TestingSessionLocal
+
     with TestClient(app) as test_client:
         yield test_client, db
 
@@ -85,6 +89,9 @@ def open_auth_client() -> Generator[TestClient, None, None]:
             pass
 
     app.dependency_overrides[get_db] = override_get_db
+
+    db_session_module.engine = engine
+    db_session_module.SessionLocal = TestingSessionLocal
 
     with TestClient(app) as test_client:
         yield test_client

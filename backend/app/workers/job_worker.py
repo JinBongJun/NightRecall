@@ -8,12 +8,12 @@ from dataclasses import dataclass
 from sqlalchemy import select
 
 from app.core.config import get_settings
+from app.db import session as db_session
 from app.db.models.question_job import QuestionGenerationJob
 from app.db.models.study_extract_job import StudyInputExtractJob
-from app.db.session import SessionLocal
+from app.services.job_processing import requeue_stuck_jobs
 from app.services.question_generation_job_service import QuestionGenerationJobService
 from app.services.study_extract_job_service import StudyInputExtractJobService
-from app.utils.time import utc_now
 
 logger = logging.getLogger(__name__)
 
@@ -28,21 +28,23 @@ class JobWorker:
     def __init__(self, poll_interval_seconds: float | None = None):
         settings = get_settings()
         self.poll_interval_seconds = poll_interval_seconds or settings.job_worker_poll_interval_seconds
+        self._idle_polls = 0
 
     def run_once(self) -> bool:
-        claimed = self._claim_next_question_job() or self._claim_next_extract_job()
+        self._maybe_recover_stuck_jobs()
+        claimed = self._next_question_job() or self._next_extract_job()
         if not claimed:
             return False
 
         logger.info("job_worker processing kind=%s job_id=%s", claimed.kind, claimed.job_id)
         if claimed.kind == "question":
-            db = SessionLocal()
+            db = db_session.SessionLocal()
             try:
                 QuestionGenerationJobService(db).process_job(claimed.job_id)
             finally:
                 db.close()
         else:
-            db = SessionLocal()
+            db = db_session.SessionLocal()
             try:
                 StudyInputExtractJobService(db).process_job(claimed.job_id)
             finally:
@@ -54,41 +56,45 @@ class JobWorker:
             if not self.run_once():
                 time.sleep(self.poll_interval_seconds)
 
-    def _claim_next_question_job(self) -> ClaimedJob | None:
-        db = SessionLocal()
+    def _maybe_recover_stuck_jobs(self) -> None:
+        self._idle_polls += 1
+        if self._idle_polls % 5 != 0:
+            return
+        db = db_session.SessionLocal()
         try:
-            job = db.scalar(
-                select(QuestionGenerationJob)
-                .where(QuestionGenerationJob.status == "queued")
-                .order_by(QuestionGenerationJob.created_at.asc())
-                .with_for_update(skip_locked=True)
-                .limit(1)
-            )
-            if not job:
-                return None
-            job.status = "running"
-            job.started_at = utc_now()
-            db.commit()
-            return ClaimedJob(kind="question", job_id=job.id)
+            recovered = requeue_stuck_jobs(db)
+            if recovered:
+                logger.warning("job_worker requeued stuck jobs count=%s", recovered)
         finally:
             db.close()
 
-    def _claim_next_extract_job(self) -> ClaimedJob | None:
-        db = SessionLocal()
+    def _next_question_job(self) -> ClaimedJob | None:
+        db = db_session.SessionLocal()
         try:
-            job = db.scalar(
-                select(StudyInputExtractJob)
-                .where(StudyInputExtractJob.status == "queued")
-                .order_by(StudyInputExtractJob.created_at.asc())
-                .with_for_update(skip_locked=True)
+            job_id = db.scalar(
+                select(QuestionGenerationJob.id)
+                .where(QuestionGenerationJob.status == "queued")
+                .order_by(QuestionGenerationJob.created_at.asc())
                 .limit(1)
             )
-            if not job:
+            if not job_id:
                 return None
-            job.status = "running"
-            job.started_at = utc_now()
-            db.commit()
-            return ClaimedJob(kind="extract", job_id=job.id)
+            return ClaimedJob(kind="question", job_id=job_id)
+        finally:
+            db.close()
+
+    def _next_extract_job(self) -> ClaimedJob | None:
+        db = db_session.SessionLocal()
+        try:
+            job_id = db.scalar(
+                select(StudyInputExtractJob.id)
+                .where(StudyInputExtractJob.status == "queued")
+                .order_by(StudyInputExtractJob.created_at.asc())
+                .limit(1)
+            )
+            if not job_id:
+                return None
+            return ClaimedJob(kind="extract", job_id=job_id)
         finally:
             db.close()
 

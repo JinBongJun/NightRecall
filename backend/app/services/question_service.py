@@ -20,7 +20,13 @@ class QuestionService:
         self.question_repository = QuestionRepository(db)
         self.study_repository = StudyRepository(db)
 
-    def generate_questions(self, user_id: str, payload: QuestionGenerateRequest) -> QuestionGenerateResponse:
+    def generate_questions(
+        self,
+        user_id: str,
+        payload: QuestionGenerateRequest,
+        *,
+        usage_reserved: bool = False,
+    ) -> QuestionGenerateResponse:
         study_input = self.study_repository.get_input(payload.study_input_id)
         if not study_input or study_input.user_id != user_id:
             raise ValueError("study_input_id not found for user")
@@ -28,7 +34,10 @@ class QuestionService:
         topics = self.study_repository.get_topics_for_input(payload.study_input_id)
         if not topics:
             raise ValueError("no topics found for study input")
-        limit_service = self._assert_generation_capacity(user_id, payload.count)
+        if usage_reserved:
+            limit_service = UsageLimitService(self.db)
+        else:
+            limit_service = self._assert_generation_capacity(user_id, payload.count)
 
         generated: list[Question] = []
         schedules: list[QuestionSchedule] = []

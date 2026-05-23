@@ -16,7 +16,8 @@ from app.db.schemas.questions import (
     QuestionGenerationJobStatus,
     QuestionGenerationJobResponse,
 )
-from app.db.session import SessionLocal
+from app.db import session as db_session
+from app.services.job_processing import requeue_stuck_jobs, try_begin_question_generation_job
 from app.services.question_service import QuestionService
 from app.services.usage_limit_service import UsageLimitService
 from app.utils.ids import make_id
@@ -59,22 +60,22 @@ class QuestionGenerationJobService:
         return self._to_response(job)
 
     def process_job(self, job_id: str) -> None:
-        db = SessionLocal()
+        db = db_session.SessionLocal()
         try:
+            requeue_stuck_jobs(db)
             job = db.scalar(select(QuestionGenerationJob).where(QuestionGenerationJob.id == job_id))
             if not job:
                 logger.warning("question_generation.job missing job_id=%s", job_id)
                 return
             if job.status not in ("queued", "running"):
                 return
-
-            job.status = "running"
-            job.started_at = datetime.now(UTC)
-            db.commit()
+            if not try_begin_question_generation_job(db, job_id):
+                logger.info("question_generation.job skipped job_id=%s status=%s", job_id, job.status)
+                return
 
             run_started_at = datetime.now(UTC)
             payload = QuestionGenerateRequest.model_validate_json(job.request_json)
-            response = QuestionService(db).generate_questions(job.user_id, payload)
+            response = QuestionService(db).generate_questions(job.user_id, payload, usage_reserved=True)
             duration_ms = int((datetime.now(UTC) - run_started_at).total_seconds() * 1000)
 
             job.status = "succeeded"

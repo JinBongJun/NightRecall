@@ -6,6 +6,7 @@ from app.db.models.usage_event import UsageEvent
 from app.db.models.user import User
 from app.db.repositories.usage_repository import UsageRepository
 from app.db.schemas.usage import UsageLimitInfo, UsageLimitsResponse
+from app.services.job_quota_service import JobQuotaService
 from app.utils.ids import make_id
 from app.utils.time import as_utc, timezone_or_utc, utc_now
 
@@ -33,7 +34,8 @@ class UsageLimitService:
         reference_now = now or utc_now()
         day_start_utc = self._local_day_start_utc(user.timezone, reference_now)
         daily_count = self.repository.count_events_for_user_since(user.id, PHOTO_EXTRACT_EVENT, day_start_utc)
-        if daily_count >= PHOTO_EXTRACTION_DAILY_LIMIT:
+        pending_count = JobQuotaService(self.db).pending_photo_extract_count(user.id)
+        if daily_count + pending_count >= PHOTO_EXTRACTION_DAILY_LIMIT:
             raise ValueError(PHOTO_EXTRACTION_LIMIT_REACHED)
 
     def assert_can_generate_questions(self, user: User, requested_count: int = 1, now: datetime | None = None) -> None:
@@ -41,13 +43,14 @@ class UsageLimitService:
         day_start_utc = self._local_day_start_utc(user.timezone, reference_now)
         month_start_utc = self._local_month_start_utc(user.timezone, reference_now)
         requested = max(1, requested_count)
+        pending_count = JobQuotaService(self.db).pending_question_generation_count(user.id)
 
         daily_count = self.repository.count_events_for_user_since(user.id, QUESTION_GENERATION_EVENT, day_start_utc)
-        if daily_count + requested > QUESTION_GENERATION_DAILY_LIMIT:
+        if daily_count + pending_count + requested > QUESTION_GENERATION_DAILY_LIMIT:
             raise ValueError(QUESTION_GENERATION_DAILY_LIMIT_REACHED)
 
         monthly_count = self.repository.count_events_for_user_since(user.id, QUESTION_GENERATION_EVENT, month_start_utc)
-        if monthly_count + requested > QUESTION_GENERATION_MONTHLY_LIMIT:
+        if monthly_count + pending_count + requested > QUESTION_GENERATION_MONTHLY_LIMIT:
             raise ValueError(QUESTION_GENERATION_MONTHLY_LIMIT_REACHED)
 
     def record_photo_extract(self, user_id: str) -> None:
@@ -75,28 +78,33 @@ class UsageLimitService:
         month_start_utc = self._local_month_start_utc(user.timezone, reference_now)
 
         photo_used = self.repository.count_events_for_user_since(user.id, PHOTO_EXTRACT_EVENT, day_start_utc)
+        pending_photo = JobQuotaService(self.db).pending_photo_extract_count(user.id)
+        photo_reserved = photo_used + pending_photo
         question_daily_used = self.repository.count_events_for_user_since(
             user.id, QUESTION_GENERATION_EVENT, day_start_utc
         )
+        pending_questions = JobQuotaService(self.db).pending_question_generation_count(user.id)
+        question_daily_reserved = question_daily_used + pending_questions
         question_monthly_used = self.repository.count_events_for_user_since(
             user.id, QUESTION_GENERATION_EVENT, month_start_utc
         )
+        question_monthly_reserved = question_monthly_used + pending_questions
 
         return UsageLimitsResponse(
             photo_extract_daily=UsageLimitInfo(
                 limit=PHOTO_EXTRACTION_DAILY_LIMIT,
-                used=photo_used,
-                remaining=max(0, PHOTO_EXTRACTION_DAILY_LIMIT - photo_used),
+                used=photo_reserved,
+                remaining=max(0, PHOTO_EXTRACTION_DAILY_LIMIT - photo_reserved),
             ),
             question_generation_daily=UsageLimitInfo(
                 limit=QUESTION_GENERATION_DAILY_LIMIT,
-                used=question_daily_used,
-                remaining=max(0, QUESTION_GENERATION_DAILY_LIMIT - question_daily_used),
+                used=question_daily_reserved,
+                remaining=max(0, QUESTION_GENERATION_DAILY_LIMIT - question_daily_reserved),
             ),
             question_generation_monthly=UsageLimitInfo(
                 limit=QUESTION_GENERATION_MONTHLY_LIMIT,
-                used=question_monthly_used,
-                remaining=max(0, QUESTION_GENERATION_MONTHLY_LIMIT - question_monthly_used),
+                used=question_monthly_reserved,
+                remaining=max(0, QUESTION_GENERATION_MONTHLY_LIMIT - question_monthly_reserved),
             ),
         )
 

@@ -16,7 +16,8 @@ from app.db.schemas.study_inputs import (
     StudyInputExtractRequest,
     StudyInputExtractResponse,
 )
-from app.db.session import SessionLocal
+from app.db import session as db_session
+from app.services.job_processing import requeue_stuck_jobs, try_begin_study_extract_job
 from app.services.study_extract_service import StudyExtractService
 from app.services.usage_limit_service import UsageLimitService
 from app.utils.ids import make_id
@@ -59,18 +60,18 @@ class StudyInputExtractJobService:
         return self._to_response(job)
 
     def process_job(self, job_id: str) -> None:
-        db = SessionLocal()
+        db = db_session.SessionLocal()
         try:
+            requeue_stuck_jobs(db)
             job = db.scalar(select(StudyInputExtractJob).where(StudyInputExtractJob.id == job_id))
             if not job:
                 logger.warning("study_extract.job missing job_id=%s", job_id)
                 return
             if job.status not in ("queued", "running"):
                 return
-
-            job.status = "running"
-            job.started_at = datetime.now(UTC)
-            db.commit()
+            if not try_begin_study_extract_job(db, job_id):
+                logger.info("study_extract.job skipped job_id=%s status=%s", job_id, job.status)
+                return
 
             run_started_at = datetime.now(UTC)
             payload = StudyInputExtractRequest.model_validate_json(job.request_json)

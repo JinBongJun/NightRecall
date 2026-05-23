@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     jwt_refresh_token_ttl_days: int = 30
     job_inline_processing: bool | None = None
     job_worker_poll_interval_seconds: float = 2.0
+    job_stale_running_seconds: int = 600
     source_image_storage_provider: str = "local"
     source_image_storage_root: str = "./storage/source-images"
     source_image_storage_endpoint_url: str | None = None
