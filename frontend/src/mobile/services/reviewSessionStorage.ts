@@ -2,6 +2,7 @@ import * as SecureStore from "expo-secure-store";
 
 import type { Question } from "../types/models";
 import type { ReviewPhase } from "../store/reviewRetryLogic";
+import type { ReviewKind } from "../utils/reviewAttemptKind";
 
 const REVIEW_SESSION_KEY = "nightrecall.review-session";
 
@@ -10,6 +11,7 @@ export type PersistedReviewSession = {
   sessionQuestions: Question[];
   sessionIndex: number;
   sessionSource: "server" | "local" | null;
+  reviewKind: ReviewKind;
   tonightQuestion: Question | null;
   currentQuestion: Question | null;
   currentQuestionMode: "normal" | "retry";
@@ -47,6 +49,7 @@ export function normalizePersistedReviewSession(raw: unknown): PersistedReviewSe
       sessionQuestions: session.sessionQuestions,
       sessionIndex: session.sessionIndex,
       sessionSource: session.sessionSource ?? null,
+      reviewKind: session.reviewKind === "practice" ? "practice" : "ritual",
       tonightQuestion: session.tonightQuestion ?? null,
       currentQuestion: session.currentQuestion ?? null,
       currentQuestionMode: session.currentQuestionMode ?? "normal",
@@ -66,6 +69,7 @@ export function normalizePersistedReviewSession(raw: unknown): PersistedReviewSe
     sessionQuestions: session.sessionQuestions,
     sessionIndex: session.sessionIndex,
     sessionSource: session.sessionSource ?? null,
+    reviewKind: session.reviewKind === "practice" ? "practice" : "ritual",
     tonightQuestion: session.tonightQuestion ?? null,
     currentQuestion: session.currentQuestion ?? null,
     currentQuestionMode: session.currentQuestionMode ?? "normal",

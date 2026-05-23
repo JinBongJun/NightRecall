@@ -32,6 +32,7 @@ export function ResultScreen({ navigation }: Props) {
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const sessionIndex = useReviewStore((state) => state.sessionIndex);
   const sessionPhase = useReviewStore((state) => state.sessionPhase);
+  const reviewKind = useReviewStore((state) => state.reviewKind);
   const missedQuestions = useReviewStore((state) => state.missedQuestions);
   const retryIndex = useReviewStore((state) => state.retryIndex);
   const advanceSessionQuestion = useReviewStore((state) => state.advanceSessionQuestion);
@@ -42,10 +43,12 @@ export function ResultScreen({ navigation }: Props) {
   const missedCount = missedQuestions.length;
   const inMain = sessionPhase === "main";
   const inRetry = sessionPhase === "retry";
-  const showNextMain = inMain && remaining > 0;
-  const showBeginRetry = inMain && remaining === 0 && hasMissedRetries(missedQuestions);
-  const showNextRetry = inRetry && hasMoreRetriesAfterCurrent(missedQuestions, retryIndex, sessionPhase);
+  const isPractice = reviewKind === "practice";
+  const showNextMain = !isPractice && inMain && remaining > 0;
+  const showBeginRetry = !isPractice && inMain && remaining === 0 && hasMissedRetries(missedQuestions);
+  const showNextRetry = !isPractice && inRetry && hasMoreRetriesAfterCurrent(missedQuestions, retryIndex, sessionPhase);
   const showDoneOnly =
+    isPractice ||
     (inMain && remaining === 0 && !hasMissedRetries(missedQuestions)) ||
     (inRetry && retryPassComplete(missedQuestions, retryIndex, sessionPhase));
   const isCorrect = Boolean(result?.is_correct);
@@ -94,7 +97,9 @@ export function ResultScreen({ navigation }: Props) {
     ? missedQuestions.length - (retryIndex + 1)
     : 0;
 
-  const meta = showNextMain
+  const meta = isPractice
+    ? "Practice complete. Your nightly stats stay unchanged."
+    : showNextMain
     ? `${remaining} more ${pluralQuestion(remaining)} left tonight.`
     : showBeginRetry
       ? `${missedCount} missed ${pluralQuestion(missedCount)} ready for one more try.`
@@ -112,7 +117,11 @@ export function ResultScreen({ navigation }: Props) {
       <ResultBanner
         correct={isCorrect}
         body={
-          inRetry
+          isPractice
+            ? isCorrect
+              ? "Nice recall. This was practice only."
+              : "Worth another look later, but this pass was just for practice."
+            : inRetry
             ? isCorrect
               ? "That second try landed."
               : "Still worth another look later tonight or tomorrow."
@@ -128,18 +137,20 @@ export function ResultScreen({ navigation }: Props) {
         <Text style={styles.body}>{result?.explanation ?? "No explanation available."}</Text>
       </View>
 
-      <View
-        style={styles.streakCard}
-        accessibilityRole="text"
-        accessibilityLabel={`${result?.current_streak ?? 0} night streak`}
-      >
-        <Text style={styles.streakValue} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
-          {result?.current_streak ?? 0}-night streak
-        </Text>
-        <Text style={styles.streakHelper} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
-          {result?.current_streak ? "Your recall habit is still active." : "Start your streak again tonight."}
-        </Text>
-      </View>
+      {!isPractice ? (
+        <View
+          style={styles.streakCard}
+          accessibilityRole="text"
+          accessibilityLabel={`${result?.current_streak ?? 0} night streak`}
+        >
+          <Text style={styles.streakValue} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+            {result?.current_streak ?? 0}-night streak
+          </Text>
+          <Text style={styles.streakHelper} allowFontScaling maxFontSizeMultiplier={MAX_FONT_SCALE}>
+            {result?.current_streak ? "Your recall habit is still active." : "Start your streak again tonight."}
+          </Text>
+        </View>
+      ) : null}
 
       {showNextMain ? (
         <>
@@ -160,7 +171,7 @@ export function ResultScreen({ navigation }: Props) {
           <ActionButton label="Finish for tonight" onPress={done} variant="secondary" />
         </>
       ) : showDoneOnly ? (
-        <PrimaryButton label="Done" onPress={done} />
+        <PrimaryButton label={isPractice ? "Done practicing" : "Done"} onPress={done} />
       ) : (
         <PrimaryButton label="Done" onPress={done} />
       )}

@@ -125,12 +125,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/v1/users/logout": {
@@ -1586,6 +1581,16 @@
             "minimum": 0.0,
             "title": "Response Time Ms",
             "default": 0
+          },
+          "attempt_kind": {
+            "type": "string",
+            "enum": [
+              "ritual_main",
+              "ritual_retry",
+              "practice"
+            ],
+            "title": "Attempt Kind",
+            "default": "ritual_main"
           }
         },
         "type": "object",

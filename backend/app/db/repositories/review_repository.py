@@ -6,11 +6,15 @@ from sqlalchemy.orm import Session
 from app.db.models.question import Question, QuestionSchedule
 from app.db.models.review import ReviewEvent
 from app.db.models.study import StudyTopic
+from app.domain.review_attempts import RITUAL_MAIN_ATTEMPT, RITUAL_STATS_ATTEMPTS
 
 
 class ReviewRepository:
     def __init__(self, db: Session):
         self.db = db
+
+    def _ritual_stats_filter(self):
+        return ReviewEvent.attempt_kind.in_(RITUAL_STATS_ATTEMPTS)
 
     def add_event(self, event: ReviewEvent) -> ReviewEvent:
         self.db.add(event)
@@ -24,10 +28,22 @@ class ReviewRepository:
         return self.db.scalar(select(Question).where(Question.id == question_id))
 
     def count_answers(self, user_id: str) -> int:
-        return int(self.db.scalar(select(func.count(ReviewEvent.id)).where(ReviewEvent.user_id == user_id)) or 0)
+        return int(
+            self.db.scalar(
+                select(func.count(ReviewEvent.id)).where(
+                    ReviewEvent.user_id == user_id,
+                    self._ritual_stats_filter(),
+                )
+            )
+            or 0
+        )
 
     def count_correct(self, user_id: str) -> int:
-        stmt = select(func.count(ReviewEvent.id)).where(ReviewEvent.user_id == user_id, ReviewEvent.is_correct.is_(True))
+        stmt = select(func.count(ReviewEvent.id)).where(
+            ReviewEvent.user_id == user_id,
+            ReviewEvent.is_correct.is_(True),
+            self._ritual_stats_filter(),
+        )
         return int(self.db.scalar(stmt) or 0)
 
     def recent_wrong_topics(self, user_id: str, limit: int = 5) -> list[str]:
@@ -35,7 +51,11 @@ class ReviewRepository:
             select(StudyTopic.topic_text)
             .join(Question, Question.study_topic_id == StudyTopic.id)
             .join(ReviewEvent, ReviewEvent.question_id == Question.id)
-            .where(ReviewEvent.user_id == user_id, ReviewEvent.is_correct.is_(False))
+            .where(
+                ReviewEvent.user_id == user_id,
+                ReviewEvent.is_correct.is_(False),
+                ReviewEvent.attempt_kind == RITUAL_MAIN_ATTEMPT,
+            )
             .order_by(ReviewEvent.answered_at.desc())
             .limit(limit)
         )
@@ -44,7 +64,10 @@ class ReviewRepository:
     def answer_timestamps_desc(self, user_id: str) -> list[datetime]:
         stmt = (
             select(ReviewEvent.answered_at)
-            .where(ReviewEvent.user_id == user_id)
+            .where(
+                ReviewEvent.user_id == user_id,
+                ReviewEvent.attempt_kind == RITUAL_MAIN_ATTEMPT,
+            )
             .order_by(ReviewEvent.answered_at.desc())
         )
         return list(self.db.scalars(stmt))
@@ -52,7 +75,11 @@ class ReviewRepository:
     def answer_timestamps_since_desc(self, user_id: str, since: datetime) -> list[datetime]:
         stmt = (
             select(ReviewEvent.answered_at)
-            .where(ReviewEvent.user_id == user_id, ReviewEvent.answered_at >= since)
+            .where(
+                ReviewEvent.user_id == user_id,
+                ReviewEvent.answered_at >= since,
+                ReviewEvent.attempt_kind == RITUAL_MAIN_ATTEMPT,
+            )
             .order_by(ReviewEvent.answered_at.desc())
         )
         return list(self.db.scalars(stmt))

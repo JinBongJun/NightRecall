@@ -12,6 +12,7 @@ import { SectionRow } from "../components/SectionRow";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { submitAnswer } from "../services/reviewService";
 import { useReviewStore } from "../store/reviewStore";
+import { resolveAttemptKind } from "../utils/reviewAttemptKind";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 import { navigateToCapture, navigateToHome } from "../navigation/navigationHelpers";
@@ -27,6 +28,7 @@ export function ReviewScreen({ navigation }: Props) {
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const sessionIndex = useReviewStore((state) => state.sessionIndex);
   const sessionPhase = useReviewStore((state) => state.sessionPhase);
+  const reviewKind = useReviewStore((state) => state.reviewKind);
   const missedQuestions = useReviewStore((state) => state.missedQuestions);
   const retryIndex = useReviewStore((state) => state.retryIndex);
   const selectedChoice = useReviewStore((state) => state.selectedChoice);
@@ -38,6 +40,7 @@ export function ReviewScreen({ navigation }: Props) {
   const startedAt = useRef(Date.now());
   const [submitting, setSubmitting] = useState(false);
   const inRetry = sessionPhase === "retry";
+  const isPractice = reviewKind === "practice";
   const totalQuestions = sessionQuestions.length ? sessionQuestions.length : 1;
   const totalMissed = missedQuestions.length;
   const currentNumber = inRetry ? retryIndex + 1 : sessionQuestions.length ? sessionIndex + 1 : 1;
@@ -93,8 +96,9 @@ export function ReviewScreen({ navigation }: Props) {
         selected_index: selectedChoice,
         selected_text: fillBlankAnswer || null,
         response_time_ms: Date.now() - startedAt.current,
+        attempt_kind: resolveAttemptKind(reviewKind, sessionPhase),
       });
-      if (!result.is_correct && sessionPhase === "main") {
+      if (!result.is_correct && sessionPhase === "main" && reviewKind === "ritual") {
         recordMissedQuestion(currentQuestion);
       }
       setResult(result);
@@ -125,10 +129,12 @@ export function ReviewScreen({ navigation }: Props) {
         <View style={styles.statusHeader}>
           <View style={styles.statusCopy}>
             <Text style={styles.statusEyebrow}>
-              {inRetry ? "Second try" : isResurfaced ? "One more look" : "Tonight's recall"}
+              {isPractice ? "Practice" : inRetry ? "Second try" : isResurfaced ? "One more look" : "Tonight's recall"}
             </Text>
             <Text style={styles.statusTitle}>
-              {inRetry
+              {isPractice
+                ? `Practice ${currentNumber} of ${totalQuestions}`
+                : inRetry
                 ? `Retry ${currentNumber} of ${totalMissed}`
                 : isResurfaced
                   ? "Take one more look at this idea"
@@ -144,7 +150,9 @@ export function ReviewScreen({ navigation }: Props) {
         </View>
         <View style={styles.heroFooter}>
           <Text style={styles.heroFooterText}>
-            {inRetry
+            {isPractice
+              ? "Practice mode does not affect your streak."
+              : inRetry
               ? "One more pass on what you missed"
               : isResurfaced
                 ? "A quick return to something worth another look"

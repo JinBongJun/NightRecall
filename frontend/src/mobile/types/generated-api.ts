@@ -619,6 +619,12 @@ export interface components {
              * @default 0
              */
             response_time_ms: number;
+            /**
+             * Attempt Kind
+             * @default ritual_main
+             * @enum {string}
+             */
+            attempt_kind: AnswerSubmitRequestAttempt_kind;
         };
         /** AnswerSubmitResponse */
         AnswerSubmitResponse: {
@@ -2273,6 +2279,11 @@ export interface operations {
             };
         };
     };
+}
+export enum AnswerSubmitRequestAttempt_kind {
+    ritual_main = "ritual_main",
+    ritual_retry = "ritual_retry",
+    practice = "practice"
 }
 export enum EntitlementsResponsePlan {
     free = "free",

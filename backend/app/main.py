@@ -50,6 +50,11 @@ def ensure_runtime_schema() -> None:
         if "avatar_url" not in user_columns:
             statements.append("ALTER TABLE users ADD COLUMN avatar_url VARCHAR(1024)")
 
+    if "review_events" in table_names:
+        review_columns = {column["name"] for column in inspector.get_columns("review_events")}
+        if "attempt_kind" not in review_columns:
+            statements.append("ALTER TABLE review_events ADD COLUMN attempt_kind VARCHAR(24) DEFAULT 'ritual_main'")
+
     if not statements:
         return
 

@@ -5,9 +5,10 @@ from pydantic import Field, model_validator
 from app.db.schemas.common import APIModel
 from app.db.schemas.questions import QuestionGenerateResponse, QuestionPublic
 from app.db.schemas.study_inputs import SourceKind, StudyInputType, TopicResponse
-
+from app.domain.review_attempts import RITUAL_MAIN_ATTEMPT
 
 ReviewMode = Literal["auto", "picked"]
+AttemptKind = Literal["ritual_main", "ritual_retry", "practice"]
 
 
 class ReviewQuestionResponse(APIModel):
@@ -87,6 +88,7 @@ class AnswerSubmitRequest(APIModel):
     selected_index: int | None = None
     selected_text: str | None = None
     response_time_ms: int = Field(default=0, ge=0, le=120000)
+    attempt_kind: AttemptKind = RITUAL_MAIN_ATTEMPT
 
     @model_validator(mode="after")
     def validate_selection(self) -> "AnswerSubmitRequest":

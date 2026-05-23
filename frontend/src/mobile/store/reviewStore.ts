@@ -13,13 +13,19 @@ import {
   appendMissedQuestion,
   type ReviewPhase,
 } from "./reviewRetryLogic";
+import type { ReviewKind } from "../utils/reviewAttemptKind";
 
 export { MAX_SESSION_QUESTIONS } from "./reviewSessionLogic";
+
+type SessionQuestionOptions = {
+  reviewKind?: ReviewKind;
+};
 
 type ReviewState = {
   sessionQuestions: Question[];
   sessionIndex: number;
   sessionSource: "server" | "local" | null;
+  reviewKind: ReviewKind;
   tonightQuestion: Question | null;
   currentQuestion: Question | null;
   sessionPhase: ReviewPhase;
@@ -32,7 +38,7 @@ type ReviewState = {
   result: AnswerResponse | null;
   loading: boolean;
   error: string | null;
-  setSessionQuestions: (questions: Question[]) => void;
+  setSessionQuestions: (questions: Question[], options?: SessionQuestionOptions) => void;
   addSessionQuestions: (questions: Question[]) => void;
   advanceSessionQuestion: () => boolean;
   recordMissedQuestion: (question: Question) => void;
@@ -56,6 +62,7 @@ const defaultReviewState = {
   sessionQuestions: [],
   sessionIndex: 0,
   sessionSource: null,
+  reviewKind: "ritual" as ReviewKind,
   tonightQuestion: null,
   currentQuestion: null,
   sessionPhase: "main" as ReviewPhase,
@@ -80,6 +87,7 @@ function snapshotFromState(state: ReviewState): PersistedReviewSession | null {
     sessionQuestions: state.sessionQuestions,
     sessionIndex: state.sessionIndex,
     sessionSource: state.sessionSource,
+    reviewKind: state.reviewKind,
     tonightQuestion: state.tonightQuestion,
     currentQuestion: state.currentQuestion,
     currentQuestionMode: state.currentQuestionMode,
@@ -101,13 +109,15 @@ function syncReviewSessionToStorage() {
 
 export const useReviewStore = create<ReviewState>((set) => ({
   ...defaultReviewState,
-  setSessionQuestions: (questions) => {
+  setSessionQuestions: (questions, options) => {
     set(() => {
       const sanitized = capSessionQuestions(questions);
+      const reviewKind = options?.reviewKind ?? "ritual";
       return {
         sessionQuestions: sanitized,
         sessionIndex: 0,
         sessionSource: "local",
+        reviewKind,
         tonightQuestion: sanitized[0] ?? null,
         currentQuestion: sanitized[0] ?? null,
         sessionPhase: "main",
@@ -245,6 +255,7 @@ export const useReviewStore = create<ReviewState>((set) => ({
       sessionQuestions: [],
       sessionIndex: 0,
       sessionSource: null,
+      reviewKind: "ritual",
       tonightQuestion: null,
       currentQuestion: null,
       sessionPhase: "main",
@@ -266,6 +277,7 @@ export const useReviewStore = create<ReviewState>((set) => ({
       sessionQuestions: capSessionQuestions(normalized.sessionQuestions),
       sessionIndex: Math.min(normalized.sessionIndex, Math.max(0, normalized.sessionQuestions.length - 1)),
       sessionSource: normalized.sessionSource,
+      reviewKind: normalized.reviewKind,
       tonightQuestion: normalized.tonightQuestion,
       currentQuestion: normalized.currentQuestion,
       sessionPhase: normalized.sessionPhase,
@@ -285,6 +297,7 @@ export const useReviewStore = create<ReviewState>((set) => ({
   setTonightQuestion: (question) => {
     set(() => ({
       sessionSource: question ? "local" : null,
+      reviewKind: "ritual",
       tonightQuestion: question,
       currentQuestion: question,
       sessionPhase: "main",
@@ -304,6 +317,7 @@ export const useReviewStore = create<ReviewState>((set) => ({
 
       return {
         sessionSource: question ? ("server" as const) : null,
+        reviewKind: "ritual" as const,
         tonightQuestion: question,
         currentQuestion: question,
         currentQuestionMode: "normal" as const,

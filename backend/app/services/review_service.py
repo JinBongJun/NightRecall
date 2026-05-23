@@ -30,6 +30,7 @@ from app.db.schemas.study_inputs import TopicResponse
 from app.services.question_service import QuestionService
 from app.services.source_image_storage_service import SourceImageStorageService
 from app.services.streak_service import StreakService
+from app.domain.review_attempts import RITUAL_MAIN_ATTEMPT
 from app.utils.ids import make_id
 from app.utils.time import local_date
 
@@ -339,6 +340,7 @@ class ReviewService:
                 id=make_id("rv"),
                 user_id=user_id,
                 question_id=question.id,
+                attempt_kind=payload.attempt_kind,
                 selected_index=payload.selected_index,
                 selected_text=payload.selected_text,
                 is_correct=is_correct,
@@ -347,7 +349,7 @@ class ReviewService:
         )
 
         schedule = self.review_repository.get_schedule(question.id)
-        if schedule:
+        if schedule and payload.attempt_kind == RITUAL_MAIN_ATTEMPT:
             self._apply_resurfacing(schedule, is_correct)
 
         self.db.commit()

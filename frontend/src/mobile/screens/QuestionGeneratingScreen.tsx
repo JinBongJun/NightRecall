@@ -77,11 +77,12 @@ export function QuestionGeneratingScreen({ route, navigation }: Props) {
         return;
       }
 
+      const reviewKind = route.params.variant === "saved" ? "practice" : "ritual";
       const activeQuestionCount = sessionQuestions.length ? sessionQuestions.length : currentQuestion ? 1 : 0;
       if (activeQuestionCount > 0) {
         addSessionQuestions(questions);
-      } else if (questions.length > 1) {
-        setSessionQuestions(questions);
+      } else if (questions.length > 1 || reviewKind === "practice") {
+        setSessionQuestions(questions, { reviewKind });
       } else {
         setTonightQuestion(questions[0]);
       }
