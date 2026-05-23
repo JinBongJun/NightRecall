@@ -4,28 +4,42 @@ import { useCallback, useState } from "react";
 import { fetchUsageLimits } from "../services/usageService";
 import type { UsageLimits } from "../services/usageService";
 
-export function useUsageLimits() {
+export type UsageLimitsLoadState = "loading" | "ready" | "error";
+
+export type UsageLimitsResult = {
+  usageLimits: UsageLimits | null;
+  status: UsageLimitsLoadState;
+  limitsUnavailable: boolean;
+  reload: () => void;
+};
+
+export function useUsageLimits(): UsageLimitsResult {
   const [usageLimits, setUsageLimits] = useState<UsageLimits | null>(null);
+  const [status, setStatus] = useState<UsageLimitsLoadState>("loading");
+
+  const reload = useCallback(() => {
+    setStatus("loading");
+    void fetchUsageLimits()
+      .then((limits) => {
+        setUsageLimits(limits);
+        setStatus("ready");
+      })
+      .catch(() => {
+        setUsageLimits(null);
+        setStatus("error");
+      });
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      let active = true;
-
-      void fetchUsageLimits()
-        .then((limits) => {
-          if (active) {
-            setUsageLimits(limits);
-          }
-        })
-        .catch(() => {
-          // Keep the UI permissive if the limits request fails; the backend still enforces quotas.
-        });
-
-      return () => {
-        active = false;
-      };
-    }, []),
+      reload();
+    }, [reload]),
   );
 
-  return usageLimits;
+  return {
+    usageLimits,
+    status,
+    limitsUnavailable: status === "error",
+    reload,
+  };
 }

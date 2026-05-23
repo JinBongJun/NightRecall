@@ -15,7 +15,8 @@ import { useUsageLimits } from "../hooks/useUsageLimits";
 import {
   formatAddAnotherLabel,
   formatTonightLimitsLine,
-  remainingQuestionGenerations,
+  isUsageLimitsReady,
+  remainingQuestionGenerationsWhenReady,
 } from "../utils/usageLimitDisplay";
 import { useReminderStore } from "../store/reminderStore";
 import { useReviewStore } from "../store/reviewStore";
@@ -29,7 +30,9 @@ export function HomeScreen({ navigation }: Props) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useAppTheme();
   const loadTonightQuestion = useTonightQuestion();
-  const usageLimits = useUsageLimits();
+  const { usageLimits, status } = useUsageLimits();
+  const reviewError = useReviewStore((state) => state.error);
+  const reviewLoading = useReviewStore((state) => state.loading);
   const reminderTime = useReminderStore((state) => state.reminderTime);
   const nextReminderLabel = useReminderStore((state) => state.nextReminderLabel);
   const sessionSource = useReviewStore((state) => state.sessionSource);
@@ -75,10 +78,10 @@ export function HomeScreen({ navigation }: Props) {
         ? 1
         : 0;
 
-  const remainingQuestionsTonight = remainingQuestionGenerations(usageLimits);
+  const remainingQuestionsTonight = remainingQuestionGenerationsWhenReady(usageLimits, status);
   const addAnotherLabel = formatAddAnotherLabel(remainingQuestionsTonight);
-  const canAddQuestionTonight = Boolean(addAnotherLabel);
-  const limitsLine = formatTonightLimitsLine(usageLimits);
+  const canAddQuestionTonight = isUsageLimitsReady(status) && Boolean(addAnotherLabel);
+  const limitsLine = formatTonightLimitsLine(usageLimits, status);
   const ritualStatus = answeredToday ? "1/1 tonight" : "0/1 tonight";
 
   const todayLabel = useMemo(
@@ -187,6 +190,9 @@ export function HomeScreen({ navigation }: Props) {
         </View>
 
         {limitsLine ? <Text style={styles.limitsLine}>{limitsLine}</Text> : null}
+        {reviewError && !currentQuestion && !reviewLoading ? (
+          <Text style={styles.tonightError}>{reviewError}</Text>
+        ) : null}
 
         <View style={styles.tonightCopy}>
           <Text style={styles.tonightEyebrow}>{tonightState.eyebrow}</Text>
@@ -338,6 +344,12 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   },
   limitsLine: {
     color: colors.muted,
+    fontSize: typography.caption.fontSize,
+    fontWeight: "600",
+    lineHeight: typography.caption.lineHeight,
+  },
+  tonightError: {
+    color: colors.secondary,
     fontSize: typography.caption.fontSize,
     fontWeight: "600",
     lineHeight: typography.caption.lineHeight,

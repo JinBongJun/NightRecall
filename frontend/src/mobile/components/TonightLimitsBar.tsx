@@ -7,16 +7,15 @@ import { theme, useAppTheme } from "../theme";
 
 export function TonightLimitsBar() {
   const styles = useThemedStyles(createStyles);
-  const { colors } = useAppTheme();
-  const usageLimits = useUsageLimits();
-  const line = formatTonightLimitsLine(usageLimits);
+  const { usageLimits, status } = useUsageLimits();
+  const line = formatTonightLimitsLine(usageLimits, status);
 
   if (!line) {
     return null;
   }
 
   return (
-    <View style={styles.bar}>
+    <View style={[styles.bar, status === "error" ? styles.barError : null]}>
       <Text style={styles.text}>{line}</Text>
     </View>
   );
@@ -31,6 +30,10 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: colors.line,
+  },
+  barError: {
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
   text: {
     color: colors.muted,

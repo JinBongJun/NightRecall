@@ -12,6 +12,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
+import { isUsageLimitsReady, remainingPhotoReadsWhenReady } from "../utils/usageLimitDisplay";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
 import { theme, useAppTheme } from "../theme";
 type Props = NativeStackScreenProps<CaptureStackParamList, "Capture">;
@@ -20,7 +21,7 @@ export function CaptureScreen({ navigation }: Props) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useAppTheme();
   const [loading, setLoading] = useState(false);
-  const usageLimits = useUsageLimits();
+  const { usageLimits, status, limitsUnavailable } = useUsageLimits();
   const [selectedImage, setSelectedImage] = useState<{
     label: string;
     base64: string;
@@ -30,18 +31,21 @@ export function CaptureScreen({ navigation }: Props) {
   } | null>(null);
   const canContinue = Boolean(selectedImage?.base64);
 
-  const photoReadsRemaining = usageLimits?.photo_extract_daily.remaining ?? null;
-  const photoReadsLocked = photoReadsRemaining === 0;
+  const photoReadsRemaining = remainingPhotoReadsWhenReady(usageLimits, status);
+  const photoReadsLocked = !isUsageLimitsReady(status) || photoReadsRemaining <= 0;
 
   const photoLimitCopy = useMemo(() => {
-    if (photoReadsRemaining === null) {
-      return null;
+    if (limitsUnavailable) {
+      return "Could not load usage limits. Photo capture is paused until limits refresh.";
+    }
+    if (!isUsageLimitsReady(status)) {
+      return "Checking tonight's photo limits...";
     }
     if (photoReadsRemaining <= 0) {
       return "Photo reads are full for tonight (3/3). Write it down instead.";
     }
     return `Photo reads left tonight: ${photoReadsRemaining}/3`;
-  }, [photoReadsRemaining]);
+  }, [limitsUnavailable, photoReadsRemaining, status]);
 
   const handlePhoto = async (kind: "camera" | "gallery") => {
     try {

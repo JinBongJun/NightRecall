@@ -11,7 +11,11 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TonightLimitsBar } from "../components/TonightLimitsBar";
 import { TopBar } from "../components/TopBar";
 import { useUsageLimits } from "../hooks/useUsageLimits";
-import { isQuestionGenerationFull, remainingQuestionGenerations } from "../utils/usageLimitDisplay";
+import {
+  isQuestionGenerationFull,
+  isUsageLimitsReady,
+  remainingQuestionGenerationsWhenReady,
+} from "../utils/usageLimitDisplay";
 import { fetchSavedInputDetail, fetchSavedTopicSource } from "../services/reviewService";
 import { createStudyInput, deleteSourceImage, uploadSourceImage } from "../services/studyService";
 import { getSourceImageHeaders, getSourceImageUrl } from "../services/api";
@@ -54,7 +58,7 @@ type SaveDestination = "library" | "back";
 export function EditPointsScreen({ route, navigation }: Props) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useAppTheme();
-  const usageLimits = useUsageLimits();
+  const { usageLimits, status } = useUsageLimits();
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const setTopics = useTopicsStore((state) => state.setTopics);
@@ -132,9 +136,9 @@ export function EditPointsScreen({ route, navigation }: Props) {
     };
   }, [navigation, route.params]);
 
-  const remainingQuestionsTonight = remainingQuestionGenerations(usageLimits);
-  const tonightIsFull = isQuestionGenerationFull(usageLimits);
-  const maxSelectableQuestions = remainingQuestionsTonight ?? 3;
+  const remainingQuestionsTonight = remainingQuestionGenerationsWhenReady(usageLimits, status);
+  const tonightIsFull = isQuestionGenerationFull(usageLimits, status);
+  const maxSelectableQuestions = isUsageLimitsReady(status) ? (remainingQuestionsTonight ?? 3) : 0;
   const usablePointCount = newPoints.filter((point) => point.text.trim()).length;
   const normalizedSourcePreview =
     route.params.variant === "new"

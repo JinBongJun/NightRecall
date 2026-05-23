@@ -1,4 +1,9 @@
 import type { UsageLimits } from "../services/usageService";
+import type { UsageLimitsLoadState } from "../hooks/useUsageLimits";
+
+export function isUsageLimitsReady(status: UsageLimitsLoadState): boolean {
+  return status === "ready";
+}
 
 export function remainingQuestionGenerations(usageLimits: UsageLimits | null): number | null {
   return usageLimits?.question_generation_daily.remaining ?? null;
@@ -8,11 +13,34 @@ export function remainingPhotoReads(usageLimits: UsageLimits | null): number | n
   return usageLimits?.photo_extract_daily.remaining ?? null;
 }
 
+export function remainingQuestionGenerationsWhenReady(
+  usageLimits: UsageLimits | null,
+  status: UsageLimitsLoadState,
+): number {
+  if (!isUsageLimitsReady(status)) {
+    return 0;
+  }
+  return remainingQuestionGenerations(usageLimits) ?? 0;
+}
+
+export function remainingPhotoReadsWhenReady(
+  usageLimits: UsageLimits | null,
+  status: UsageLimitsLoadState,
+): number {
+  if (!isUsageLimitsReady(status)) {
+    return 0;
+  }
+  return remainingPhotoReads(usageLimits) ?? 0;
+}
+
 export function formatRemainingCount(value: number | null): string {
   return value === null ? "—" : String(value);
 }
 
-export function isQuestionGenerationFull(usageLimits: UsageLimits | null): boolean {
+export function isQuestionGenerationFull(usageLimits: UsageLimits | null, status?: UsageLimitsLoadState): boolean {
+  if (status && !isUsageLimitsReady(status)) {
+    return true;
+  }
   const remaining = remainingQuestionGenerations(usageLimits);
   return remaining !== null && remaining <= 0;
 }
@@ -27,7 +55,17 @@ export function formatAddAnotherLabel(remaining: number | null): string {
   return `Capture another (${remaining} left)`;
 }
 
-export function formatTonightLimitsLine(usageLimits: UsageLimits | null): string | null {
+export function formatTonightLimitsLine(
+  usageLimits: UsageLimits | null,
+  status?: UsageLimitsLoadState,
+): string | null {
+  if (status === "error") {
+    return "Usage limits unavailable. Try again in a moment.";
+  }
+  if (status === "loading") {
+    return "Checking tonight's limits...";
+  }
+
   const remainingQuestions = remainingQuestionGenerations(usageLimits);
   const remainingPhotos = remainingPhotoReads(usageLimits);
 

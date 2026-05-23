@@ -30,6 +30,7 @@ from app.db.schemas.study_inputs import TopicResponse
 from app.services.question_service import QuestionService
 from app.services.source_image_storage_service import SourceImageStorageService
 from app.services.streak_service import StreakService
+from app.domain.review_answer_validation import INVALID_ANSWER_PAYLOAD, INDEX_QUESTION_TYPES, TEXT_QUESTION_TYPES
 from app.domain.review_attempts import RITUAL_MAIN_ATTEMPT
 from app.utils.ids import make_id
 from app.utils.time import local_date
@@ -334,6 +335,7 @@ class ReviewService:
         if question.user_id != user_id:
             raise ValueError("question does not belong to user")
 
+        self._validate_answer_payload(question, payload)
         is_correct = self._evaluate_answer(question.answer_index, question.answer_text, payload.selected_index, payload.selected_text)
         self.review_repository.add_event(
             ReviewEvent(
@@ -364,6 +366,23 @@ class ReviewService:
             explanation=question.explanation,
             current_streak=streak,
         )
+
+    @staticmethod
+    def _validate_answer_payload(question: Question, payload: AnswerSubmitRequest) -> None:
+        if question.question_type in INDEX_QUESTION_TYPES:
+            if payload.selected_index is None:
+                raise ValueError(INVALID_ANSWER_PAYLOAD)
+            choices = question.choices_json or []
+            if payload.selected_index < 0 or payload.selected_index >= len(choices):
+                raise ValueError(INVALID_ANSWER_PAYLOAD)
+            return
+
+        if question.question_type in TEXT_QUESTION_TYPES:
+            if not payload.selected_text or not payload.selected_text.strip():
+                raise ValueError(INVALID_ANSWER_PAYLOAD)
+            return
+
+        raise ValueError(INVALID_ANSWER_PAYLOAD)
 
     @staticmethod
     def _evaluate_answer(

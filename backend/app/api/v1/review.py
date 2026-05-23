@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 from sqlalchemy.orm import Session
 
 from app.api.v1.dependencies import get_current_user, get_db
+from app.api.v1.rate_limit import rate_limit_user
 from app.db.models.user import User
 from app.db.schemas.review import (
     AnswerSubmitRequest,
@@ -171,6 +172,7 @@ def submit_answer(
     request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit_user(endpoint="review.answer", limit=60, window_seconds=60)),
 ) -> AnswerSubmitResponse:
     try:
         response = ReviewService(db).submit_answer(current_user.id, payload)

@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import type { UsageLimits } from "../services/usageService";
+import type { UsageLimitsLoadState } from "../hooks/useUsageLimits";
 import {
   formatAddAnotherLabel,
   formatTonightLimitsLine,
   formatRemainingCount,
+  isQuestionGenerationFull,
+  isUsageLimitsReady,
+  remainingQuestionGenerationsWhenReady,
 } from "./usageLimitDisplay";
 
 const limits: UsageLimits = {
@@ -27,5 +31,13 @@ describe("usageLimitDisplay", () => {
   it("formats tonight limits line when data is available", () => {
     expect(formatTonightLimitsLine(limits)).toBe("2 questions · 1 photo read left tonight");
     expect(formatTonightLimitsLine(null)).toBeNull();
+    expect(formatTonightLimitsLine(null, "error")).toBe("Usage limits unavailable. Try again in a moment.");
+    expect(formatTonightLimitsLine(null, "loading")).toBe("Checking tonight's limits...");
+  });
+
+  it("treats unknown limits as blocked for generation", () => {
+    expect(isUsageLimitsReady("ready")).toBe(true);
+    expect(remainingQuestionGenerationsWhenReady(limits, "error")).toBe(0);
+    expect(isQuestionGenerationFull(limits, "error")).toBe(true);
   });
 });
