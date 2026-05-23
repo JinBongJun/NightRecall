@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 
 import type { Question } from "../types/models";
+import type { ReviewPhase } from "../store/reviewRetryLogic";
 
 const REVIEW_SESSION_KEY = "nightrecall.review-session";
 
@@ -11,13 +12,67 @@ export type PersistedReviewSession = {
   sessionSource: "server" | "local" | null;
   tonightQuestion: Question | null;
   currentQuestion: Question | null;
-  retryQuestion: Question | null;
-  retryUsed: boolean;
   currentQuestionMode: "normal" | "retry";
+  sessionPhase: ReviewPhase;
+  missedQuestions: Question[];
+  retryIndex: number;
+};
+
+type LegacyPersistedReviewSession = Partial<PersistedReviewSession> & {
+  retryQuestion?: Question | null;
+  retryUsed?: boolean;
 };
 
 export function localDateKey(date = new Date()) {
   return date.toLocaleDateString("en-CA");
+}
+
+export function normalizePersistedReviewSession(raw: unknown): PersistedReviewSession | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+
+  const session = raw as LegacyPersistedReviewSession;
+  if (
+    typeof session.dateKey !== "string" ||
+    !Array.isArray(session.sessionQuestions) ||
+    typeof session.sessionIndex !== "number"
+  ) {
+    return null;
+  }
+
+  if (session.sessionPhase && Array.isArray(session.missedQuestions)) {
+    return {
+      dateKey: session.dateKey,
+      sessionQuestions: session.sessionQuestions,
+      sessionIndex: session.sessionIndex,
+      sessionSource: session.sessionSource ?? null,
+      tonightQuestion: session.tonightQuestion ?? null,
+      currentQuestion: session.currentQuestion ?? null,
+      currentQuestionMode: session.currentQuestionMode ?? "normal",
+      sessionPhase: session.sessionPhase,
+      missedQuestions: session.missedQuestions,
+      retryIndex: session.retryIndex ?? 0,
+    };
+  }
+
+  const legacyMissed =
+    session.retryQuestion && !session.retryUsed ? [session.retryQuestion] : [];
+  const sessionPhase: ReviewPhase =
+    session.currentQuestionMode === "retry" && legacyMissed.length ? "retry" : "main";
+
+  return {
+    dateKey: session.dateKey,
+    sessionQuestions: session.sessionQuestions,
+    sessionIndex: session.sessionIndex,
+    sessionSource: session.sessionSource ?? null,
+    tonightQuestion: session.tonightQuestion ?? null,
+    currentQuestion: session.currentQuestion ?? null,
+    currentQuestionMode: session.currentQuestionMode ?? "normal",
+    sessionPhase,
+    missedQuestions: legacyMissed,
+    retryIndex: 0,
+  };
 }
 
 export async function saveReviewSession(session: PersistedReviewSession) {
@@ -31,7 +86,7 @@ export async function loadReviewSession(): Promise<PersistedReviewSession | null
   }
 
   try {
-    return JSON.parse(raw) as PersistedReviewSession;
+    return normalizePersistedReviewSession(JSON.parse(raw));
   } catch {
     await SecureStore.deleteItemAsync(REVIEW_SESSION_KEY);
     return null;

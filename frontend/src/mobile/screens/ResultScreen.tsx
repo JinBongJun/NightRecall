@@ -10,8 +10,15 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { useStatsRefresh } from "../hooks/useStatsRefresh";
 import { refreshStatsFromServer } from "../services/refreshStats";
 import { useReviewStore } from "../store/reviewStore";
+import {
+  hasMissedRetries,
+  hasMoreRetriesAfterCurrent,
+  mainRemaining,
+  pluralQuestion,
+  retryPassComplete,
+} from "../store/reviewRetryLogic";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
-import { theme, useAppTheme } from "../theme";
+import { theme } from "../theme";
 import { navigateToReview } from "../navigation/navigationHelpers";
 import type { RootStackParamList } from "../navigation/types";
 import { playAnswerResultHaptic } from "../utils/feedback";
@@ -21,29 +28,29 @@ type Props = NativeStackScreenProps<RootStackParamList, "Result">;
 
 export function ResultScreen({ navigation }: Props) {
   const styles = useThemedStyles(createStyles);
-  const { colors } = useAppTheme();
   const result = useReviewStore((state) => state.result);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const sessionIndex = useReviewStore((state) => state.sessionIndex);
-  const retryQuestion = useReviewStore((state) => state.retryQuestion);
-  const retryUsed = useReviewStore((state) => state.retryUsed);
-  const currentQuestionMode = useReviewStore((state) => state.currentQuestionMode);
+  const sessionPhase = useReviewStore((state) => state.sessionPhase);
+  const missedQuestions = useReviewStore((state) => state.missedQuestions);
+  const retryIndex = useReviewStore((state) => state.retryIndex);
   const advanceSessionQuestion = useReviewStore((state) => state.advanceSessionQuestion);
-  const consumeRetryQuestion = useReviewStore((state) => state.consumeRetryQuestion);
+  const beginRetryPass = useReviewStore((state) => state.beginRetryPass);
+  const advanceRetryQuestion = useReviewStore((state) => state.advanceRetryQuestion);
   const resetSession = useReviewStore((state) => state.resetSession);
-  const releaseActiveRecall = useReviewStore((state) => state.releaseActiveRecall);
-  const remaining = sessionQuestions.length ? Math.max(0, sessionQuestions.length - (sessionIndex + 1)) : 0;
-  const retryReady = Boolean(retryQuestion) && !retryUsed && currentQuestionMode !== "retry";
+  const remaining = mainRemaining(sessionQuestions, sessionIndex);
+  const missedCount = missedQuestions.length;
+  const inMain = sessionPhase === "main";
+  const inRetry = sessionPhase === "retry";
+  const showNextMain = inMain && remaining > 0;
+  const showBeginRetry = inMain && remaining === 0 && hasMissedRetries(missedQuestions);
+  const showNextRetry = inRetry && hasMoreRetriesAfterCurrent(missedQuestions, retryIndex, sessionPhase);
+  const showDoneOnly =
+    (inMain && remaining === 0 && !hasMissedRetries(missedQuestions)) ||
+    (inRetry && retryPassComplete(missedQuestions, retryIndex, sessionPhase));
   const isCorrect = Boolean(result?.is_correct);
-  const sessionFinished = remaining === 0 && !retryReady;
 
   useStatsRefresh();
-
-  useEffect(() => {
-    if (sessionFinished) {
-      releaseActiveRecall();
-    }
-  }, [releaseActiveRecall, sessionFinished]);
 
   useEffect(() => {
     if (!result) {
@@ -67,20 +74,36 @@ export function ResultScreen({ navigation }: Props) {
     navigateToReview(navigation, "auto");
   };
 
-  const retryTonight = () => {
-    const consumed = consumeRetryQuestion();
-    if (!consumed) {
+  const startRetryPass = () => {
+    const started = beginRetryPass();
+    if (!started) {
       return;
     }
     navigateToReview(navigation, "auto");
   };
 
-  const meta =
-    remaining > 0
-      ? `${remaining} more question${remaining > 1 ? "s" : ""} left tonight.`
-      : retryReady
-        ? "One more try is ready."
+  const continueRetry = () => {
+    const advanced = advanceRetryQuestion();
+    if (!advanced) {
+      return;
+    }
+    navigateToReview(navigation, "auto");
+  };
+
+  const retriesLeft = hasMoreRetriesAfterCurrent(missedQuestions, retryIndex, sessionPhase)
+    ? missedQuestions.length - (retryIndex + 1)
+    : 0;
+
+  const meta = showNextMain
+    ? `${remaining} more ${pluralQuestion(remaining)} left tonight.`
+    : showBeginRetry
+      ? `${missedCount} missed ${pluralQuestion(missedCount)} ready for one more try.`
+      : showNextRetry
+        ? "Second try in progress."
         : "This set is done for tonight.";
+
+  const retryPrimaryLabel =
+    missedCount === 1 ? "Retry missed question" : `Retry missed questions (${missedCount})`;
 
   return (
     <ScreenContainer>
@@ -89,9 +112,13 @@ export function ResultScreen({ navigation }: Props) {
       <ResultBanner
         correct={isCorrect}
         body={
-          isCorrect
-            ? "You pulled the right idea back tonight."
-            : "That one needs another pass, but the recall still counts."
+          inRetry
+            ? isCorrect
+              ? "That second try landed."
+              : "Still worth another look later tonight or tomorrow."
+            : isCorrect
+              ? "You pulled the right idea back tonight."
+              : "That one needs another pass, but the recall still counts."
         }
         meta={meta}
       />
@@ -114,16 +141,26 @@ export function ResultScreen({ navigation }: Props) {
         </Text>
       </View>
 
-      {remaining > 0 ? (
+      {showNextMain ? (
         <>
           <PrimaryButton label={`Next question (${remaining} left)`} onPress={continueTonight} />
           <ActionButton label="Done for now" onPress={done} variant="secondary" />
         </>
-      ) : retryReady ? (
+      ) : showBeginRetry ? (
         <>
-          <PrimaryButton label="Try once more" onPress={retryTonight} />
-          <ActionButton label="Done for now" onPress={done} variant="secondary" />
+          <PrimaryButton label={retryPrimaryLabel} onPress={startRetryPass} />
+          <ActionButton label="Finish for tonight" onPress={done} variant="secondary" />
         </>
+      ) : showNextRetry ? (
+        <>
+          <PrimaryButton
+            label={`Next missed question (${retriesLeft} left)`}
+            onPress={continueRetry}
+          />
+          <ActionButton label="Finish for tonight" onPress={done} variant="secondary" />
+        </>
+      ) : showDoneOnly ? (
+        <PrimaryButton label="Done" onPress={done} />
       ) : (
         <PrimaryButton label="Done" onPress={done} />
       )}

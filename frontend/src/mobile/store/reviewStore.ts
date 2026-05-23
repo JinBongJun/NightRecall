@@ -3,11 +3,16 @@ import { create } from "zustand";
 import {
   clearReviewSession,
   localDateKey,
+  normalizePersistedReviewSession,
   saveReviewSession,
   type PersistedReviewSession,
 } from "../services/reviewSessionStorage";
 import { AnswerResponse, Question, Topic } from "../types/models";
 import { capSessionQuestions, mergeSessionQuestions } from "./reviewSessionLogic";
+import {
+  appendMissedQuestion,
+  type ReviewPhase,
+} from "./reviewRetryLogic";
 
 export { MAX_SESSION_QUESTIONS } from "./reviewSessionLogic";
 
@@ -17,8 +22,9 @@ type ReviewState = {
   sessionSource: "server" | "local" | null;
   tonightQuestion: Question | null;
   currentQuestion: Question | null;
-  retryQuestion: Question | null;
-  retryUsed: boolean;
+  sessionPhase: ReviewPhase;
+  missedQuestions: Question[];
+  retryIndex: number;
   currentQuestionMode: "normal" | "retry";
   pickableTopics: Topic[];
   selectedChoice: number | null;
@@ -29,8 +35,9 @@ type ReviewState = {
   setSessionQuestions: (questions: Question[]) => void;
   addSessionQuestions: (questions: Question[]) => void;
   advanceSessionQuestion: () => boolean;
-  queueRetryQuestion: (question: Question) => void;
-  consumeRetryQuestion: () => boolean;
+  recordMissedQuestion: (question: Question) => void;
+  beginRetryPass: () => boolean;
+  advanceRetryQuestion: () => boolean;
   resetSession: () => void;
   releaseActiveRecall: () => void;
   hydrateFromPersisted: (session: PersistedReviewSession) => void;
@@ -51,8 +58,9 @@ const defaultReviewState = {
   sessionSource: null,
   tonightQuestion: null,
   currentQuestion: null,
-  retryQuestion: null,
-  retryUsed: false,
+  sessionPhase: "main" as ReviewPhase,
+  missedQuestions: [] as Question[],
+  retryIndex: 0,
   currentQuestionMode: "normal" as const,
   pickableTopics: [],
   selectedChoice: null,
@@ -74,9 +82,10 @@ function snapshotFromState(state: ReviewState): PersistedReviewSession | null {
     sessionSource: state.sessionSource,
     tonightQuestion: state.tonightQuestion,
     currentQuestion: state.currentQuestion,
-    retryQuestion: state.retryQuestion,
-    retryUsed: state.retryUsed,
     currentQuestionMode: state.currentQuestionMode,
+    sessionPhase: state.sessionPhase,
+    missedQuestions: state.missedQuestions,
+    retryIndex: state.retryIndex,
   };
 }
 
@@ -101,8 +110,9 @@ export const useReviewStore = create<ReviewState>((set) => ({
         sessionSource: "local",
         tonightQuestion: sanitized[0] ?? null,
         currentQuestion: sanitized[0] ?? null,
-        retryQuestion: null,
-        retryUsed: false,
+        sessionPhase: "main",
+        missedQuestions: [],
+        retryIndex: 0,
         currentQuestionMode: "normal",
         selectedChoice: null,
         fillBlankAnswer: "",
@@ -141,6 +151,10 @@ export const useReviewStore = create<ReviewState>((set) => ({
   advanceSessionQuestion: () => {
     let advanced = false;
     set((state) => {
+      if (state.sessionPhase !== "main") {
+        return state;
+      }
+
       const nextIndex = state.sessionIndex + 1;
       if (nextIndex >= state.sessionQuestions.length) {
         return state;
@@ -159,39 +173,65 @@ export const useReviewStore = create<ReviewState>((set) => ({
     }
     return advanced;
   },
-  queueRetryQuestion: (question) => {
+  recordMissedQuestion: (question) => {
     set((state) => {
-      if (state.retryQuestion || state.retryUsed) {
+      if (state.sessionPhase !== "main") {
         return state;
       }
 
       return {
-        retryQuestion: question,
+        missedQuestions: appendMissedQuestion(state.missedQuestions, question),
       };
     });
     syncReviewSessionToStorage();
   },
-  consumeRetryQuestion: () => {
-    let consumed = false;
+  beginRetryPass: () => {
+    let started = false;
     set((state) => {
-      if (!state.retryQuestion || state.retryUsed) {
+      if (!state.missedQuestions.length || state.sessionPhase !== "main") {
         return state;
       }
 
-      consumed = true;
+      started = true;
       return {
-        currentQuestion: state.retryQuestion,
+        sessionPhase: "retry",
+        retryIndex: 0,
+        currentQuestion: state.missedQuestions[0] ?? null,
         currentQuestionMode: "retry",
-        retryQuestion: null,
-        retryUsed: true,
         selectedChoice: null,
         fillBlankAnswer: "",
       };
     });
-    if (consumed) {
+    if (started) {
       syncReviewSessionToStorage();
     }
-    return consumed;
+    return started;
+  },
+  advanceRetryQuestion: () => {
+    let advanced = false;
+    set((state) => {
+      if (state.sessionPhase !== "retry" || !state.missedQuestions.length) {
+        return state;
+      }
+
+      const nextIndex = state.retryIndex + 1;
+      if (nextIndex >= state.missedQuestions.length) {
+        return state;
+      }
+
+      advanced = true;
+      return {
+        retryIndex: nextIndex,
+        currentQuestion: state.missedQuestions[nextIndex] ?? null,
+        currentQuestionMode: "retry",
+        selectedChoice: null,
+        fillBlankAnswer: "",
+      };
+    });
+    if (advanced) {
+      syncReviewSessionToStorage();
+    }
+    return advanced;
   },
   resetSession: () => {
     set(() => ({
@@ -207,8 +247,9 @@ export const useReviewStore = create<ReviewState>((set) => ({
       sessionSource: null,
       tonightQuestion: null,
       currentQuestion: null,
-      retryQuestion: null,
-      retryUsed: false,
+      sessionPhase: "main",
+      missedQuestions: [],
+      retryIndex: 0,
       currentQuestionMode: "normal",
       selectedChoice: null,
       fillBlankAnswer: "",
@@ -220,15 +261,17 @@ export const useReviewStore = create<ReviewState>((set) => ({
     void clearReviewSession();
   },
   hydrateFromPersisted: (session) => {
+    const normalized = normalizePersistedReviewSession(session) ?? session;
     set({
-      sessionQuestions: capSessionQuestions(session.sessionQuestions),
-      sessionIndex: Math.min(session.sessionIndex, Math.max(0, session.sessionQuestions.length - 1)),
-      sessionSource: session.sessionSource,
-      tonightQuestion: session.tonightQuestion,
-      currentQuestion: session.currentQuestion,
-      retryQuestion: session.retryQuestion,
-      retryUsed: session.retryUsed,
-      currentQuestionMode: session.currentQuestionMode,
+      sessionQuestions: capSessionQuestions(normalized.sessionQuestions),
+      sessionIndex: Math.min(normalized.sessionIndex, Math.max(0, normalized.sessionQuestions.length - 1)),
+      sessionSource: normalized.sessionSource,
+      tonightQuestion: normalized.tonightQuestion,
+      currentQuestion: normalized.currentQuestion,
+      sessionPhase: normalized.sessionPhase,
+      missedQuestions: normalized.missedQuestions,
+      retryIndex: Math.min(normalized.retryIndex, Math.max(0, normalized.missedQuestions.length - 1)),
+      currentQuestionMode: normalized.currentQuestionMode,
       selectedChoice: null,
       fillBlankAnswer: "",
     });
@@ -244,6 +287,9 @@ export const useReviewStore = create<ReviewState>((set) => ({
       sessionSource: question ? "local" : null,
       tonightQuestion: question,
       currentQuestion: question,
+      sessionPhase: "main",
+      missedQuestions: [],
+      retryIndex: 0,
       currentQuestionMode: "normal",
       selectedChoice: null,
       fillBlankAnswer: "",

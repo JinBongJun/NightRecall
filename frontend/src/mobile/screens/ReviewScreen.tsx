@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -26,20 +26,31 @@ export function ReviewScreen({ navigation }: Props) {
   const currentQuestion = useReviewStore((state) => state.currentQuestion);
   const sessionQuestions = useReviewStore((state) => state.sessionQuestions);
   const sessionIndex = useReviewStore((state) => state.sessionIndex);
-  const currentQuestionMode = useReviewStore((state) => state.currentQuestionMode);
+  const sessionPhase = useReviewStore((state) => state.sessionPhase);
+  const missedQuestions = useReviewStore((state) => state.missedQuestions);
+  const retryIndex = useReviewStore((state) => state.retryIndex);
   const selectedChoice = useReviewStore((state) => state.selectedChoice);
   const fillBlankAnswer = useReviewStore((state) => state.fillBlankAnswer);
   const setSelectedChoice = useReviewStore((state) => state.setSelectedChoice);
   const setFillBlankAnswer = useReviewStore((state) => state.setFillBlankAnswer);
   const setResult = useReviewStore((state) => state.setResult);
-  const queueRetryQuestion = useReviewStore((state) => state.queueRetryQuestion);
+  const recordMissedQuestion = useReviewStore((state) => state.recordMissedQuestion);
   const startedAt = useRef(Date.now());
   const [submitting, setSubmitting] = useState(false);
+  const inRetry = sessionPhase === "retry";
   const totalQuestions = sessionQuestions.length ? sessionQuestions.length : 1;
-  const currentNumber = currentQuestionMode === "retry" ? totalQuestions : sessionQuestions.length ? sessionIndex + 1 : 1;
-  const progressRatio = currentQuestionMode === "retry" ? 1 : Math.min(1, Math.max(0, currentNumber / totalQuestions));
-  const remainingAfterCurrent = currentQuestionMode === "retry" ? 0 : Math.max(0, totalQuestions - currentNumber);
+  const totalMissed = missedQuestions.length;
+  const currentNumber = inRetry ? retryIndex + 1 : sessionQuestions.length ? sessionIndex + 1 : 1;
+  const progressDenominator = inRetry ? Math.max(totalMissed, 1) : totalQuestions;
+  const progressRatio = Math.min(1, Math.max(0, currentNumber / progressDenominator));
+  const remainingAfterCurrent = inRetry
+    ? Math.max(0, totalMissed - currentNumber)
+    : Math.max(0, totalQuestions - currentNumber);
   const isResurfaced = currentQuestion?.resurface_reason === "missed_before";
+
+  useEffect(() => {
+    startedAt.current = Date.now();
+  }, [currentQuestion?.id, sessionPhase, retryIndex, sessionIndex]);
 
   const canSubmit = useMemo(() => {
     if (!currentQuestion) return false;
@@ -83,8 +94,8 @@ export function ReviewScreen({ navigation }: Props) {
         selected_text: fillBlankAnswer || null,
         response_time_ms: Date.now() - startedAt.current,
       });
-      if (!result.is_correct && currentQuestionMode === "normal") {
-        queueRetryQuestion(currentQuestion);
+      if (!result.is_correct && sessionPhase === "main") {
+        recordMissedQuestion(currentQuestion);
       }
       setResult(result);
       navigation.navigate("Result");
@@ -114,11 +125,11 @@ export function ReviewScreen({ navigation }: Props) {
         <View style={styles.statusHeader}>
           <View style={styles.statusCopy}>
             <Text style={styles.statusEyebrow}>
-              {currentQuestionMode === "retry" ? "One more try" : isResurfaced ? "One more look" : "Tonight's recall"}
+              {inRetry ? "Second try" : isResurfaced ? "One more look" : "Tonight's recall"}
             </Text>
             <Text style={styles.statusTitle}>
-              {currentQuestionMode === "retry"
-                ? "A quick retry before you finish"
+              {inRetry
+                ? `Retry ${currentNumber} of ${totalMissed}`
                 : isResurfaced
                   ? "Take one more look at this idea"
                   : `Question ${currentNumber} of ${totalQuestions}`}
@@ -133,13 +144,13 @@ export function ReviewScreen({ navigation }: Props) {
         </View>
         <View style={styles.heroFooter}>
           <Text style={styles.heroFooterText}>
-            {currentQuestionMode === "retry"
-              ? "A quick retry for the one you missed"
+            {inRetry
+              ? "One more pass on what you missed"
               : isResurfaced
                 ? "A quick return to something worth another look"
-              : remainingAfterCurrent > 0
-              ? `${remainingAfterCurrent} question${remainingAfterCurrent > 1 ? "s" : ""} left after this`
-              : "Last question for tonight"}
+                : remainingAfterCurrent > 0
+                  ? `${remainingAfterCurrent} ${remainingAfterCurrent > 1 ? "questions" : "question"} left after this`
+                  : "Last question for tonight"}
           </Text>
         </View>
       </View>
@@ -148,8 +159,8 @@ export function ReviewScreen({ navigation }: Props) {
       <View style={styles.questionCard}>
         <View style={styles.questionMeta}>
           <Text style={styles.questionMetaText}>
-            {currentQuestionMode === "retry"
-              ? "One more try"
+            {inRetry
+              ? "Second try"
               : isResurfaced
                 ? "One more look"
               : currentQuestion.question_type === "fill_blank"
