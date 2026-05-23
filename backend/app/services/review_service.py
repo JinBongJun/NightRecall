@@ -13,7 +13,8 @@ from app.db.models.user import User
 from app.db.repositories.question_repository import QuestionRepository
 from app.db.repositories.review_repository import ReviewRepository
 from app.db.repositories.study_repository import StudyRepository
-from app.db.schemas.questions import QuestionGenerateResponse, QuestionOutput
+from app.db.schemas.questions import QuestionGenerateResponse
+from app.services.question_mapper import to_public_model
 from app.db.schemas.review import (
     AnswerSubmitRequest,
     AnswerSubmitResponse,
@@ -126,7 +127,7 @@ class ReviewService:
         )
         return ReviewQuestionResponse(
             mode="auto",
-            question=self._to_output(
+            question=to_public_model(
                 question,
                 resurface_reason="missed_before" if ranked[0].wrong_count > 0 else None,
             ),
@@ -146,7 +147,7 @@ class ReviewService:
         if not questions:
             return None
         questions.sort(key=lambda item: item.created_at, reverse=True)
-        return ReviewQuestionResponse(mode="picked", question=self._to_output(questions[0]))
+        return ReviewQuestionResponse(mode="picked", question=to_public_model(questions[0]))
 
     def list_saved_inputs(self, user_id: str, page: int = 1, limit: int = 20) -> SavedStudyInputsResponse:
         page = max(1, page)
@@ -397,19 +398,6 @@ class ReviewService:
             seen_dates.add(normalized_date)
             local_dates.append(normalized_date)
         return local_dates
-
-    @staticmethod
-    def _to_output(question, resurface_reason: str | None = None) -> QuestionOutput:
-        return QuestionOutput(
-            id=question.id,
-            question_type=question.question_type,
-            question_text=question.question_text,
-            choices=question.choices_json,
-            answer_index=question.answer_index,
-            answer_text=question.answer_text,
-            explanation=question.explanation,
-            resurface_reason=resurface_reason,
-        )
 
     @staticmethod
     def _raw_preview(raw_content: str) -> str:

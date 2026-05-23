@@ -673,7 +673,7 @@ export interface components {
         /** GenerateFromSavedInputResponse */
         GenerateFromSavedInputResponse: {
             /** Questions */
-            questions: components["schemas"]["QuestionOutput"][];
+            questions: components["schemas"]["QuestionPublic"][];
         };
         /** GenerateFromSavedTopicRequest */
         GenerateFromSavedTopicRequest: {
@@ -690,7 +690,7 @@ export interface components {
         /** GenerateFromSavedTopicResponse */
         GenerateFromSavedTopicResponse: {
             /** Questions */
-            questions: components["schemas"]["QuestionOutput"][];
+            questions: components["schemas"]["QuestionPublic"][];
         };
         /** GoogleSignInRequest */
         GoogleSignInRequest: {
@@ -763,7 +763,7 @@ export interface components {
         /** QuestionGenerateResponse */
         QuestionGenerateResponse: {
             /** Questions */
-            questions: components["schemas"]["QuestionOutput"][];
+            questions: components["schemas"]["QuestionPublic"][];
         };
         /** QuestionGenerationJobResponse */
         QuestionGenerationJobResponse: {
@@ -775,7 +775,7 @@ export interface components {
              */
             status: QuestionGenerationJobResponseStatus;
             /** Questions */
-            questions?: components["schemas"]["QuestionOutput"][] | null;
+            questions?: components["schemas"]["QuestionPublic"][] | null;
             /** Error Message */
             error_message?: string | null;
             /**
@@ -789,25 +789,22 @@ export interface components {
              */
             updated_at: string;
         };
-        /** QuestionOutput */
-        QuestionOutput: {
+        /**
+         * QuestionPublic
+         * @description Client-safe question payload without answers or explanations.
+         */
+        QuestionPublic: {
             /** Id */
             id: string;
             /**
              * Question Type
              * @enum {string}
              */
-            question_type: QuestionOutputQuestion_type;
+            question_type: QuestionPublicQuestion_type;
             /** Question Text */
             question_text: string;
             /** Choices */
             choices?: string[] | null;
-            /** Answer Index */
-            answer_index?: number | null;
-            /** Answer Text */
-            answer_text?: string | null;
-            /** Explanation */
-            explanation: string;
             /** Resurface Reason */
             resurface_reason?: "missed_before" | null;
         };
@@ -852,7 +849,7 @@ export interface components {
              * @enum {string}
              */
             mode: ReviewQuestionResponseMode;
-            question: components["schemas"]["QuestionOutput"];
+            question: components["schemas"]["QuestionPublic"];
         };
         /** SavedStudyInputDetailResponse */
         SavedStudyInputDetailResponse: {
@@ -2287,7 +2284,7 @@ export enum QuestionGenerationJobResponseStatus {
     succeeded = "succeeded",
     failed = "failed"
 }
-export enum QuestionOutputQuestion_type {
+export enum QuestionPublicQuestion_type {
     mcq = "mcq",
     true_false = "true_false",
     fill_blank = "fill_blank"

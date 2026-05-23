@@ -31,12 +31,13 @@ type GeneratedQuestionsResponse = {
 
 const QUESTION_GENERATION_TIMEOUT_MS = 60000;
 
-function normalizeQuestion(question: components["schemas"]["QuestionOutput"]): Question {
+function normalizeQuestion(question: components["schemas"]["QuestionPublic"]): Question {
   return {
-    ...question,
+    id: question.id,
+    question_type: question.question_type as Question["question_type"],
+    question_text: question.question_text,
     choices: question.choices ?? null,
-    answer_index: question.answer_index ?? null,
-    answer_text: question.answer_text ?? null,
+    resurface_reason: question.resurface_reason ?? null,
   };
 }
 

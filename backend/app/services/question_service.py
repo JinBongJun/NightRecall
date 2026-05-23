@@ -9,6 +9,7 @@ from app.db.repositories.question_repository import QuestionRepository
 from app.db.repositories.study_repository import StudyRepository
 from app.db.schemas.questions import QuestionGenerateRequest, QuestionGenerateResponse, QuestionOutput
 from app.services.llm_service import LLMService
+from app.services.question_mapper import to_public_outputs
 from app.services.usage_limit_service import UsageLimitService
 from app.utils.ids import make_id
 
@@ -80,7 +81,7 @@ class QuestionService:
         self.question_repository.add_schedules(schedules)
         limit_service.record_question_generation(user_id, len(generated))
         self.db.commit()
-        return QuestionGenerateResponse(questions=outputs)
+        return QuestionGenerateResponse(questions=to_public_outputs(outputs))
 
     def generate_questions_for_topics(self, user_id: str, topic_id: str, selected_topic_ids: list[str], count: int) -> QuestionGenerateResponse:
         topic = self.study_repository.get_topic(topic_id)
@@ -155,7 +156,7 @@ class QuestionService:
         self.question_repository.add_schedules(schedules)
         limit_service.record_question_generation(user_id, len(generated))
         self.db.commit()
-        return QuestionGenerateResponse(questions=outputs)
+        return QuestionGenerateResponse(questions=to_public_outputs(outputs))
 
     def generate_questions_for_study_input(self, user_id: str, study_input_id: str, selected_topic_ids: list[str], count: int) -> QuestionGenerateResponse:
         study_input = self.study_repository.get_input(study_input_id)
@@ -226,7 +227,7 @@ class QuestionService:
         self.question_repository.add_schedules(schedules)
         limit_service.record_question_generation(user_id, len(generated))
         self.db.commit()
-        return QuestionGenerateResponse(questions=outputs)
+        return QuestionGenerateResponse(questions=to_public_outputs(outputs))
 
     def _assert_generation_capacity(self, user_id: str, requested_count: int) -> UsageLimitService:
         user = self.db.get(User, user_id)

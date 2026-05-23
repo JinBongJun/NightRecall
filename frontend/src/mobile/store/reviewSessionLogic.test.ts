@@ -8,9 +8,6 @@ const sampleQuestion = (id: string): Question => ({
   question_text: `Question ${id}`,
   question_type: "mcq",
   choices: ["A", "B"],
-  answer_index: 0,
-  answer_text: null,
-  explanation: "Because.",
 });
 
 describe("reviewSessionLogic", () => {

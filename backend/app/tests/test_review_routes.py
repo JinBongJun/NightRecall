@@ -46,6 +46,54 @@ def test_from_topic_requires_question_owner_scope(client) -> None:
     assert response.status_code == 404
 
 
+def test_from_topic_returns_public_question_without_answers(client) -> None:
+    test_client, db = client
+    db.add(
+        StudyInput(
+            id="si_public",
+            user_id="usr_test",
+            input_type="notes",
+            raw_content="This is a sufficiently long note for public question coverage.",
+        )
+    )
+    db.add(
+        StudyTopic(
+            id="tp_public",
+            study_input_id="si_public",
+            user_id="usr_test",
+            topic_text="Public topic",
+            is_starred=True,
+        )
+    )
+    db.add(
+        Question(
+            id="q_public",
+            user_id="usr_test",
+            study_input_id="si_public",
+            study_topic_id="tp_public",
+            question_type="mcq",
+            question_text="Which choice is correct?",
+            choices_json=["A", "B", "C", "D"],
+            answer_index=1,
+            answer_text=None,
+            explanation="Because B is correct.",
+            source_hash="hash_public",
+            created_at=datetime(2026, 4, 20, 12, 0, tzinfo=UTC),
+        )
+    )
+    db.commit()
+
+    response = test_client.post("/v1/review/from-topic", json={"topic_id": "tp_public"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    question = payload["question"]
+    assert question["id"] == "q_public"
+    assert "answer_index" not in question
+    assert "answer_text" not in question
+    assert "explanation" not in question
+
+
 def test_saved_input_detail_returns_only_saved_points(client) -> None:
     test_client, db = client
     db.add(
@@ -126,3 +174,5 @@ def test_submit_answer_keeps_working_after_timezone_stats_refactor(client) -> No
     payload = response.json()
     assert payload["is_correct"] is True
     assert payload["current_streak"] == 1
+    assert payload["correct_index"] == 1
+    assert payload["explanation"] == "Because B is correct."

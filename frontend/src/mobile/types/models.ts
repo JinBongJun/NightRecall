@@ -57,9 +57,6 @@ export type Question = {
   question_type: QuestionType;
   question_text: string;
   choices: string[] | null;
-  answer_index: number | null;
-  answer_text: string | null;
-  explanation: string;
   resurface_reason?: "missed_before" | null;
 };
 

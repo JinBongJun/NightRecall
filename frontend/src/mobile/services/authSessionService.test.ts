@@ -99,9 +99,6 @@ describe("authSessionService", () => {
       question_type: "mcq",
       question_text: "Question?",
       choices: ["A", "B"],
-      answer_index: 0,
-      answer_text: null,
-      explanation: "Explanation",
     });
     useStatsStore.getState().setStats({ streak: 4, totalAnswered: 9 });
     useReminderStore.getState().setReminder("21:15", true);

@@ -3,7 +3,7 @@ from typing import Literal
 from pydantic import Field, model_validator
 
 from app.db.schemas.common import APIModel
-from app.db.schemas.questions import QuestionGenerateResponse, QuestionOutput
+from app.db.schemas.questions import QuestionGenerateResponse, QuestionPublic
 from app.db.schemas.study_inputs import SourceKind, StudyInputType, TopicResponse
 
 
@@ -12,7 +12,7 @@ ReviewMode = Literal["auto", "picked"]
 
 class ReviewQuestionResponse(APIModel):
     mode: ReviewMode
-    question: QuestionOutput
+    question: QuestionPublic
 
 
 class TonightTopicsResponse(APIModel):

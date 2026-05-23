@@ -16,6 +16,8 @@ class QuestionGenerateRequest(APIModel):
 
 
 class QuestionOutput(APIModel):
+    """Internal full question payload for LLM validation and persistence."""
+
     id: str
     question_type: QuestionType
     question_text: str = Field(min_length=1, max_length=180)
@@ -48,14 +50,35 @@ class QuestionOutput(APIModel):
         return self
 
 
+class QuestionPublic(APIModel):
+    """Client-safe question payload without answers or explanations."""
+
+    id: str
+    question_type: QuestionType
+    question_text: str = Field(min_length=1, max_length=180)
+    choices: list[str] | None = None
+    resurface_reason: Literal["missed_before"] | None = None
+
+    @field_validator("choices")
+    @classmethod
+    def validate_choices(cls, value: list[str] | None) -> list[str] | None:
+        if value is None:
+            return value
+        if not 2 <= len(value) <= 4:
+            raise ValueError("mcq choices must contain 2 to 4 items")
+        if len(set(value)) != len(value):
+            raise ValueError("mcq choices must be unique")
+        return value
+
+
 class QuestionGenerateResponse(APIModel):
-    questions: list[QuestionOutput]
+    questions: list[QuestionPublic]
 
 
 class QuestionGenerationJobResponse(APIModel):
     job_id: str
     status: QuestionGenerationJobStatus
-    questions: list[QuestionOutput] | None = None
+    questions: list[QuestionPublic] | None = None
     error_message: str | None = None
     created_at: datetime
     updated_at: datetime
