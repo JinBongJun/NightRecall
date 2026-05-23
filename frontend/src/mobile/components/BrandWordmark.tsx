@@ -36,7 +36,7 @@ export function BrandWordmark({ size = "medium", showBetaBadge = false, badgeLab
   );
 }
 
-function createStyles({ colors, typography }: ThemedStyleContext) {
+function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   return StyleSheet.create({
   wrap: {
     flexDirection: "row",
@@ -48,11 +48,11 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,253,248,0.84)",
+    backgroundColor: colors.surfaceLow,
     borderWidth: 1,
-    borderColor: "rgba(15,76,63,0.12)",
+    borderColor: colors.line,
     shadowColor: colors.shadow,
-    shadowOpacity: 0.05,
+    shadowOpacity: isDark ? 0.12 : 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
   },
@@ -104,9 +104,9 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: "rgba(18,67,67,0.12)",
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: "rgba(18,67,67,0.18)",
+    borderColor: isDark ? "rgba(114,168,134,0.35)" : "rgba(15,76,63,0.16)",
   },
   badgeText: {
     color: colors.primary,

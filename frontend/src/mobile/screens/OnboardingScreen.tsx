@@ -19,6 +19,8 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { BrandWordmark } from "../components/BrandWordmark";
+import { GoogleSignInButton } from "../components/GoogleSignInButton";
+import { PrimaryButton } from "../components/PrimaryButton";
 import { persistSession } from "../services/authSessionService";
 import { getGoogleIdToken, isGoogleSignInCancelled } from "../services/googleAuthService";
 import { syncReminderWithServer } from "../services/syncReminderSettings";
@@ -30,7 +32,6 @@ import { RootStackParamList } from "../types/navigation";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Onboarding">;
 
-const GOOGLE_G_LOGO = "https://developers.google.com/static/identity/images/g-logo.png";
 const BRAND_LOGO = require("../../../assets/logo.png");
 
 export function OnboardingScreen({ navigation }: Props) {
@@ -238,18 +239,11 @@ export function OnboardingScreen({ navigation }: Props) {
                 <View style={styles.heroLogoShell}>
                   <Image source={BRAND_LOGO} style={styles.heroLogo} resizeMode="contain" />
                 </View>
-                <View style={styles.heroNodeRow}>
-                  <OrbitNode />
-                  <View style={styles.heroNodeLine} />
-                  <OrbitNode />
-                  <View style={[styles.heroNodeLine, styles.heroNodeLineShort]} />
-                  <OrbitNode />
-                </View>
               </View>
 
               <View style={styles.copyCenter}>
                 <Text style={styles.overline}>Nightly recall</Text>
-                <Text style={[styles.posterTitle, { fontSize: typeScale.title, lineHeight: typeScale.titleLine }]}>
+                <Text style={[styles.posterTitle, styles.posterTitleHero, { fontSize: typeScale.title, lineHeight: typeScale.titleLine }]}>
                   One question{"\n"}before sleep
                 </Text>
                 <Text style={[styles.posterBody, { fontSize: typeScale.body, lineHeight: typeScale.bodyLine }]}>
@@ -283,8 +277,6 @@ export function OnboardingScreen({ navigation }: Props) {
             >
               <View style={[styles.flowArtwork, compact && styles.flowArtworkCompact, small && styles.flowArtworkSmall]}>
                 <View style={styles.flowGlow} />
-                <View style={styles.flowHalo} />
-                <View style={styles.flowOrbit} />
 
                 <View style={[styles.flowRow, small && styles.flowRowSmall]}>
                   <FlowMiniCard
@@ -330,14 +322,13 @@ export function OnboardingScreen({ navigation }: Props) {
           </View>
 
           <View style={styles.actions}>
-            <Pressable style={styles.primaryButton} onPress={handlePrimary} disabled={loading}>
-              <Text style={styles.primaryButtonText}>{loading ? "Getting ready..." : "Get Started"}</Text>
-            </Pressable>
+            <PrimaryButton
+              label={loading ? "Getting ready..." : "Get Started"}
+              onPress={handlePrimary}
+              disabled={loading}
+            />
 
-            <Pressable style={styles.googleButton} onPress={() => void startGoogleFlow()}>
-              <Image source={{ uri: GOOGLE_G_LOGO }} style={styles.googleLogo} />
-              <Text style={styles.googleText}>Continue with Google</Text>
-            </Pressable>
+            <GoogleSignInButton onPress={() => void startGoogleFlow()} disabled={loading} />
           </View>
         </View>
       </View>
@@ -359,12 +350,13 @@ function FlowMiniCard({
   compact: boolean;
 }) {
   const styles = useThemedStyles(createStyles);
-  const { colors } = useAppTheme();
+  const { colors, isDark } = useAppTheme();
+  const iconColor = active ? (isDark ? colors.primary : colors.onPrimary) : colors.primary;
 
   return (
     <View style={[styles.flowMiniCard, active && styles.flowMiniCardActive, compact && styles.flowMiniCardCompact]}>
       <View style={[styles.flowMiniIconBubble, active && styles.flowMiniIconBubbleActive, compact && styles.flowMiniIconBubbleCompact]}>
-        <MaterialIcons name={icon} size={compact ? 18 : 20} color={colors.primary} />
+        <MaterialIcons name={icon} size={compact ? 18 : 20} color={iconColor} />
       </View>
       <Text style={[styles.flowMiniStep, active && styles.flowMiniStepActive]}>{step}</Text>
       <Text style={[styles.flowMiniTitle, active && styles.flowMiniTitleActive, compact && styles.flowMiniTitleCompact]}>{title}</Text>
@@ -411,18 +403,20 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     justifyContent: "center",
   },
   posterBlock: {
-    gap: 14,
+    gap: 20,
   },
   heroImage: {
     width: "100%",
     aspectRatio: 1.4,
     borderRadius: theme.radius.xl,
     overflow: "hidden",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
     shadowColor: colors.shadow,
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: isDark ? 0.2 : 0.08,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
     alignItems: "center",
     justifyContent: "center",
   },
@@ -437,7 +431,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     width: 160,
     height: 160,
     borderRadius: 999,
-    backgroundColor: "rgba(255,248,236,0.1)",
+    backgroundColor: isDark ? "rgba(114,168,134,0.12)" : "rgba(213,230,220,0.35)",
     top: -32,
     right: -18,
   },
@@ -446,7 +440,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     width: 100,
     height: 100,
     borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: isDark ? "rgba(114,168,134,0.08)" : "rgba(213,230,220,0.28)",
     left: -16,
     bottom: 12,
   },
@@ -456,7 +450,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     height: 200,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: isDark ? "rgba(114,168,134,0.2)" : "rgba(15,76,63,0.1)",
     top: -56,
     right: -64,
   },
@@ -464,11 +458,11 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     width: 120,
     height: 120,
     borderRadius: 999,
-    backgroundColor: "rgba(255,252,247,0.94)",
+    backgroundColor: colors.surfaceLow,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.16)",
+    borderColor: colors.line,
     overflow: "hidden",
     padding: 16,
   },
@@ -476,30 +470,8 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     width: "100%",
     height: "100%",
   },
-  heroNodeRow: {
-    position: "absolute",
-    bottom: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  heroNodeLine: {
-    width: 46,
-    height: 2,
-    borderRadius: 999,
-    backgroundColor: "rgba(255,248,236,0.38)",
-  },
-  heroNodeLineShort: {
-    width: 26,
-  },
-  heroNode: {
-    width: 12,
-    height: 12,
-    borderRadius: 999,
-    backgroundColor: colors.surface,
-  },
   copyCenter: {
-    gap: 8,
+    gap: 10,
     alignItems: "center",
   },
   overline: {
@@ -508,10 +480,13 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     fontWeight: "700",
   },
   posterTitle: {
-    color: colors.primary,
+    color: colors.text,
     fontWeight: "800",
     textAlign: "center",
     letterSpacing: -1.2,
+  },
+  posterTitleHero: {
+    color: colors.text,
   },
   posterTitleDark: {
     color: colors.text,
@@ -530,7 +505,9 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
-    backgroundColor: isDark ? colors.surfaceLow : "rgba(255,253,248,0.42)",
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
   },
   flowArtworkCompact: {
     height: 128,
@@ -542,25 +519,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     position: "absolute",
     inset: 0,
     borderRadius: theme.radius.xl,
-    backgroundColor: isDark ? "rgba(114,168,134,0.12)" : "rgba(213,230,220,0.18)",
-  },
-  flowHalo: {
-    position: "absolute",
-    width: 180,
-    height: 120,
-    borderRadius: 999,
-    backgroundColor: isDark ? "rgba(114,168,134,0.16)" : "rgba(213,230,220,0.2)",
-    top: 18,
-  },
-  flowOrbit: {
-    position: "absolute",
-    width: 240,
-    height: 240,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "rgba(15,76,63,0.08)",
-    top: -90,
-    right: -60,
+    backgroundColor: isDark ? "rgba(114,168,134,0.08)" : "rgba(213,230,220,0.14)",
   },
   flowRow: {
     width: "100%",
@@ -576,20 +535,19 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   },
   flowMiniCard: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceLow,
     borderRadius: theme.radius.lg,
     minHeight: 88,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    borderWidth: 1,
+    borderColor: colors.line,
   },
   flowMiniCardActive: {
-    backgroundColor: isDark ? colors.primaryContainer : colors.primary,
-    minHeight: 104,
-    transform: [{ translateY: -4 }],
+    backgroundColor: isDark ? colors.primarySoft : colors.primary,
+    borderColor: isDark ? "rgba(114,168,134,0.45)" : colors.primary,
+    minHeight: 96,
+    transform: [{ translateY: -2 }],
   },
   flowMiniCardCompact: {
     minHeight: 80,
@@ -620,7 +578,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     marginBottom: 6,
   },
   flowMiniStepActive: {
-    color: "rgba(255,255,255,0.55)",
+    color: isDark ? colors.primary : "rgba(255,255,255,0.65)",
   },
   flowMiniTitle: {
     color: colors.text,
@@ -629,7 +587,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     fontWeight: "700",
   },
   flowMiniTitleActive: {
-    color: colors.onPrimary,
+    color: isDark ? colors.primary : colors.onPrimary,
   },
   flowMiniTitleCompact: {
     fontSize: 13,
@@ -637,7 +595,7 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
   },
   footer: {
     paddingHorizontal: theme.spacing.md,
-    paddingTop: 4,
+    paddingTop: 8,
     backgroundColor: colors.background,
   },
   dots: {
@@ -645,60 +603,20 @@ function createStyles({ colors, typography, isDark }: ThemedStyleContext) {
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 999,
-    backgroundColor: "rgba(192,200,199,0.55)",
+    backgroundColor: colors.surfaceHigh,
   },
   dotActive: {
     backgroundColor: colors.primary,
+    width: 20,
   },
   actions: {
-    gap: 10,
-  },
-  primaryButton: {
-    height: 48,
-    backgroundColor: colors.primary,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: colors.shadow,
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
-  },
-  primaryButtonText: {
-    color: colors.onPrimary,
-    fontSize: 13,
-    fontWeight: "800",
-  },
-  googleButton: {
-    height: 48,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-  },
-  googleLogo: {
-    width: 18,
-    height: 18,
-  },
-  googleText: {
-    color: "#1F1F1F",
-    fontSize: 13,
-    fontWeight: "600",
+    gap: 12,
   },
 });
-}
-
-function OrbitNode() {
-  const styles = useThemedStyles(createStyles);
-  return <View style={styles.heroNode} />;
 }
