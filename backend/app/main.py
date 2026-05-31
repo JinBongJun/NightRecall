@@ -1,72 +1,22 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import inspect, text
+from fastapi.responses import JSONResponse
 
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.core.sentry import SentryConfig, init_sentry
 from app.db.base import Base
-from app.db.models import (
-    AnalyticsEvent,
-    Question,
-    QuestionSchedule,
-    QuestionGenerationJob,
-    RateLimitBucket,
-    ReviewEvent,
-    OpsEvent,
-    StudyInput,
-    StudyTopic,
-    StudyInputExtractJob,
-    User,
-    UserIdentity,
-    UserSession,
-    WaitlistSignup,
-)
 from app.db.session import engine
 from app.middleware.ops_middleware import ops_middleware
-
-
-def ensure_runtime_schema() -> None:
-    inspector = inspect(engine)
-    table_names = inspector.get_table_names()
-    statements: list[str] = []
-
-    if "study_inputs" in table_names:
-        columns = {column["name"] for column in inspector.get_columns("study_inputs")}
-        if "source_kind" not in columns:
-            statements.append("ALTER TABLE study_inputs ADD COLUMN source_kind VARCHAR(24)")
-        if "source_preview_text" not in columns:
-            statements.append("ALTER TABLE study_inputs ADD COLUMN source_preview_text TEXT")
-        if "source_image_ref" not in columns:
-            statements.append("ALTER TABLE study_inputs ADD COLUMN source_image_ref VARCHAR(128)")
-
-    if "users" in table_names:
-        user_columns = {column["name"] for column in inspector.get_columns("users")}
-        if "display_name" not in user_columns:
-            statements.append("ALTER TABLE users ADD COLUMN display_name VARCHAR(255)")
-        if "avatar_url" not in user_columns:
-            statements.append("ALTER TABLE users ADD COLUMN avatar_url VARCHAR(1024)")
-
-    if "review_events" in table_names:
-        review_columns = {column["name"] for column in inspector.get_columns("review_events")}
-        if "attempt_kind" not in review_columns:
-            statements.append("ALTER TABLE review_events ADD COLUMN attempt_kind VARCHAR(24) DEFAULT 'ritual_main'")
-
-    if not statements:
-        return
-
-    with engine.begin() as connection:
-        for statement in statements:
-            connection.execute(text(statement))
+from app.services.health_service import check_database
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
-    ensure_runtime_schema()
     yield
 
 
@@ -102,8 +52,16 @@ def create_app() -> FastAPI:
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 
     @app.get("/health", tags=["health"])
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
+    def health() -> JSONResponse:
+        database_ok = check_database()
+        payload = {
+            "status": "ok" if database_ok else "degraded",
+            "database": "ok" if database_ok else "unavailable",
+        }
+        return JSONResponse(
+            status_code=status.HTTP_200_OK if database_ok else status.HTTP_503_SERVICE_UNAVAILABLE,
+            content=payload,
+        )
 
     return app
 

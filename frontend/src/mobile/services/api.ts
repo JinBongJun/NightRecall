@@ -1,6 +1,7 @@
 import axios from "axios";
 import Constants from "expo-constants";
 
+import { retryAfterUnauthorizedRefresh } from "./apiUnauthorizedRetry";
 import { refreshAccessToken } from "./refreshAccessToken";
 import { useAuthStore } from "../store/authStore";
 import type { components } from "../types/generated-api";
@@ -54,24 +55,23 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config as typeof error.config & { _retry?: boolean };
-    if (error.response?.status !== 401 || originalRequest?._retry) {
+    if (!originalRequest) {
       return Promise.reject(error);
     }
-
-    const auth = useAuthStore.getState();
-    if (!auth.refreshToken || !auth.userId || !auth.provider) {
-      return Promise.reject(error);
-    }
-
-    originalRequest._retry = true;
 
     try {
-      const refreshed = await refreshAccessToken(postRefresh);
-      originalRequest.headers = originalRequest.headers ?? {};
-      originalRequest.headers.Authorization = `Bearer ${refreshed.accessToken}`;
-      return apiClient(originalRequest);
-    } catch (refreshError) {
-      return Promise.reject(refreshError);
+      return await retryAfterUnauthorizedRefresh(
+        originalRequest,
+        error,
+        {
+          getCredentials: () => useAuthStore.getState(),
+          refreshAccessToken,
+          postRefresh: postRefresh,
+        },
+        (config) => apiClient.request(config),
+      );
+    } catch (retryError) {
+      return Promise.reject(retryError);
     }
   },
 );

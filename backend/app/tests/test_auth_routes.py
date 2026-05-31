@@ -115,6 +115,47 @@ def test_refresh_with_expired_access_token(open_auth_client: TestClient) -> None
     assert me_response.json()["user"]["id"] == user_id
 
 
+def test_protected_route_succeeds_after_refresh_when_access_token_expired(open_auth_client: TestClient) -> None:
+    guest_response = open_auth_client.post(
+        "/v1/users/guest/session",
+        json={"timezone": "UTC", "locale": "en"},
+    )
+    assert guest_response.status_code == 201
+    tokens = guest_response.json()["tokens"]
+    user_id = guest_response.json()["user"]["id"]
+
+    settings = get_settings()
+    expired_access = jwt.encode(
+        {
+            "sub": user_id,
+            "type": "access",
+            "exp": datetime.now(UTC) - timedelta(minutes=1),
+        },
+        settings.jwt_secret_key,
+        algorithm="HS256",
+    )
+
+    stats_with_expired = open_auth_client.get(
+        "/v1/stats",
+        headers={"Authorization": f"Bearer {expired_access}"},
+    )
+    assert stats_with_expired.status_code == 401
+
+    refresh_response = open_auth_client.post(
+        "/v1/users/refresh",
+        json={"refresh_token": tokens["refresh_token"]},
+    )
+    assert refresh_response.status_code == 200
+    refreshed = refresh_response.json()
+
+    stats_with_fresh = open_auth_client.get(
+        "/v1/stats",
+        headers={"Authorization": f"Bearer {refreshed['access_token']}"},
+    )
+    assert stats_with_fresh.status_code == 200
+    assert stats_with_fresh.json()["current_streak"] == 0
+
+
 def test_refresh_rejects_invalid_refresh_token(open_auth_client: TestClient) -> None:
     settings = get_settings()
     invalid_refresh = jwt.encode(
