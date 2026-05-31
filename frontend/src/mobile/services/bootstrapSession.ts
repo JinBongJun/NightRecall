@@ -5,6 +5,7 @@ type BootstrapSessionDependencies = {
   fetchPlan: () => Promise<{ plan: PlanName }>;
   setPlan: (plan: PlanName) => void;
   finishBootstrap: () => void;
+  beforeReady?: () => Promise<void>;
 };
 
 type RestoredSession = Awaited<ReturnType<BootstrapSessionDependencies["restoreSession"]>>;
@@ -14,6 +15,7 @@ export async function bootstrapSession({
   fetchPlan,
   setPlan,
   finishBootstrap,
+  beforeReady,
 }: BootstrapSessionDependencies): Promise<RestoredSession> {
   let session: RestoredSession = null;
   try {
@@ -27,6 +29,14 @@ export async function bootstrapSession({
       setPlan(entitlements.plan);
     } catch {
       // Keep defaults if the contract is unavailable.
+    }
+
+    if (beforeReady) {
+      try {
+        await beforeReady();
+      } catch {
+        // Keep the restored session if pre-ready hydration fails.
+      }
     }
   } finally {
     finishBootstrap();

@@ -1,26 +1,30 @@
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 
-import { navigationRef } from "../navigation/navigationRef";
+import { navigateFromNightlyReminderTap } from "../navigation/navigateFromNightlyReminder";
+import { NIGHTLY_REMINDER_KEY } from "../utils/nightlyReminderNavigation";
 
-const NIGHTLY_REMINDER_KEY = "nightly-reminder";
+function isNightlyReminderResponse(response: Notifications.NotificationResponse) {
+  return response.notification.request.content.data?.reminderKey === NIGHTLY_REMINDER_KEY;
+}
 
 export function useReminderNotificationTap() {
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      const reminderKey = response.notification.request.content.data?.reminderKey;
-      if (reminderKey !== NIGHTLY_REMINDER_KEY) {
+    const handleResponse = (response: Notifications.NotificationResponse) => {
+      if (!isNightlyReminderResponse(response)) {
         return;
       }
 
-      if (!navigationRef.isReady()) {
-        return;
-      }
+      navigateFromNightlyReminderTap();
+      void Notifications.clearLastNotificationResponseAsync();
+    };
 
-      navigationRef.navigate("MainTabs", {
-        screen: "HomeTab",
-        params: { screen: "Home" },
-      });
+    const subscription = Notifications.addNotificationResponseReceivedListener(handleResponse);
+
+    void Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (response) {
+        handleResponse(response);
+      }
     });
 
     return () => subscription.remove();

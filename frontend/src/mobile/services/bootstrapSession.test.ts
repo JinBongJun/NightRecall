@@ -40,6 +40,37 @@ describe("bootstrapSession", () => {
     expect(finishBootstrap).toHaveBeenCalledTimes(1);
   });
 
+  it("runs beforeReady before finishing bootstrap", async () => {
+    const finishBootstrap = vi.fn();
+    const beforeReady = vi.fn().mockResolvedValue(undefined);
+    const callOrder: string[] = [];
+
+    beforeReady.mockImplementation(async () => {
+      callOrder.push("beforeReady");
+    });
+    finishBootstrap.mockImplementation(() => {
+      callOrder.push("finishBootstrap");
+    });
+
+    await bootstrapSession({
+      restoreSession: vi.fn().mockResolvedValue({
+        userId: "user-1",
+        timezone: "Asia/Seoul",
+        authMode: "signed_in",
+        accessToken: "access",
+        refreshToken: "refresh",
+        provider: "google",
+      }),
+      fetchPlan: vi.fn().mockResolvedValue({ plan: "free" }),
+      setPlan: vi.fn(),
+      finishBootstrap,
+      beforeReady,
+    });
+
+    expect(beforeReady).toHaveBeenCalledTimes(1);
+    expect(callOrder).toEqual(["beforeReady", "finishBootstrap"]);
+  });
+
   it("still finishes bootstrap when entitlements fail", async () => {
     const finishBootstrap = vi.fn();
     const setPlan = vi.fn();

@@ -33,6 +33,7 @@ export function useSessionBootstrap() {
       const session = await bootstrapSession({
         restoreSession: restorePersistedSession,
         fetchPlan: fetchEntitlements,
+        beforeReady: restoreReviewSession,
         setPlan: (plan) => {
           if (active) {
             setPlan(plan);
@@ -47,12 +48,6 @@ export function useSessionBootstrap() {
 
       if (!active || !session) {
         return;
-      }
-
-      try {
-        await restoreReviewSession();
-      } catch {
-        // Keep the nightly flow moving if local recall state cannot be restored.
       }
 
       try {
