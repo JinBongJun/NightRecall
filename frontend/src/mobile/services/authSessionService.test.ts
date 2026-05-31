@@ -12,6 +12,12 @@ const sessionStorageMocks = vi.hoisted(() => ({
   saveSession: vi.fn(),
 }));
 
+vi.mock("expo-secure-store", () => ({
+  getItemAsync: vi.fn(),
+  setItemAsync: vi.fn(),
+  deleteItemAsync: vi.fn(),
+}));
+
 vi.mock("./sessionStorage", () => ({
   clearSessionStorage: sessionStorageMocks.clearSessionStorage,
   loadSession: sessionStorageMocks.loadSession,
