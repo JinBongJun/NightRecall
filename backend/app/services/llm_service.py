@@ -134,9 +134,6 @@ class LLMService:
                 "explanation": parsed["explanation"],
             }
         )
-        # We intentionally do not ship free-form or fill-in-the-blank answers yet.
-        if validated.question_type == "fill_blank":
-            raise ValueError("fill_blank_disabled")
         logger.info(
             "question_generation: provider_success topic_len=%s variant_seed=%s type=%s",
             len(topic or ""),

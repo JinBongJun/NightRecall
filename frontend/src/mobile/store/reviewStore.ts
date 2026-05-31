@@ -34,7 +34,6 @@ type ReviewState = {
   currentQuestionMode: "normal" | "retry";
   pickableTopics: Topic[];
   selectedChoice: number | null;
-  fillBlankAnswer: string;
   result: AnswerResponse | null;
   loading: boolean;
   error: string | null;
@@ -51,7 +50,6 @@ type ReviewState = {
   setServerTonightQuestion: (question: Question | null) => void;
   setPickableTopics: (topics: Topic[]) => void;
   setSelectedChoice: (choice: number | null) => void;
-  setFillBlankAnswer: (value: string) => void;
   setResult: (result: AnswerResponse | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -71,7 +69,6 @@ const defaultReviewState = {
   currentQuestionMode: "normal" as const,
   pickableTopics: [],
   selectedChoice: null,
-  fillBlankAnswer: "",
   result: null,
   loading: false,
   error: null,
@@ -125,7 +122,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
         retryIndex: 0,
         currentQuestionMode: "normal",
         selectedChoice: null,
-        fillBlankAnswer: "",
       };
     });
     syncReviewSessionToStorage();
@@ -153,7 +149,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
         currentQuestion: nextQuestions[nextIndex] ?? null,
         currentQuestionMode: "normal",
         selectedChoice: null,
-        fillBlankAnswer: "",
       };
     });
     syncReviewSessionToStorage();
@@ -175,7 +170,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
         currentQuestion: state.sessionQuestions[nextIndex] ?? null,
         currentQuestionMode: "normal",
         selectedChoice: null,
-        fillBlankAnswer: "",
       };
     });
     if (advanced) {
@@ -209,7 +203,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
         currentQuestion: state.missedQuestions[0] ?? null,
         currentQuestionMode: "retry",
         selectedChoice: null,
-        fillBlankAnswer: "",
       };
     });
     if (started) {
@@ -235,7 +228,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
         currentQuestion: state.missedQuestions[nextIndex] ?? null,
         currentQuestionMode: "retry",
         selectedChoice: null,
-        fillBlankAnswer: "",
       };
     });
     if (advanced) {
@@ -263,7 +255,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
       retryIndex: 0,
       currentQuestionMode: "normal",
       selectedChoice: null,
-      fillBlankAnswer: "",
       result: state.result,
       loading: state.loading,
       error: state.error,
@@ -285,7 +276,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
       retryIndex: Math.min(normalized.retryIndex, Math.max(0, normalized.missedQuestions.length - 1)),
       currentQuestionMode: normalized.currentQuestionMode,
       selectedChoice: null,
-      fillBlankAnswer: "",
     });
   },
   resetReview: () => {
@@ -305,7 +295,6 @@ export const useReviewStore = create<ReviewState>((set) => ({
       retryIndex: 0,
       currentQuestionMode: "normal",
       selectedChoice: null,
-      fillBlankAnswer: "",
     }));
     syncReviewSessionToStorage();
   },
@@ -322,14 +311,12 @@ export const useReviewStore = create<ReviewState>((set) => ({
         currentQuestion: question,
         currentQuestionMode: "normal" as const,
         selectedChoice: null,
-        fillBlankAnswer: "",
       };
     });
     syncReviewSessionToStorage();
   },
   setPickableTopics: (topics) => set({ pickableTopics: topics }),
   setSelectedChoice: (selectedChoice) => set({ selectedChoice }),
-  setFillBlankAnswer: (fillBlankAnswer) => set({ fillBlankAnswer }),
   setResult: (result) => set({ result }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),

@@ -6,7 +6,7 @@ from pydantic import Field, field_validator, model_validator
 from app.db.schemas.common import APIModel
 
 
-QuestionType = Literal["mcq", "true_false", "fill_blank"]
+QuestionType = Literal["mcq", "true_false"]
 QuestionGenerationJobStatus = Literal["queued", "running", "succeeded", "failed"]
 
 
@@ -45,8 +45,13 @@ class QuestionOutput(APIModel):
                 raise ValueError("mcq requires choices and answer_index")
             if not 0 <= self.answer_index < len(self.choices):
                 raise ValueError("answer_index is out of range")
-        if self.question_type == "fill_blank" and not self.answer_text:
-            raise ValueError("fill_blank requires answer_text")
+        elif self.question_type == "true_false":
+            if self.choices is None or self.answer_index is None:
+                raise ValueError("true_false requires choices and answer_index")
+            if not 0 <= self.answer_index < len(self.choices):
+                raise ValueError("answer_index is out of range")
+        else:
+            raise ValueError("unsupported question_type")
         return self
 
 

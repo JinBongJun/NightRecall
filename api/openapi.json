@@ -2045,8 +2045,7 @@
             "type": "string",
             "enum": [
               "mcq",
-              "true_false",
-              "fill_blank"
+              "true_false"
             ],
             "title": "Question Type"
           },

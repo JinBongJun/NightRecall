@@ -81,3 +81,49 @@ def test_submit_answer_accepts_valid_index(client) -> None:
 
     assert response.status_code == 200
     assert response.json()["is_correct"] is True
+
+
+def test_submit_answer_rejects_legacy_fill_blank(client) -> None:
+    test_client, db = client
+    db.add(
+        StudyInput(
+            id="si_legacy",
+            user_id="usr_test",
+            input_type="notes",
+            raw_content="Legacy fill blank note content for validation coverage.",
+        )
+    )
+    db.add(
+        StudyTopic(
+            id="tp_legacy",
+            study_input_id="si_legacy",
+            user_id="usr_test",
+            topic_text="Legacy topic",
+            is_starred=True,
+        )
+    )
+    db.add(
+        Question(
+            id="q_legacy_fill",
+            user_id="usr_test",
+            study_input_id="si_legacy",
+            study_topic_id="tp_legacy",
+            question_type="fill_blank",
+            question_text="Fill in the blank.",
+            choices_json=None,
+            answer_index=None,
+            answer_text="legacy",
+            explanation="Legacy format.",
+            source_hash="hash_legacy_fill",
+            created_at=datetime(2026, 4, 20, 12, 0, tzinfo=UTC),
+        )
+    )
+    db.commit()
+
+    response = test_client.post(
+        "/v1/review/answer",
+        json={"question_id": "q_legacy_fill", "selected_text": "legacy"},
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"] == INVALID_ANSWER_PAYLOAD

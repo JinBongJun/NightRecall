@@ -30,7 +30,7 @@ from app.db.schemas.study_inputs import TopicResponse
 from app.services.question_service import QuestionService
 from app.services.source_image_storage_service import SourceImageStorageService
 from app.services.streak_service import StreakService
-from app.domain.review_answer_validation import INVALID_ANSWER_PAYLOAD, INDEX_QUESTION_TYPES, TEXT_QUESTION_TYPES
+from app.domain.review_answer_validation import INVALID_ANSWER_PAYLOAD, SUPPORTED_QUESTION_TYPES
 from app.domain.review_attempts import RITUAL_MAIN_ATTEMPT
 from app.utils.ids import make_id
 from app.utils.time import local_date
@@ -369,20 +369,15 @@ class ReviewService:
 
     @staticmethod
     def _validate_answer_payload(question: Question, payload: AnswerSubmitRequest) -> None:
-        if question.question_type in INDEX_QUESTION_TYPES:
-            if payload.selected_index is None:
-                raise ValueError(INVALID_ANSWER_PAYLOAD)
-            choices = question.choices_json or []
-            if payload.selected_index < 0 or payload.selected_index >= len(choices):
-                raise ValueError(INVALID_ANSWER_PAYLOAD)
-            return
+        if question.question_type not in SUPPORTED_QUESTION_TYPES:
+            raise ValueError(INVALID_ANSWER_PAYLOAD)
 
-        if question.question_type in TEXT_QUESTION_TYPES:
-            if not payload.selected_text or not payload.selected_text.strip():
-                raise ValueError(INVALID_ANSWER_PAYLOAD)
-            return
+        if payload.selected_index is None:
+            raise ValueError(INVALID_ANSWER_PAYLOAD)
 
-        raise ValueError(INVALID_ANSWER_PAYLOAD)
+        choices = question.choices_json or []
+        if payload.selected_index < 0 or payload.selected_index >= len(choices):
+            raise ValueError(INVALID_ANSWER_PAYLOAD)
 
     @staticmethod
     def _evaluate_answer(

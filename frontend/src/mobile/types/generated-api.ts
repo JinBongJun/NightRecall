@@ -2297,8 +2297,7 @@ export enum QuestionGenerationJobResponseStatus {
 }
 export enum QuestionPublicQuestion_type {
     mcq = "mcq",
-    true_false = "true_false",
-    fill_blank = "fill_blank"
+    true_false = "true_false"
 }
 export enum ReviewQuestionResponseMode {
     auto = "auto",

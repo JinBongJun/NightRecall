@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
@@ -13,8 +13,9 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { submitAnswer } from "../services/reviewService";
 import { useReviewStore } from "../store/reviewStore";
 import { resolveAttemptKind } from "../utils/reviewAttemptKind";
+import { isChoiceQuestionType } from "../utils/questionType";
 import { useThemedStyles, type ThemedStyleContext } from "../theme/useThemedStyles";
-import { theme, useAppTheme } from "../theme";
+import { useAppTheme } from "../theme";
 import { navigateToCapture, navigateToHome } from "../navigation/navigationHelpers";
 import { playLightTapHaptic } from "../utils/feedback";
 import type { RootStackParamList } from "../navigation/types";
@@ -32,11 +33,12 @@ export function ReviewScreen({ navigation }: Props) {
   const missedQuestions = useReviewStore((state) => state.missedQuestions);
   const retryIndex = useReviewStore((state) => state.retryIndex);
   const selectedChoice = useReviewStore((state) => state.selectedChoice);
-  const fillBlankAnswer = useReviewStore((state) => state.fillBlankAnswer);
   const setSelectedChoice = useReviewStore((state) => state.setSelectedChoice);
-  const setFillBlankAnswer = useReviewStore((state) => state.setFillBlankAnswer);
   const setResult = useReviewStore((state) => state.setResult);
   const recordMissedQuestion = useReviewStore((state) => state.recordMissedQuestion);
+  const advanceSessionQuestion = useReviewStore((state) => state.advanceSessionQuestion);
+  const advanceRetryQuestion = useReviewStore((state) => state.advanceRetryQuestion);
+  const releaseActiveRecall = useReviewStore((state) => state.releaseActiveRecall);
   const startedAt = useRef(Date.now());
   const [submitting, setSubmitting] = useState(false);
   const inRetry = sessionPhase === "retry";
@@ -50,16 +52,29 @@ export function ReviewScreen({ navigation }: Props) {
     ? Math.max(0, totalMissed - currentNumber)
     : Math.max(0, totalQuestions - currentNumber);
   const isResurfaced = currentQuestion?.resurface_reason === "missed_before";
+  const isUnsupportedQuestion = Boolean(currentQuestion && !isChoiceQuestionType(currentQuestion.question_type));
 
   useEffect(() => {
     startedAt.current = Date.now();
   }, [currentQuestion?.id, sessionPhase, retryIndex, sessionIndex]);
 
   const canSubmit = useMemo(() => {
-    if (!currentQuestion) return false;
-    if (currentQuestion.question_type === "fill_blank") return fillBlankAnswer.trim().length > 0;
+    if (!currentQuestion || isUnsupportedQuestion) return false;
     return selectedChoice !== null;
-  }, [currentQuestion, fillBlankAnswer, selectedChoice]);
+  }, [currentQuestion, isUnsupportedQuestion, selectedChoice]);
+
+  const skipUnsupportedQuestion = () => {
+    if (inRetry) {
+      if (advanceRetryQuestion()) {
+        return;
+      }
+    } else if (advanceSessionQuestion()) {
+      return;
+    }
+
+    releaseActiveRecall();
+    navigateToHome(navigation);
+  };
 
   if (!currentQuestion) {
     return (
@@ -84,6 +99,23 @@ export function ReviewScreen({ navigation }: Props) {
     );
   }
 
+  if (isUnsupportedQuestion) {
+    return (
+      <ScreenContainer>
+        <TopBar leftIcon="arrow-back" onLeftPress={() => navigation.goBack()} />
+        <View style={{ flex: 1, justifyContent: "center", paddingBottom: 60 }}>
+          <EmptyState
+            iconName="history"
+            title="This question format is no longer supported"
+            body="NightRecall now uses multiple choice and true/false only. Skip this one to continue."
+            actionLabel="Skip question"
+            onAction={skipUnsupportedQuestion}
+          />
+        </View>
+      </ScreenContainer>
+    );
+  }
+
   const onSubmit = async () => {
     if (submitting) {
       return;
@@ -94,7 +126,7 @@ export function ReviewScreen({ navigation }: Props) {
       const result = await submitAnswer({
         question_id: currentQuestion.id,
         selected_index: selectedChoice,
-        selected_text: fillBlankAnswer || null,
+        selected_text: null,
         response_time_ms: Date.now() - startedAt.current,
         attempt_kind: resolveAttemptKind(reviewKind, sessionPhase),
       });
@@ -167,46 +199,24 @@ export function ReviewScreen({ navigation }: Props) {
       <View style={styles.questionCard}>
         <View style={styles.questionMeta}>
           <Text style={styles.questionMetaText}>
-            {inRetry
-              ? "Second try"
-              : isResurfaced
-                ? "One more look"
-              : currentQuestion.question_type === "fill_blank"
-                ? "Fill in the answer"
-                : "Choose the best answer"}
+            {inRetry ? "Second try" : isResurfaced ? "One more look" : "Choose the best answer"}
           </Text>
         </View>
         <Text style={styles.questionText}>{currentQuestion.question_text}</Text>
 
-        {currentQuestion.question_type === "fill_blank" ? (
-          <>
-            <TextInput
-              value={fillBlankAnswer}
-              onChangeText={setFillBlankAnswer}
-              style={styles.textArea}
-              multiline
-              placeholder="Type what you remember..."
-              placeholderTextColor={colors.mutedSoft}
+        <View style={styles.choices}>
+          {currentQuestion.choices?.map((choice, index) => (
+            <ChoiceButton
+              key={`${choice}-${index}`}
+              label={choice}
+              selected={selectedChoice === index}
+              onPress={() => {
+                void playLightTapHaptic();
+                setSelectedChoice(index);
+              }}
             />
-            <View style={styles.hintRow}>
-              <Text style={styles.hintText}>Use a short, direct answer.</Text>
-            </View>
-          </>
-        ) : (
-          <View style={styles.choices}>
-            {currentQuestion.choices?.map((choice, index) => (
-              <ChoiceButton
-                key={`${choice}-${index}`}
-                label={choice}
-                selected={selectedChoice === index}
-                onPress={() => {
-                  void playLightTapHaptic();
-                  setSelectedChoice(index);
-                }}
-              />
-            ))}
-          </View>
-        )}
+          ))}
+        </View>
       </View>
 
       <PrimaryButton
@@ -303,28 +313,6 @@ function createStyles({ colors, typography }: ThemedStyleContext) {
     fontSize: 18,
     lineHeight: 22,
     fontWeight: "800",
-  },
-  textArea: {
-    minHeight: 120,
-    paddingHorizontal: 0,
-    paddingTop: 6,
-    paddingBottom: 10,
-    fontSize: 15,
-    lineHeight: 24,
-    color: colors.text,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.surfaceHigh,
-    textAlignVertical: "top",
-  },
-  hintRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  hintText: {
-    color: colors.muted,
-    fontSize: 13,
-    lineHeight: 18,
-    opacity: 0.72,
   },
   choices: {
     gap: 10,
