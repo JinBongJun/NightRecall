@@ -737,6 +737,19 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HealthResponse */
+        HealthResponse: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: HealthResponseStatus;
+            /**
+             * Database
+             * @enum {string}
+             */
+            database: HealthResponseDatabase;
+        };
         /** LinkGoogleRequest */
         LinkGoogleRequest: {
             /** Id Token */
@@ -2272,7 +2285,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthResponse"];
                 };
             };
         };
@@ -2286,6 +2308,14 @@ export enum AnswerSubmitRequestAttempt_kind {
 export enum EntitlementsResponsePlan {
     free = "free",
     plus = "plus"
+}
+export enum HealthResponseStatus {
+    ok = "ok",
+    degraded = "degraded"
+}
+export enum HealthResponseDatabase {
+    ok = "ok",
+    unavailable = "unavailable"
 }
 export enum QuestionGenerationJobResponseStatus {
     queued = "queued",

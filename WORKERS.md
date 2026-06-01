@@ -26,7 +26,7 @@ Set these in the backend environment:
 
 - `JOB_INLINE_PROCESSING=false`
 - `JOB_WORKER_POLL_INTERVAL_SECONDS=2.0`
-- `SOURCE_IMAGE_STORAGE_PROVIDER=s3` or `r2`
+- `SOURCE_IMAGE_STORAGE_PROVIDER=s3` or `r2` (required on Railway/production; local disk is not durable)
 - `SOURCE_IMAGE_STORAGE_ENDPOINT_URL=https://...`
 - `SOURCE_IMAGE_STORAGE_BUCKET=...`
 - `SOURCE_IMAGE_STORAGE_REGION=auto` or the bucket region

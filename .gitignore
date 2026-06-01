@@ -25,6 +25,9 @@ backend/.env
 nightrecall.db
 backend/nightrecall.db
 
+# Local uploaded source images
+backend/storage/
+
 # Tool caches
 .tmp/
 backend/pytest-cache-files-*/

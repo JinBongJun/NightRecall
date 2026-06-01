@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "api:types": "openapi-typescript ../api/openapi.json -o src/mobile/types/generated-api.ts --enum",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --environment node --globals --pool threads --maxWorkers 1"
+    "test": "vitest run"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

@@ -1,8 +1,9 @@
 from functools import lru_cache
-import os
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.core.hosting import LOCAL_SOURCE_IMAGE_PROVIDERS, is_hosted_environment
 
 
 class Settings(BaseSettings):
@@ -61,20 +62,31 @@ class Settings(BaseSettings):
         guessable JWT secret.
         """
 
-        hosted_markers = (
-            "RAILWAY_ENVIRONMENT",
-            "RAILWAY_PROJECT_ID",
-            "RAILWAY_SERVICE_ID",
-            "RENDER",
-            "FLY_APP_NAME",
-            "DYNO",  # Heroku
-        )
-        is_hosted = any(os.getenv(key) for key in hosted_markers)
+        is_hosted = self.is_hosted
         uses_non_sqlite = not self.sqlalchemy_database_url.startswith("sqlite")
         is_non_dev = not self.is_development
 
         if self.jwt_secret_key == "change-me" and (is_hosted or uses_non_sqlite or is_non_dev):
             raise ValueError("JWT_SECRET_KEY must be set to a strong secret in production.")
+
+        if is_hosted or uses_non_sqlite or is_non_dev:
+            provider = (self.source_image_storage_provider or "local").strip().lower()
+            if provider in LOCAL_SOURCE_IMAGE_PROVIDERS:
+                raise ValueError(
+                    "SOURCE_IMAGE_STORAGE_PROVIDER must use object storage (for example s3/r2) in production."
+                )
+
+    @property
+    def is_hosted(self) -> bool:
+        return is_hosted_environment()
+
+    @property
+    def should_bootstrap_schema(self) -> bool:
+        return (
+            self.is_development
+            and self.sqlalchemy_database_url.startswith("sqlite")
+            and not self.is_hosted
+        )
 
     @property
     def is_development(self) -> bool:
@@ -105,15 +117,7 @@ class Settings(BaseSettings):
     def inline_job_processing_enabled(self) -> bool:
         if self.job_inline_processing is not None:
             return self.job_inline_processing
-        hosted_markers = (
-            "RAILWAY_ENVIRONMENT",
-            "RAILWAY_PROJECT_ID",
-            "RAILWAY_SERVICE_ID",
-            "RENDER",
-            "FLY_APP_NAME",
-            "DYNO",  # Heroku
-        )
-        if any(os.getenv(key) for key in hosted_markers):
+        if self.is_hosted:
             return False
         return self.is_development
 
