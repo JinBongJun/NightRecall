@@ -8,7 +8,8 @@ import {
 } from "../utils/reminderTimezone";
 
 const NIGHTLY_REMINDER_KEY = "nightly-reminder";
-const NIGHTLY_REMINDER_CHANNEL_ID = "nightly-reminders";
+const LEGACY_NIGHTLY_REMINDER_CHANNEL_ID = "nightly-reminders";
+const NIGHTLY_REMINDER_CHANNEL_ID = "nightly-reminders-high";
 const NIGHTLY_REMINDER_TITLE = "NightRecall";
 const NIGHTLY_REMINDER_BODY = "1 quick question before bed?";
 let nightlyReminderMutation: Promise<void> = Promise.resolve();
@@ -150,10 +151,15 @@ export async function openSystemNotificationSettings() {
 
 function isNightlyReminderRequest(request: Notifications.NotificationRequest) {
   const matchesTaggedReminder = request.content.data?.reminderKey === NIGHTLY_REMINDER_KEY;
+  const matchesChannelReminder =
+    request.trigger && "channelId" in request.trigger
+      ? request.trigger.channelId === NIGHTLY_REMINDER_CHANNEL_ID ||
+        request.trigger.channelId === LEGACY_NIGHTLY_REMINDER_CHANNEL_ID
+      : false;
   const matchesLegacyReminder =
     request.content.title === NIGHTLY_REMINDER_TITLE && request.content.body === NIGHTLY_REMINDER_BODY;
 
-  return matchesTaggedReminder || matchesLegacyReminder;
+  return matchesTaggedReminder || matchesChannelReminder || matchesLegacyReminder;
 }
 
 export async function cancelNightlyReminder() {
@@ -189,7 +195,7 @@ async function ensureAndroidNotificationChannel() {
 
   await Notifications.setNotificationChannelAsync(NIGHTLY_REMINDER_CHANNEL_ID, {
     name: "Nightly reminders",
-    importance: Notifications.AndroidImportance.DEFAULT,
+    importance: Notifications.AndroidImportance.HIGH,
     description: "Daily NightRecall reminder before bed.",
   });
 }
